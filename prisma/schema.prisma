@@ -1,0 +1,178 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model User {
+  id           String       @id @default(cuid())
+  email        String       @unique
+  passwordHash String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  memberships  Membership[]
+  sessions     Session[]
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Business {
+  id              String           @id @default(cuid())
+  name            String
+  slug            String           @unique
+  industry        String
+  customIndustryLabel String?
+  logoUrl         String?
+  description     String           @default("")
+  phone           String           @default("")
+  whatsapp        String           @default("")
+  email           String
+  website         String?
+  brandColor      String           @default("#2563eb")
+  googleReviewUrl String?
+  googleBusinessName String?
+  googleMapsUrl   String?
+  primaryAction   String?
+  published       Boolean          @default(false)
+  onboardingStep  Int              @default(2)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  memberships     Membership[]
+  modules         BusinessModule[]
+  quoteRequests   QuoteRequest[]
+  quoteRateLimits QuoteRateLimit[]
+  trustEvidence   TrustEvidence[]
+  analyticsEvents AnalyticsEvent[]
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  eventType  String
+  createdAt  DateTime @default(now())
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, createdAt])
+  @@index([businessId, eventType, createdAt])
+}
+
+model TrustEvidence {
+  id               String   @id
+  entryId          String
+  objectKey        String   @unique
+  originalFilename String
+  mediaType        String
+  sizeBytes        Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  businessId       String
+  business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, entryId])
+  @@index([businessId])
+}
+
+model Membership {
+  id         String   @id @default(cuid())
+  role       String   @default("OWNER")
+  createdAt  DateTime @default(now())
+  userId     String
+  businessId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, businessId])
+  @@index([businessId])
+}
+
+model BusinessModule {
+  id         String   @id @default(cuid())
+  type       String
+  enabled    Boolean  @default(true)
+  sortOrder  Int
+  config     String   @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, type])
+  @@index([businessId, sortOrder])
+}
+
+model QuoteRequest {
+  id             String         @id
+  submissionKey  String
+  configSnapshot String
+  answers        String
+  customerName   String?
+  customerPhone  String?
+  customerEmail  String?
+  createdAt      DateTime       @default(now())
+  businessId     String
+  business       Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  uploads        QuoteUpload[]
+  emailDelivery  EmailDelivery?
+
+  @@unique([businessId, submissionKey])
+  @@index([businessId, createdAt])
+}
+
+model QuoteUpload {
+  id               String       @id
+  objectKey        String       @unique
+  originalFilename String
+  mediaType        String
+  sizeBytes        Int
+  createdAt        DateTime     @default(now())
+  quoteRequestId   String
+  quoteRequest     QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+
+  @@index([quoteRequestId])
+}
+
+model EmailDelivery {
+  id                String       @id
+  destination       String
+  subject           String
+  bodyText          String
+  status            String       @default("PENDING")
+  attemptCount      Int          @default(0)
+  lastAttemptAt     DateTime?
+  nextAttemptAt     DateTime?
+  lastError         String?
+  providerMessageId String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  quoteRequestId    String       @unique
+  quoteRequest      QuoteRequest @relation(fields: [quoteRequestId], references: [id], onDelete: Cascade)
+
+  @@index([status, nextAttemptAt])
+}
+
+model QuoteRateLimit {
+  id          String   @id @default(cuid())
+  clientHash  String
+  windowStart DateTime
+  count       Int      @default(1)
+  updatedAt   DateTime @updatedAt
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, clientHash])
+  @@index([windowStart])
+}

@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.env
+.env.*
+!.env.example
+*.key
+prisma/*.db
+prisma/*.db-journal
+coverage/
+.local-data/
+.tmp-goal3/
+*.tsbuildinfo
+.codebase-memory/
+.neon
+.tmp-live/
