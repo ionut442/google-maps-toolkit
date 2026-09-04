@@ -82,7 +82,7 @@ const genericQuote = (specialty: string): QuoteModuleConfig => ({
 const base = (specialty: string, emergency = false): TemplateModule[] => [
   {
     type: "QUOTE_REQUEST",
-    enabled: true,
+    enabled: false,
     config: genericQuote(specialty),
   },
   {
@@ -97,7 +97,7 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
   },
   {
     type: "PRICING",
-    enabled: true,
+    enabled: false,
     config: {
       mode: "PRICE_LIST",
       label: "Typical pricing",
@@ -121,12 +121,12 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
   },
   {
     type: "SERVICE_AREA",
-    enabled: true,
+    enabled: false,
     config: { label: "Check our service area", areas: [], postalCodes: [] },
   },
   {
     type: "TRUST",
-    enabled: true,
+    enabled: false,
     config: {
       label: "Why customers trust us",
       entries: [
@@ -141,7 +141,7 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
   },
   {
     type: "FAQ",
-    enabled: true,
+    enabled: false,
     config: {
       label: "Common questions",
       suggestedFaqs: faq([
@@ -152,7 +152,7 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
   },
   {
     type: "REVIEW",
-    enabled: true,
+    enabled: false,
     config: { label: "Read or leave a Google review" },
   },
   {
@@ -190,7 +190,7 @@ export const templates = Object.fromEntries(
     if (industry === "PLUMBING") {
       modules[0] = {
         type: "QUOTE_REQUEST",
-        enabled: true,
+        enabled: false,
         config: {
           label: "Get a Plumbing Quote",
           intro: "Tell us what is happening and whether the job is urgent.",
@@ -267,7 +267,7 @@ export const templates = Object.fromEntries(
     if (industry === "HVAC") {
       modules[0] = {
         type: "QUOTE_REQUEST",
-        enabled: true,
+        enabled: false,
         config: {
           label: "Get an HVAC Quote",
           intro:
@@ -340,7 +340,7 @@ export const templates = Object.fromEntries(
     if (industry === "CLEANING") {
       modules[0] = {
         type: "QUOTE_REQUEST",
-        enabled: true,
+        enabled: false,
         config: {
           label: "Get a Cleaning Quote",
           intro: "Describe the space and preferred cleaning frequency.",
@@ -428,7 +428,7 @@ export const templates = Object.fromEntries(
     if (industry === "PRESSURE_WASHING") {
       modules[0] = {
         type: "QUOTE_REQUEST",
-        enabled: true,
+        enabled: false,
         config: {
           label: "Get a Pressure Washing Quote",
           intro:
@@ -508,7 +508,7 @@ export const templates = Object.fromEntries(
       {
         industry,
         name: specialty,
-        defaultPrimaryAction: "QUOTE_REQUEST",
+        defaultPrimaryAction: "CALL",
         modules,
       },
     ];

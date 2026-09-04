@@ -22,8 +22,12 @@ describe("industry templates", () => {
   });
   it("provides strong plumbing defaults", () => {
     const template = getTemplate("PLUMBING");
-    expect(template.defaultPrimaryAction).toBe("QUOTE_REQUEST");
-    expect(template.modules.every((m) => m.enabled)).toBe(true);
+    expect(template.defaultPrimaryAction).toBe("CALL");
+    expect(
+      template.modules
+        .filter((module) => module.enabled)
+        .map(({ type }) => type),
+    ).toEqual(["CALL_WHATSAPP", "SAVE_CONTACT"]);
     expect(JSON.stringify(template)).toContain("Emergency call");
   });
   it("uses industry-specific cleaning quote fields", () =>

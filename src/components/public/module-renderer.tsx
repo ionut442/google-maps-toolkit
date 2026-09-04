@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import {
   BadgeDollarSign,
+  ChevronDown,
   ContactRound,
   ExternalLink,
   MapPinned,
@@ -10,11 +11,12 @@ import {
   Star,
 } from "lucide-react";
 import { AreaMap } from "@/components/area-map";
+import { ToolIcon } from "@/components/dashboard-ui";
 import { TrackedLink } from "@/components/public/analytics-client";
 import { PostcodeChecker } from "@/components/public/postcode-checker";
 import { PricingEstimator } from "@/components/public/pricing-estimator";
 import { QuoteRequestForm } from "@/components/public/quote-request-form";
-import type { ModuleType } from "@/lib/domain";
+import { labels, type ModuleType } from "@/lib/domain";
 import type { PublicAction } from "@/lib/public-actions";
 import {
   createTelHref,
@@ -24,6 +26,7 @@ import {
 import type { PublicBusiness, PublicModule } from "@/lib/public-business";
 import { formatMoney, type PricingConfig } from "@/lib/pricing";
 import { trustEntryState } from "@/lib/trust";
+import { toolDescriptions } from "@/lib/tool-presentation";
 
 type RendererContext = {
   business: PublicBusiness;
@@ -43,11 +46,9 @@ function externalProps(external = false) {
 function ContactPresentation({
   business,
   module,
-  primary,
 }: {
   business: PublicBusiness;
   module: Extract<PublicModule, { type: "CALL_WHATSAPP" }>;
-  primary: PublicAction | null;
 }) {
   const callHref = createTelHref(business.phone);
   const whatsappHref = createWhatsAppUrl(
@@ -73,7 +74,7 @@ function ContactPresentation({
           icon: MessageCircle,
         }
       : null,
-  ].filter((action) => action && action.type !== primary?.type);
+  ].filter(Boolean);
   if (!actions.length) return null;
   return (
     <section
@@ -294,13 +295,9 @@ function TrustPresentation({
 export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
   CALL_WHATSAPP: {
     analyticsEvent: "contact_action_selected",
-    render: ({ business, module, primary }) =>
+    render: ({ business, module }) =>
       module.type === "CALL_WHATSAPP" ? (
-        <ContactPresentation
-          business={business}
-          module={module}
-          primary={primary}
-        />
+        <ContactPresentation business={business} module={module} />
       ) : null,
   },
   QUOTE_REQUEST: {
@@ -440,17 +437,39 @@ export function PublicModuleRenderer({
 }) {
   return (
     <div className="action-modules">
-      {business.modules.map((module) => (
-        <div key={module.type} data-module={module.type.toLowerCase()}>
-          {publicModuleRegistry[module.type].render({
-            business,
-            module,
-            primary,
-            pricingContext,
-            pricingSummary,
-          })}
-        </div>
-      ))}
+      {business.modules.map((module) => {
+        const content = publicModuleRegistry[module.type].render({
+          business,
+          module,
+          primary,
+          pricingContext,
+          pricingSummary,
+        });
+        if (content === null || content === undefined) return null;
+        return (
+          <details
+            className="public-tool-card"
+            key={module.type}
+            data-module={module.type.toLowerCase()}
+          >
+            <summary>
+              <span className="public-tool-summary">
+                <ToolIcon type={module.type} />
+                <span>
+                  <strong>{labels[module.type]}</strong>
+                  <small>{toolDescriptions[module.type]}</small>
+                </span>
+              </span>
+              <ChevronDown
+                className="public-tool-chevron"
+                size={21}
+                aria-hidden="true"
+              />
+            </summary>
+            <div className="public-tool-panel">{content}</div>
+          </details>
+        );
+      })}
     </div>
   );
 }

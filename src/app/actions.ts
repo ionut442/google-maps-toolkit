@@ -46,6 +46,11 @@ import {
   saveOwnedTrustConfig,
 } from "@/lib/module-config-service";
 import { removeTrustEvidence, uploadTrustEvidence } from "@/lib/trust-evidence";
+import {
+  removeStoredBusinessLogo,
+  stageBusinessLogo,
+} from "@/lib/business-logo";
+import { privateStorage } from "@/lib/storage";
 
 export type FormState = {
   error?: string;
@@ -152,18 +157,61 @@ export async function saveProfileAction(
 ): Promise<FormState> {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
-  const parsed = profileSchema.safeParse(values(formData));
+  const logoFile = formData.get("logoFile");
+  const hasLogoUpload = logoFile instanceof File && logoFile.size > 0;
+  const submitted = values(formData);
+  if (hasLogoUpload) submitted.logoUrl = "";
+  const parsed = profileSchema.safeParse(submitted);
   if (!parsed.success) return invalid(parsed.error);
-  await db.business.update({
-    where: { id: business.id },
-    data: {
-      ...parsed.data,
-      googleReviewUrl: parsed.data.googleReviewUrl ?? parsed.data.googleMapsUrl,
-      phone: normalizePhone(parsed.data.phone),
-      whatsapp: normalizePhone(parsed.data.whatsapp),
-      onboardingStep: Math.max(business.onboardingStep, 4),
-    },
-  });
+  let stagedLogo: Awaited<ReturnType<typeof stageBusinessLogo>> | null = null;
+  if (hasLogoUpload) {
+    try {
+      stagedLogo = await stageBusinessLogo(
+        business.id,
+        business.slug,
+        logoFile,
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Logo upload failed.";
+      return { error: message, fields: { logoFile: [message] } };
+    }
+  }
+  const nextLogoUrl = stagedLogo?.url ?? parsed.data.logoUrl;
+  try {
+    await db.business.update({
+      where: { id: business.id },
+      data: {
+        ...parsed.data,
+        logoUrl: nextLogoUrl,
+        googleReviewUrl:
+          parsed.data.googleReviewUrl ?? parsed.data.googleMapsUrl,
+        phone: normalizePhone(parsed.data.phone),
+        whatsapp: normalizePhone(parsed.data.whatsapp),
+        onboardingStep: Math.max(business.onboardingStep, 4),
+      },
+    });
+  } catch (error) {
+    if (stagedLogo?.created) {
+      try {
+        await privateStorage.delete(stagedLogo.objectKey);
+      } catch {
+        // Preserve the database failure while leaving cleanup retryable.
+      }
+    }
+    throw error;
+  }
+  if (business.logoUrl && business.logoUrl !== nextLogoUrl) {
+    try {
+      await removeStoredBusinessLogo(
+        business.id,
+        business.slug,
+        business.logoUrl,
+      );
+    } catch {
+      // The new profile is already durable; an orphaned old logo is harmless.
+    }
+  }
   revalidatePath("/dashboard");
   if (String(formData.get("intent")) === "onboarding")
     redirect("/onboarding/tools");
@@ -243,7 +291,7 @@ export async function updateModuleLabelAction(formData: FormData) {
   const validated = parseModuleConfig(item.type as ModuleType, config);
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(validated) },
+    data: { config: JSON.stringify(validated), enabled: true },
   });
   revalidatePath("/dashboard");
   revalidatePath("/onboarding/tools");
@@ -269,7 +317,7 @@ export async function updateContactActionConfigAction(formData: FormData) {
   });
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(config) },
+    data: { config: JSON.stringify(config), enabled: true },
   });
   revalidatePath("/dashboard");
   revalidatePath(`/${business.slug}`);

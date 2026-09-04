@@ -4,7 +4,7 @@ import { AuthForm } from "@/components/auth-form";
 
 export default function SignupPage() {
   return (
-    <main className="centered">
+    <main className="auth-page">
       <div>
         <span className="eyebrow">Step 1 of 6</span>
         <h1>Create your account</h1>

@@ -50,7 +50,10 @@ export function ToolList({
                 enabled={tool.enabled}
               />
               {!onboarding && (
-                <Link href={toolEditorHref(tool.id)}>
+                <Link
+                  className="button secondary tool-edit-button"
+                  href={toolEditorHref(tool.id)}
+                >
                   Edit <ArrowRight size={16} />
                 </Link>
               )}

@@ -6,10 +6,7 @@ import { accessibleBrandColor } from "@/lib/brand";
 import { resolvePublicPrimaryAction, safeHttpUrl } from "@/lib/public-actions";
 import { getPublicBusiness, type PublicBusiness } from "@/lib/public-business";
 import { calculateEstimate, formatMoney } from "@/lib/pricing";
-import {
-  AnalyticsPageView,
-  TrackedLink,
-} from "@/components/public/analytics-client";
+import { AnalyticsPageView } from "@/components/public/analytics-client";
 import { applicationBaseUrl } from "@/lib/environment";
 import Link from "next/link";
 import { businessTypeLabel } from "@/lib/domain";
@@ -138,6 +135,9 @@ export default async function PublicActionPage({
       <AnalyticsPageView slug={business.slug} />
       <div className="action-page-shell">
         <header className="action-identity">
+          <p className="action-kicker">
+            {businessTypeLabel(business.industry, business.customIndustryLabel)}
+          </p>
           {logoUrl ? (
             // Owner-provided absolute URLs cannot use next/image without an unsafe wildcard host.
             // eslint-disable-next-line @next/next/no-img-element
@@ -154,48 +154,11 @@ export default async function PublicActionPage({
               {business.name.charAt(0).toUpperCase()}
             </div>
           )}
-          <div>
-            <p className="action-kicker">
-              {businessTypeLabel(
-                business.industry,
-                business.customIndustryLabel,
-              )}
-            </p>
-            <h1>{business.name}</h1>
-            {business.description && (
-              <p className="action-description">{business.description}</p>
-            )}
-          </div>
+          <h1>{business.name}</h1>
+          {business.description && (
+            <p className="action-description">{business.description}</p>
+          )}
         </header>
-
-        {primary ? (
-          <TrackedLink
-            className="primary-public-action"
-            href={primary.href}
-            slug={business.slug}
-            eventType={
-              primary.type === "CALL"
-                ? "CALL_CLICK"
-                : primary.type === "WHATSAPP"
-                  ? "WHATSAPP_CLICK"
-                  : primary.type === "REVIEW"
-                    ? "REVIEW_CLICK"
-                    : undefined
-            }
-            {...(primary.external
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
-          >
-            {primary.label}
-            {primary.external && (
-              <span className="sr-only"> (opens in a new tab)</span>
-            )}
-          </TrackedLink>
-        ) : (
-          <p className="action-unavailable">
-            Contact details are being updated. Please check back soon.
-          </p>
-        )}
 
         <PublicModuleRenderer
           business={business}

@@ -11,11 +11,15 @@ function hasOnlyPhoneCharacters(value: string) {
   return /^[+()\d.\-\s]+$/.test(value);
 }
 
+function trimPhoneInput(value: string) {
+  return value.trim().replace(/^=+\s*/, "");
+}
+
 export function normalizeDialablePhone(
   value: string | null | undefined,
 ): string | null {
   if (!value) return null;
-  const trimmed = value.trim();
+  const trimmed = trimPhoneInput(value);
   if (!hasOnlyPhoneCharacters(trimmed)) return null;
   const digits = digitsOnly(trimmed);
   if (digits.length < PHONE_MIN_DIGITS || digits.length > PHONE_MAX_DIGITS)
@@ -35,13 +39,10 @@ export function normalizeWhatsAppNumber(
   value: string | null | undefined,
 ): string | null {
   if (!value) return null;
-  const trimmed = value.trim();
+  const trimmed = trimPhoneInput(value);
   if (!hasOnlyPhoneCharacters(trimmed)) return null;
   let digits = digitsOnly(trimmed);
   if (trimmed.startsWith("00")) digits = digits.slice(2);
-  const hasInternationalPrefix =
-    trimmed.startsWith("+") || trimmed.startsWith("00");
-  if (!hasInternationalPrefix && digits.startsWith("0")) return null;
   if (digits.length < PHONE_MIN_DIGITS || digits.length > PHONE_MAX_DIGITS)
     return null;
   return digits;

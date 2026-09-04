@@ -225,6 +225,9 @@ describe("database ownership and toolkit integration", () => {
         loaded.modules.find((item) => item.type === "SERVICE_AREA")!.config,
       ),
     ).toEqual(area);
+    expect(
+      loaded.modules.find((item) => item.type === "SERVICE_AREA")!.enabled,
+    ).toBe(true);
   });
   it("creates a business, applies template, and enforces ownership", async () => {
     const owner = await client.user.create({
@@ -242,7 +245,10 @@ describe("database ownership and toolkit integration", () => {
     await applyTemplate(business.id, "PLUMBING", client);
     const owned = await requireOwnedBusiness(owner.id, business.id, client);
     expect(owned.modules).toHaveLength(8);
-    expect(owned.primaryAction).toBe("QUOTE_REQUEST");
+    expect(owned.primaryAction).toBe("CALL");
+    expect(
+      owned.modules.filter((module) => module.enabled).map(({ type }) => type),
+    ).toEqual(["CALL_WHATSAPP", "SAVE_CONTACT"]);
     await expect(
       findOwnedBusiness(stranger.id, business.id, client),
     ).resolves.toBeNull();

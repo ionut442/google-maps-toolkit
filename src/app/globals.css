@@ -767,9 +767,8 @@ body:has(.public-action-page) > .site-header {
 }
 .customer-preview-page .action-logo,
 .customer-preview-page .action-monogram {
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
+  width: min(88px, 100%);
+  height: 76px;
 }
 .customer-preview-page .action-identity h1 {
   font-size: clamp(1.35rem, 4vw, 1.8rem);
@@ -903,26 +902,32 @@ body:has(.public-action-page) > .site-header {
   padding-top: 1rem;
 }
 .tool-switch {
-  min-width: 76px;
-  min-height: 44px;
+  min-width: 58px;
+  min-height: 32px;
   justify-content: flex-start;
   border: 0;
   border-radius: 999px;
   background: #e8e8e5;
   color: var(--secondary-ink);
-  padding: 0.25rem 0.58rem;
-  font-size: 0.78rem;
+  padding: 0.2rem 0.42rem;
+  font-size: 0.72rem;
 }
 .tool-switch:hover {
   border: 0;
   background: #ddddda;
 }
 .tool-switch > span {
-  width: 23px;
-  height: 23px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 1px 3px rgb(0 0 0 / 15%);
+}
+.tool-card-actions .tool-edit-button {
+  min-height: 38px;
+  border-color: var(--primary);
+  color: var(--primary);
+  padding: 0.5rem 0.8rem;
 }
 .tool-switch.is-on {
   justify-content: flex-end;
@@ -2090,18 +2095,18 @@ dd {
   margin: auto;
 }
 .action-identity {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
+  display: grid;
+  justify-items: start;
+  gap: 0.65rem;
   border-bottom: 1px solid var(--border);
   padding: 1.5rem 0 2rem;
 }
 .action-logo,
 .action-monogram {
-  width: 74px;
-  height: 74px;
+  width: min(100px, 100%);
+  height: 88px;
   flex: 0 0 auto;
-  border-radius: 18px;
+  border-radius: 14px;
   object-fit: cover;
 }
 .action-monogram {
@@ -2113,7 +2118,7 @@ dd {
   font-weight: 750;
 }
 .action-identity h1 {
-  margin: 0.25rem 0;
+  margin: 0;
   font-size: clamp(1.8rem, 6vw, 2.5rem);
 }
 .action-description {
@@ -2137,13 +2142,18 @@ dd {
   display: grid;
   gap: 1rem;
 }
-.public-tool-card,
 .action-module,
 .compact-module {
   border: 1px solid var(--border);
   border-radius: 15px;
   background: #fff;
   padding: 1.15rem;
+}
+.public-tool-card {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: #fff;
 }
 .public-tool-card > summary,
 .action-module > summary {
@@ -2152,6 +2162,44 @@ dd {
   justify-content: space-between;
   gap: 1rem;
   cursor: pointer;
+}
+.public-tool-card > summary {
+  padding: 1rem 1.1rem;
+  list-style: none;
+}
+.public-tool-card > summary::-webkit-details-marker {
+  display: none;
+}
+.public-tool-summary {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.85rem;
+}
+.public-tool-summary > span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+.public-tool-summary strong {
+  font-size: 1rem;
+}
+.public-tool-summary small {
+  color: var(--muted);
+}
+.public-tool-chevron {
+  flex: 0 0 auto;
+  color: var(--muted);
+  transition: transform 0.16s ease;
+}
+.public-tool-card[open] .public-tool-chevron {
+  transform: rotate(180deg);
+}
+.public-tool-panel {
+  border-top: 1px solid var(--soft-border);
+}
+.public-tool-panel > .action-module {
+  border: 0;
+  border-radius: 0;
 }
 .public-tool-card h2,
 .action-module h2 {
@@ -2651,12 +2699,12 @@ dd {
     grid-template-columns: 1fr;
   }
   .action-identity {
-    align-items: flex-start;
+    justify-items: start;
   }
   .action-logo,
   .action-monogram {
-    width: 58px;
-    height: 58px;
+    width: min(88px, 100%);
+    height: 76px;
     border-radius: 14px;
   }
   .action-button-grid,

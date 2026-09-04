@@ -159,8 +159,20 @@ export function ProfileForm({
               <small className="error">{error("website")}</small>
             )}
           </label>
+          <label className="logo-upload-field">
+            Upload logo <span className="optional">Optional</span>
+            <input
+              name="logoFile"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+            />
+            <small>JPG, PNG or WebP. Maximum 1 MB.</small>
+            {error("logoFile") && (
+              <small className="error">{error("logoFile")}</small>
+            )}
+          </label>
           <label>
-            Logo URL <span className="optional">Optional</span>
+            Or use a logo URL <span className="optional">Optional</span>
             <input
               name="logoUrl"
               type="url"

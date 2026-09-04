@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import { ExternalLink } from "lucide-react";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
 import { accessibleBrandColor } from "@/lib/brand";
 import {
@@ -118,6 +117,12 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
       <div className="customer-preview-viewport">
         <div className="customer-preview-page" inert>
           <header className="action-identity">
+            <p className="action-kicker">
+              {businessTypeLabel(
+                safeBusiness.industry,
+                safeBusiness.customIndustryLabel,
+              )}
+            </p>
             {logoUrl ? (
               // Owner-provided absolute URLs cannot use next/image safely.
               // eslint-disable-next-line @next/next/no-img-element
@@ -134,32 +139,12 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
                 {safeBusiness.name.charAt(0).toUpperCase()}
               </div>
             )}
-            <div>
-              <p className="action-kicker">
-                {businessTypeLabel(
-                  safeBusiness.industry,
-                  safeBusiness.customIndustryLabel,
-                )}
-              </p>
-              <h1>{safeBusiness.name}</h1>
-              <p className="action-description">
-                {safeBusiness.description ||
-                  "Your business description appears here."}
-              </p>
-            </div>
-          </header>
-          {primary ? (
-            <span className="primary-public-action">
-              {primary.label}
-              {primary.external && (
-                <ExternalLink size={17} aria-hidden="true" />
-              )}
-            </span>
-          ) : (
-            <p className="preview-empty-action">
-              Choose a main action to show it here.
+            <h1>{safeBusiness.name}</h1>
+            <p className="action-description">
+              {safeBusiness.description ||
+                "Your business description appears here."}
             </p>
-          )}
+          </header>
           <PublicModuleRenderer business={safeBusiness} primary={primary} />
         </div>
       </div>

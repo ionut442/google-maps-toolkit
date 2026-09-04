@@ -43,7 +43,7 @@ async function mutate(
   const next = quoteModuleConfigSchema.parse(update(structuredClone(config)));
   await client.businessModule.update({
     where: { id: quoteModule.id },
-    data: { config: JSON.stringify(next) },
+    data: { config: JSON.stringify(next), enabled: true },
   });
   return business.slug;
 }

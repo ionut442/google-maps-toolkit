@@ -11,7 +11,9 @@ export type ValidatedUpload = {
   sizeBytes: number;
 };
 
-function detectedPhotoType(bytes: Uint8Array): SupportedPhotoType | null {
+export function detectedPhotoType(
+  bytes: Uint8Array,
+): SupportedPhotoType | null {
   if (
     bytes.length >= 3 &&
     bytes[0] === 0xff &&

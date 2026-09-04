@@ -41,7 +41,7 @@ async function saveFaqs(
   const validated = parseModuleConfig("FAQ", { ...config, suggestedFaqs });
   await client.businessModule.update({
     where: { id: faqModule.id },
-    data: { config: JSON.stringify(validated) },
+    data: { config: JSON.stringify(validated), enabled: true },
   });
   return business.slug;
 }

@@ -13,6 +13,7 @@ describe("public customer action URLs", () => {
     expect(normalizeDialablePhone("+40 (700) 111-222")).toBe("+40700111222");
     expect(normalizeDialablePhone("0040 700 111 222")).toBe("+40700111222");
     expect(createTelHref("40700-111-222")).toBe("tel:40700111222");
+    expect(createTelHref("=40700-111-222")).toBe("tel:40700111222");
   });
 
   it("rejects missing and impossible phone lengths", () => {
@@ -24,7 +25,8 @@ describe("public customer action URLs", () => {
   it("builds WhatsApp numbers without formatting or a plus sign", () => {
     expect(normalizeWhatsAppNumber("+40 (700) 111-222")).toBe("40700111222");
     expect(normalizeWhatsAppNumber("0040 700 111 222")).toBe("40700111222");
-    expect(normalizeWhatsAppNumber("0700111222")).toBeNull();
+    expect(normalizeWhatsAppNumber("=40700111222")).toBe("40700111222");
+    expect(normalizeWhatsAppNumber("0700111222")).toBe("0700111222");
   });
 
   it("safely encodes an optional WhatsApp message", () => {

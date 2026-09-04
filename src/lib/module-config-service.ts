@@ -19,7 +19,7 @@ export async function saveOwnedModuleConfig<T extends ModuleType>(
   const config = parseModuleConfig(type, input);
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(config) },
+    data: { config: JSON.stringify(config), enabled: true },
   });
   return { slug: business.slug, config: config as ModuleConfigByType[T] };
 }
@@ -45,7 +45,7 @@ export async function saveOwnedTrustConfig(
   await db.$transaction([
     db.businessModule.update({
       where: { id: item.id },
-      data: { config: JSON.stringify(config) },
+      data: { config: JSON.stringify(config), enabled: true },
     }),
     ...(removed.length
       ? [
