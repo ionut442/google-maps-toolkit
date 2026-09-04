@@ -99,6 +99,25 @@ export const normalizePostalCode = (value: string) =>
     .replace(/[\s-]+/g, "");
 export const postalCodeIsValid = (value: string) =>
   /^[\p{L}\p{N}]+(?:[ -][\p{L}\p{N}]+)*$/u.test(value.trim());
+
+export function parsePostalCodeBatch(value: string) {
+  const valid: string[] = [];
+  const invalid: string[] = [];
+  const seen = new Set<string>();
+  value
+    .split(/[\r\n,]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .forEach((item) => {
+      const normalized = normalizePostalCode(item);
+      if (!postalCodeIsValid(item)) invalid.push(item);
+      else if (!seen.has(normalized)) {
+        seen.add(normalized);
+        valid.push(item.toUpperCase());
+      }
+    });
+  return { valid, invalid };
+}
 export function postcodeIsServed(config: ServiceAreaConfig, value: string) {
   const normalized = normalizePostalCode(value);
   return Boolean(

@@ -532,6 +532,7 @@ export async function setPublishedAction(formData: FormData) {
     data: { published: publish, onboardingStep: 7 },
   });
   revalidatePath("/dashboard");
+  revalidatePath("/onboarding/publish");
   revalidatePath(`/${business.slug}`);
   if (String(formData.get("intent")) === "onboarding") redirect("/dashboard");
 }

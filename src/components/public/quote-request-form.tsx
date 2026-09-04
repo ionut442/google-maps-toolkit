@@ -23,7 +23,7 @@ function FieldLabel({ field }: { field: QuoteField }) {
   );
 }
 
-function QuoteFieldControl({
+export function QuoteFieldControl({
   field,
   error,
   onFiles,

@@ -89,7 +89,9 @@ describe("Goal 4 public rendering", () => {
     });
     expect(html).not.toContain("Old licence");
     expect(html).toContain("Current insurance");
-    expect(html).toContain("Information provided by business");
+    expect(html).toContain("Information provided by this business");
+    expect(html).toContain("lucide-shield-check");
+    expect(html).not.toContain("public-tool-card");
     expect(html).not.toContain("Verified by Platform");
   });
 });

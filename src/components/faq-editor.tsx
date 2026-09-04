@@ -5,6 +5,7 @@ import {
   updateFaqAction,
 } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { ArrowUp, ArrowDown, Pencil, Plus, CircleHelp } from "lucide-react";
 import { MAX_FAQS, type ModuleConfigByType } from "@/lib/domain";
 
 export function FaqEditor({
@@ -15,13 +16,12 @@ export function FaqEditor({
   config: ModuleConfigByType["FAQ"];
 }) {
   return (
-    <details className="purpose-editor">
-      <summary>Configure questions</summary>
+    <div className="tool-editor-layout">
       <div className="editor-sheet stack-form">
         <header>
           <div>
             <span className="eyebrow">FAQ</span>
-            <h3>Answer common questions</h3>
+            <h3>Questions customers often ask</h3>
             <p>
               Add questions one at a time. Customers open only the answers they
               need.
@@ -30,7 +30,8 @@ export function FaqEditor({
         </header>
         {config.suggestedFaqs.length === 0 && (
           <div className="empty-state">
-            <strong>No FAQs yet</strong>
+            <CircleHelp size={24} aria-hidden="true" />
+            <strong>No questions yet</strong>
             <span>Add the first question customers often ask.</span>
           </div>
         )}
@@ -45,7 +46,9 @@ export function FaqEditor({
                     {faq.answer.length > 84 ? "…" : ""}
                   </small>
                 </span>
-                <span>Edit →</span>
+                <span className="edit-affordance">
+                  <Pencil size={15} aria-hidden="true" /> Edit
+                </span>
               </summary>
               <div className="focused-form">
                 <form action={updateFaqAction} className="stack-form">
@@ -86,7 +89,7 @@ export function FaqEditor({
                       aria-label={`Move ${faq.question} up`}
                       pendingLabel="…"
                     >
-                      ↑
+                      <ArrowUp size={18} aria-hidden="true" />
                     </SubmitButton>
                     <SubmitButton
                       className="icon secondary"
@@ -96,7 +99,7 @@ export function FaqEditor({
                       aria-label={`Move ${faq.question} down`}
                       pendingLabel="…"
                     >
-                      ↓
+                      <ArrowDown size={18} aria-hidden="true" />
                     </SubmitButton>
                   </form>
                   <form action={deleteFaqAction}>
@@ -116,7 +119,9 @@ export function FaqEditor({
         </div>
         {config.suggestedFaqs.length < MAX_FAQS && (
           <details className="add-object">
-            <summary>+ Add question</summary>
+            <summary>
+              <Plus size={18} aria-hidden="true" /> Add question
+            </summary>
             <form action={addFaqAction} className="focused-form stack-form">
               <input type="hidden" name="businessId" value={businessId} />
               <label>
@@ -135,6 +140,24 @@ export function FaqEditor({
           {config.suggestedFaqs.length} of {MAX_FAQS} questions
         </small>
       </div>
-    </details>
+      <aside className="tool-editor-aside">
+        <section className="tool-customer-preview faq-customer-preview">
+          <small>What customers see</small>
+          <h2>Questions customers often ask</h2>
+          {config.suggestedFaqs.length === 0 ? (
+            <p>Your questions and answers will appear here.</p>
+          ) : (
+            <div className="public-faq-list">
+              {config.suggestedFaqs.map((faq, index) => (
+                <details key={`${index}-${faq.question}`}>
+                  <summary>{faq.question}</summary>
+                  <p>{faq.answer}</p>
+                </details>
+              ))}
+            </div>
+          )}
+        </section>
+      </aside>
+    </div>
   );
 }

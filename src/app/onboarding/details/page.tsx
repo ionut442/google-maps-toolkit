@@ -8,8 +8,8 @@ export default async function DetailsPage() {
   return (
     <StepShell
       step={3}
-      title="Tell customers who you are"
-      intro="Enter shared details once. Every tool can reuse them."
+      title="Add your business details"
+      intro="Enter the essentials once. Your customer tools will reuse them automatically."
     >
       <ProfileForm business={business} onboarding />
     </StepShell>

@@ -11,7 +11,7 @@ export default async function IndustryPage() {
     <StepShell
       step={2}
       title="What type of business do you run?"
-      intro="We’ll create a useful starting toolkit for you."
+      intro="We’ll recommend a useful starting set of customer tools."
     >
       <BusinessTypeChooser
         current={business.industry}

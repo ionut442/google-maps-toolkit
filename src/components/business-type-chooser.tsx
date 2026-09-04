@@ -53,7 +53,7 @@ export function BusinessTypeChooser({
           <small>Use the name your customers would recognize.</small>
         </label>
       )}
-      <button className="sticky-submit">Use this toolkit</button>
+      <button className="sticky-submit">Continue</button>
     </form>
   );
 }

@@ -1,4 +1,19 @@
 import type { ReactNode } from "react";
+import {
+  BadgeDollarSign,
+  ContactRound,
+  ExternalLink,
+  MapPinned,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
+import { AreaMap } from "@/components/area-map";
+import { TrackedLink } from "@/components/public/analytics-client";
+import { PostcodeChecker } from "@/components/public/postcode-checker";
+import { PricingEstimator } from "@/components/public/pricing-estimator";
+import { QuoteRequestForm } from "@/components/public/quote-request-form";
 import type { ModuleType } from "@/lib/domain";
 import type { PublicAction } from "@/lib/public-actions";
 import {
@@ -7,13 +22,8 @@ import {
   safeHttpUrl,
 } from "@/lib/public-actions";
 import type { PublicBusiness, PublicModule } from "@/lib/public-business";
-import { QuoteRequestForm } from "@/components/public/quote-request-form";
-import { PricingEstimator } from "@/components/public/pricing-estimator";
-import { PostcodeChecker } from "@/components/public/postcode-checker";
-import { formatMoney } from "@/lib/pricing";
+import { formatMoney, type PricingConfig } from "@/lib/pricing";
 import { trustEntryState } from "@/lib/trust";
-import { TrackedLink } from "@/components/public/analytics-client";
-import { AreaMap } from "@/components/area-map";
 
 type RendererContext = {
   business: PublicBusiness;
@@ -22,58 +32,63 @@ type RendererContext = {
   pricingContext?: { addOnIds: string[]; quantity?: number };
   pricingSummary?: string;
 };
-
 type RegistryEntry = {
   analyticsEvent: string;
   render: (context: RendererContext) => ReactNode;
 };
-
 function externalProps(external = false) {
   return external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 }
 
-export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
-  CALL_WHATSAPP: {
-    analyticsEvent: "contact_action_selected",
-    render: ({ business, module, primary }) => {
-      if (module.type !== "CALL_WHATSAPP") return null;
-      const callHref = createTelHref(business.phone);
-      const whatsappHref = createWhatsAppUrl(
-        business.whatsapp,
-        module.config.whatsappMessage,
-      );
-      const actions = [
-        callHref && {
-          type: "CALL",
+function ContactPresentation({
+  business,
+  module,
+  primary,
+}: {
+  business: PublicBusiness;
+  module: Extract<PublicModule, { type: "CALL_WHATSAPP" }>;
+  primary: PublicAction | null;
+}) {
+  const callHref = createTelHref(business.phone);
+  const whatsappHref = createWhatsAppUrl(
+    business.whatsapp,
+    module.config.whatsappMessage,
+  );
+  const actions = [
+    callHref
+      ? {
+          type: "CALL" as const,
           label: module.config.callLabel,
           href: callHref,
           external: false,
-        },
-        whatsappHref && {
-          type: "WHATSAPP",
+          icon: Phone,
+        }
+      : null,
+    whatsappHref
+      ? {
+          type: "WHATSAPP" as const,
           label: module.config.whatsappLabel,
           href: whatsappHref,
           external: true,
-        },
-      ].filter(Boolean) as Array<{
-        type: string;
-        label: string;
-        href: string;
-        external: boolean;
-      }>;
-      if (!actions.length) return null;
-      return (
-        <section className="action-module" aria-labelledby="contact-heading">
-          <p className="action-kicker">Get in touch</p>
-          <h2 id="contact-heading">Talk to {business.name}</h2>
-          <div className="action-button-grid">
-            {actions.map((action) => (
+          icon: MessageCircle,
+        }
+      : null,
+  ].filter((action) => action && action.type !== primary?.type);
+  if (!actions.length) return null;
+  return (
+    <section
+      className="action-module public-quick-actions"
+      aria-labelledby="contact-heading"
+    >
+      <h2 className="sr-only" id="contact-heading">
+        Other ways to contact {business.name}
+      </h2>
+      <div>
+        {actions.map(
+          (action) =>
+            action && (
               <TrackedLink
-                className={
-                  action.type === primary?.type
-                    ? "action-link subdued"
-                    : "action-link"
-                }
+                className="public-quick-action"
                 href={action.href}
                 key={action.type}
                 slug={business.slug}
@@ -82,22 +97,216 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
                 }
                 {...externalProps(action.external)}
               >
-                {action.label}
+                <action.icon size={21} aria-hidden="true" />
+                <span>{action.label}</span>
                 {action.external && (
                   <span className="sr-only"> (opens in a new tab)</span>
                 )}
               </TrackedLink>
-            ))}
-          </div>
+            ),
+        )}
+      </div>
+    </section>
+  );
+}
+
+function PricingPresentation({
+  module,
+  primary,
+}: {
+  module: Extract<PublicModule, { type: "PRICING" }>;
+  primary: PublicAction | null;
+}) {
+  return (
+    <section
+      className="action-module public-pricing-module"
+      aria-labelledby="pricing-heading"
+    >
+      <div className="public-module-heading">
+        <BadgeDollarSign size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Pricing</p>
+          <h2 id="pricing-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      {module.config.mode === "HOURLY" ? (
+        <div className="hourly-price">
+          <strong>
+            {formatMoney(module.config.amountMinor, module.config.currency)}
+          </strong>
+          <span>/ hour</span>
+          {module.config.note && <p>{module.config.note}</p>}
+        </div>
+      ) : module.config.mode === "PRICE_LIST" ? (
+        <PublicPriceList config={module.config} />
+      ) : (
+        <PricingEstimator
+          config={module.config}
+          ctaHref={primary?.type === "QUOTE_REQUEST" ? "#quote" : primary?.href}
+          ctaLabel={
+            primary?.type === "QUOTE_REQUEST"
+              ? "Get Exact Quote"
+              : primary?.label
+          }
+        />
+      )}
+      {(module.config.mode === "PRICE_LIST" ||
+        module.config.mode === "HOURLY") &&
+        primary && (
+          <a className="action-link" href={primary.href}>
+            {primary.type === "QUOTE_REQUEST"
+              ? "Request Exact Quote"
+              : primary.label}
+          </a>
+        )}
+    </section>
+  );
+}
+
+function PublicPriceList({
+  config,
+}: {
+  config: Extract<PricingConfig, { mode: "PRICE_LIST" }>;
+}) {
+  return (
+    <div className="public-price-categories">
+      {config.categories.map((category) => (
+        <section key={category.id}>
+          {(config.categories.length > 1 || category.name !== "Services") && (
+            <h3>{category.name}</h3>
+          )}
+          {category.items.map((item) => (
+            <div className="public-price-row" key={item.id}>
+              <span>
+                <strong>{item.name}</strong>
+                {item.description && <small>{item.description}</small>}
+              </span>
+              <strong>
+                {item.pricePrefix === "FROM" ? "From " : ""}
+                {formatMoney(item.amountMinor, config.currency)}
+              </strong>
+            </div>
+          ))}
         </section>
-      );
-    },
+      ))}
+    </div>
+  );
+}
+
+function ServiceAreaPresentation({
+  module,
+  primary,
+}: {
+  module: Extract<PublicModule, { type: "SERVICE_AREA" }>;
+  primary: PublicAction | null;
+}) {
+  if (!module.config.areas.length && !module.config.postalCodes.length)
+    return null;
+  const points = module.config.areas.flatMap((area) =>
+    "latitude" in area
+      ? [
+          {
+            name: area.name,
+            latitude: area.latitude,
+            longitude: area.longitude,
+          },
+        ]
+      : [],
+  );
+  return (
+    <section
+      className="action-module public-service-area"
+      aria-labelledby="area-heading"
+    >
+      <div className="public-module-heading">
+        <MapPinned size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Service area</p>
+          <h2 id="area-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      {points.length > 0 && (
+        <>
+          <AreaMap points={points} compact />
+          <p className="map-note">
+            Pins show the centre of each area, not exact service boundaries.
+          </p>
+        </>
+      )}
+      {module.config.areas.length > 0 && (
+        <ul className="chip-list">
+          {module.config.areas.map((area) => (
+            <li key={area.id}>{area.name}</li>
+          ))}
+        </ul>
+      )}
+      {module.config.postalCodes.length > 0 && (
+        <PostcodeChecker
+          config={module.config}
+          ctaHref={primary?.href}
+          ctaLabel={primary?.label}
+        />
+      )}
+    </section>
+  );
+}
+
+function TrustPresentation({
+  module,
+}: {
+  module: Extract<PublicModule, { type: "TRUST" }>;
+}) {
+  const entries = module.config.entries.filter(
+    (entry) => trustEntryState(entry.expiresOn) !== "EXPIRED",
+  );
+  if (!entries.length) return null;
+  return (
+    <section
+      className="action-module public-trust-module"
+      aria-labelledby="trust-heading"
+    >
+      <div className="public-module-heading">
+        <ShieldCheck size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Credentials & reassurance</p>
+          <h2 id="trust-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      <ul className="trust-list">
+        {entries.map((item) => (
+          <li key={item.id}>
+            <ShieldCheck size={20} aria-hidden="true" />
+            <span>
+              <strong>{item.name}</strong>
+              {item.description && <span>{item.description}</span>}
+              {item.referenceNumber && (
+                <small>Reference: {item.referenceNumber}</small>
+              )}
+            </span>
+          </li>
+        ))}
+      </ul>
+      <p className="trust-disclaimer">Information provided by this business.</p>
+    </section>
+  );
+}
+
+export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
+  CALL_WHATSAPP: {
+    analyticsEvent: "contact_action_selected",
+    render: ({ business, module, primary }) =>
+      module.type === "CALL_WHATSAPP" ? (
+        <ContactPresentation
+          business={business}
+          module={module}
+          primary={primary}
+        />
+      ) : null,
   },
   QUOTE_REQUEST: {
     analyticsEvent: "quote_surface_viewed",
-    render: ({ business, module, pricingContext, pricingSummary }) => {
-      if (module.type !== "QUOTE_REQUEST") return null;
-      return (
+    render: ({ business, module, pricingContext, pricingSummary }) =>
+      module.type === "QUOTE_REQUEST" ? (
         <section
           className="action-module action-module-accent"
           id="quote"
@@ -116,212 +325,47 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             pricingSummary={pricingSummary}
           />
         </section>
-      );
-    },
+      ) : null,
   },
   PRICING: {
     analyticsEvent: "pricing_surface_viewed",
     render: ({ module, primary }) =>
       module.type === "PRICING" ? (
-        <details
-          className="action-module public-tool-card"
-          aria-labelledby="pricing-heading"
-        >
-          <summary>
-            <span>
-              <span className="action-kicker">Pricing</span>
-              <strong id="pricing-heading">{module.config.label}</strong>
-            </span>
-            <span>View prices →</span>
-          </summary>
-          {module.config.mode === "HOURLY" ? (
-            <div className="hourly-price">
-              <strong>
-                {formatMoney(module.config.amountMinor, module.config.currency)}
-              </strong>
-              <span>/ hour</span>
-              {module.config.note && <p>{module.config.note}</p>}
-            </div>
-          ) : module.config.mode === "PRICE_LIST" ? (
-            <div className="public-price-categories">
-              {module.config.categories.map((category) => (
-                <details key={category.id}>
-                  <summary>
-                    <span>
-                      <strong>{category.name}</strong>
-                      <small>
-                        {category.items.length}{" "}
-                        {category.items.length === 1 ? "service" : "services"}
-                      </small>
-                    </span>
-                    <span>View prices</span>
-                  </summary>
-                  <div>
-                    {category.items.map((item) => (
-                      <div className="public-price-row" key={item.id}>
-                        <span>
-                          {item.name}
-                          {item.description && (
-                            <small>{item.description}</small>
-                          )}
-                        </span>
-                        <strong>
-                          {item.pricePrefix === "FROM" ? "From " : ""}
-                          {formatMoney(
-                            item.amountMinor,
-                            module.config.currency,
-                          )}
-                        </strong>
-                      </div>
-                    ))}
-                  </div>
-                </details>
-              ))}
-            </div>
-          ) : (
-            <PricingEstimator
-              config={module.config}
-              ctaHref={
-                primary?.type === "QUOTE_REQUEST" ? "#quote" : primary?.href
-              }
-              ctaLabel={
-                primary?.type === "QUOTE_REQUEST"
-                  ? "Get Exact Quote"
-                  : primary?.label
-              }
-            />
-          )}
-          {(module.config.mode === "PRICE_LIST" ||
-            module.config.mode === "HOURLY") &&
-            primary && (
-              <a className="action-link" href={primary.href}>
-                {primary.type === "QUOTE_REQUEST"
-                  ? "Request Exact Quote"
-                  : primary.label}
-              </a>
-            )}
-        </details>
+        <PricingPresentation module={module} primary={primary} />
       ) : null,
   },
   SERVICE_AREA: {
     analyticsEvent: "service_area_viewed",
-    render: ({ module, primary }) => {
-      if (module.type !== "SERVICE_AREA") return null;
-      if (!module.config.areas.length && !module.config.postalCodes.length)
-        return null;
-      const points = module.config.areas.flatMap((area) =>
-        "latitude" in area
-          ? [
-              {
-                name: area.name,
-                latitude: area.latitude,
-                longitude: area.longitude,
-              },
-            ]
-          : [],
-      );
-      return (
-        <details
-          className="action-module public-tool-card"
-          aria-labelledby="area-heading"
-        >
-          <summary>
-            <span>
-              <span className="action-kicker">Service area</span>
-              <strong id="area-heading">
-                {module.config.areas.length + module.config.postalCodes.length}{" "}
-                areas listed
-              </strong>
-            </span>
-            <span>See where we work →</span>
-          </summary>
-          <ul className="chip-list">
-            {module.config.areas.map((value) => (
-              <li key={value.id}>{value.name}</li>
-            ))}
-          </ul>
-          {points.length > 0 && (
-            <>
-              <p className="map-note">
-                Markers show area centres, not exact service boundaries.
-              </p>
-              <AreaMap points={points} compact />
-            </>
-          )}
-          {module.config.postalCodes.length > 0 && (
-            <PostcodeChecker
-              config={module.config}
-              ctaHref={primary?.href}
-              ctaLabel={primary?.label}
-            />
-          )}
-        </details>
-      );
-    },
+    render: ({ module, primary }) =>
+      module.type === "SERVICE_AREA" ? (
+        <ServiceAreaPresentation module={module} primary={primary} />
+      ) : null,
   },
   TRUST: {
     analyticsEvent: "trust_signals_viewed",
-    render: ({ module }) => {
-      if (module.type !== "TRUST") return null;
-      const entries = module.config.entries.filter(
-        (entry) => trustEntryState(entry.expiresOn) !== "EXPIRED",
-      );
-      if (!entries.length) return null;
-      return (
-        <details
-          className="action-module public-tool-card"
-          aria-labelledby="trust-heading"
-        >
-          <summary>
-            <span>
-              <span className="action-kicker">Credentials</span>
-              <strong id="trust-heading">
-                {entries.length}{" "}
-                {entries.length === 1 ? "credential" : "credentials"}
-              </strong>
-            </span>
-            <span>View credentials →</span>
-          </summary>
-          <p>
-            <small>Information provided by business.</small>
-          </p>
-          <ul className="trust-list">
-            {entries.map((item) => (
-              <li key={item.id}>
-                <strong>{item.name}</strong>
-                {item.description && <span>{item.description}</span>}
-                {item.referenceNumber && (
-                  <small>Reference: {item.referenceNumber}</small>
-                )}
-              </li>
-            ))}
-          </ul>
-        </details>
-      );
-    },
+    render: ({ module }) =>
+      module.type === "TRUST" ? <TrustPresentation module={module} /> : null,
   },
   FAQ: {
     analyticsEvent: "faq_viewed",
-    render: ({ module }) => {
-      if (module.type !== "FAQ" || !module.config.suggestedFaqs.length)
-        return null;
-      return (
-        <section className="action-module" aria-labelledby="faq-heading">
+    render: ({ module }) =>
+      module.type !== "FAQ" || !module.config.suggestedFaqs.length ? null : (
+        <section
+          className="action-module public-faq-module"
+          aria-labelledby="faq-heading"
+        >
           <p className="action-kicker">Frequently asked questions</p>
-          <h2 id="faq-heading">
-            {module.config.suggestedFaqs.length} questions
-          </h2>
+          <h2 id="faq-heading">Questions customers often ask</h2>
           <div className="public-faq-list">
             {module.config.suggestedFaqs.map((faq, index) => (
-              <details key={`${index}-${faq.question}`}>
+              <details key={index + "-" + faq.question}>
                 <summary>{faq.question}</summary>
                 <p>{faq.answer}</p>
               </details>
             ))}
           </div>
         </section>
-      );
-    },
+      ),
   },
   REVIEW: {
     analyticsEvent: "review_link_selected",
@@ -329,9 +373,18 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
       if (module.type !== "REVIEW") return null;
       const href = safeHttpUrl(business.googleReviewUrl);
       return href ? (
-        <section className="action-module" aria-labelledby="review-heading">
-          <p className="action-kicker">Customer feedback</p>
-          <h2 id="review-heading">Find us on Google</h2>
+        <section
+          className="action-module compact-action-module public-review-module"
+          aria-labelledby="review-heading"
+        >
+          <Star size={26} aria-hidden="true" />
+          <div>
+            <p className="action-kicker">Customer feedback</p>
+            <h2 id="review-heading">Find us on Google</h2>
+            <p>
+              Had a good experience? Your review helps other local customers.
+            </p>
+          </div>
           <TrackedLink
             className="action-link"
             href={href}
@@ -340,7 +393,8 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             target="_blank"
             rel="noopener noreferrer"
           >
-            ⭐ {module.config.label || "Leave Us a Review"}
+            {module.config.label || "Leave Us a Review"}{" "}
+            <ExternalLink size={17} aria-hidden="true" />
             <span className="sr-only"> (opens in a new tab)</span>
           </TrackedLink>
         </section>
@@ -352,16 +406,18 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
     render: ({ business, module }) =>
       module.type === "SAVE_CONTACT" ? (
         <section
-          className="action-module compact-module"
+          className="action-module compact-action-module public-save-contact"
           aria-labelledby="save-heading"
         >
+          <ContactRound size={26} aria-hidden="true" />
           <div>
             <p className="action-kicker">Keep the details</p>
             <h2 id="save-heading">Save this business</h2>
+            <p>Add the phone number and email to your contacts.</p>
           </div>
           <a
             className="action-link"
-            href={`/${business.slug}/contact.vcf`}
+            href={"/" + business.slug + "/contact.vcf"}
             download
           >
             {module.config.label}

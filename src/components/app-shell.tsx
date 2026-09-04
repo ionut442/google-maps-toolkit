@@ -1,0 +1,128 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import {
+  BriefcaseBusiness,
+  ChevronRight,
+  FileText,
+  House,
+  LogOut,
+  Menu,
+  PanelTop,
+  Star,
+  UserRound,
+  Wrench,
+  X,
+} from "lucide-react";
+import { logoutAction } from "@/app/actions";
+
+const navigation = [
+  { href: "/dashboard", label: "Home", icon: House, exact: true },
+  { href: "/dashboard/page", label: "My Page", icon: PanelTop },
+  { href: "/dashboard/tools", label: "Tools", icon: Wrench },
+  { href: "/dashboard/quotes", label: "Quote Requests", icon: FileText },
+  { href: "/dashboard/review-kit", label: "Review Kit", icon: Star },
+  {
+    href: "/dashboard/business",
+    label: "Business Details",
+    icon: BriefcaseBusiness,
+  },
+];
+
+function NavigationLinks({ mobile = false }: { mobile?: boolean }) {
+  const pathname = usePathname();
+  return (
+    <nav
+      className={mobile ? "mobile-nav-links" : "app-nav"}
+      aria-label="Account"
+    >
+      {navigation.map((item) => {
+        const active = item.exact
+          ? pathname === item.href
+          : pathname.startsWith(item.href);
+        const Icon = item.icon;
+        return (
+          <Link
+            href={item.href}
+            key={item.href}
+            className={active ? "active" : undefined}
+            aria-label={item.label}
+            aria-current={active ? "page" : undefined}
+          >
+            <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
+            <span>{item.label}</span>
+            {mobile && <ChevronRight aria-hidden="true" size={18} />}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function AppShell({
+  email,
+  businessName,
+  children,
+}: {
+  email: string;
+  businessName: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="app-shell">
+      <aside className="app-sidebar">
+        <Link href="/dashboard" className="app-wordmark">
+          <span aria-hidden="true">L</span>
+          LocalAction
+        </Link>
+        <NavigationLinks />
+        <div className="sidebar-account">
+          <span className="account-avatar" aria-hidden="true">
+            <UserRound size={18} />
+          </span>
+          <span>
+            <strong>{businessName}</strong>
+            <small>{email}</small>
+          </span>
+          <form action={logoutAction}>
+            <button
+              className="icon-button"
+              aria-label="Log out"
+              title="Log out"
+            >
+              <LogOut size={18} aria-hidden="true" />
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      <header className="mobile-app-bar">
+        <Link href="/dashboard" className="app-wordmark">
+          <span aria-hidden="true">L</span>
+          LocalAction
+        </Link>
+        <details className="mobile-menu">
+          <summary aria-label="Open navigation">
+            <Menu className="menu-open-icon" aria-hidden="true" />
+            <X className="menu-close-icon" aria-hidden="true" />
+          </summary>
+          <div className="mobile-menu-sheet">
+            <div>
+              <strong>{businessName}</strong>
+              <small>{email}</small>
+            </div>
+            <NavigationLinks mobile />
+            <form action={logoutAction}>
+              <button className="secondary mobile-logout" aria-label="Log out">
+                <LogOut size={18} aria-hidden="true" /> Log out
+              </button>
+            </form>
+          </div>
+        </details>
+      </header>
+
+      <div className="app-content">{children}</div>
+    </div>
+  );
+}

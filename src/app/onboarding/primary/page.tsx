@@ -8,8 +8,8 @@ export default async function PrimaryPage() {
   return (
     <StepShell
       step={5}
-      title="Choose one primary action"
-      intro="This is the clearest next step customers will see."
+      title="Choose your main customer action"
+      intro="This will be the clearest next step at the top of your customer page."
     >
       <PrimaryForm business={business} onboarding />
     </StepShell>

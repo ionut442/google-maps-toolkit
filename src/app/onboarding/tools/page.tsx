@@ -9,12 +9,17 @@ export default async function ToolsPage() {
   return (
     <StepShell
       step={4}
-      title="Your starting toolkit"
-      intro="Strong defaults are ready. Enable, disable, rename, or reorder tools."
+      title="Choose your customer tools"
+      intro="Start with the actions your customers need most. You can change these later."
     >
-      <ToolList businessId={business.id} tools={business.modules} />
+      <ToolList
+        businessId={business.id}
+        tools={business.modules}
+        onboarding
+        googleConnected={Boolean(business.googleReviewUrl)}
+      />
       <form action={finishToolsAction}>
-        <button>Continue to primary action</button>
+        <button className="sticky-submit">Continue</button>
       </form>
     </StepShell>
   );

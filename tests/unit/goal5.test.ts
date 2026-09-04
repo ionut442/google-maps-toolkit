@@ -153,9 +153,9 @@ describe("Goal 5 QR, assets, and analytics", () => {
           primary: null,
         }),
       );
-    expect(render("https://g.page/r/example/review")).toContain(
-      "⭐ Leave Us a Review",
-    );
+    const connected = render("https://g.page/r/example/review");
+    expect(connected).toContain("Leave Us a Review");
+    expect(connected).toContain("lucide-star");
     expect(render("javascript:alert(1)")).toBe("");
     expect(render(null)).toBe("");
   });

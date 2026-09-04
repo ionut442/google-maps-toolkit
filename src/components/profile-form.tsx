@@ -100,7 +100,7 @@ export function ProfileForm({
               <small className="error">{error("description")}</small>
             )}
           </label>
-          <label>
+          <label className="phone-field">
             Phone number
             <input
               name="phone"
@@ -114,7 +114,7 @@ export function ProfileForm({
               <small className="error">{error("phone")}</small>
             )}
           </label>
-          <label>
+          <label className="whatsapp-field">
             WhatsApp number
             <span className="input-action">
               <input
@@ -174,96 +174,108 @@ export function ProfileForm({
         </div>
       </fieldset>
 
-      <fieldset className="form-section">
-        <legend>Action Page colour</legend>
-        <p className="field-intro">
-          Choose one accent for your public buttons and highlights.
-        </p>
-        <div className="color-row">
-          <label className="color-swatch" title="Open colour picker">
-            <span className="sr-only">Choose brand colour</span>
-            <input
-              type="color"
-              value={validHex(brandColor) ? brandColor : "#2F6FED"}
-              onChange={(e) =>
-                setBrandColor(e.currentTarget.value.toUpperCase())
+      <details className="profile-disclosure" open={!onboarding}>
+        <summary>
+          <span>Page personalisation</span>
+          <small>Colour and branding</small>
+        </summary>
+        <fieldset className="form-section">
+          <legend>Action Page colour</legend>
+          <p className="field-intro">
+            Choose one accent for your public buttons and highlights.
+          </p>
+          <div className="color-row">
+            <label className="color-swatch" title="Open colour picker">
+              <span className="sr-only">Choose brand colour</span>
+              <input
+                type="color"
+                value={validHex(brandColor) ? brandColor : "#2F6FED"}
+                onChange={(e) =>
+                  setBrandColor(e.currentTarget.value.toUpperCase())
+                }
+              />
+            </label>
+            <label>
+              HEX
+              <input
+                name="brandColor"
+                value={brandColor}
+                onChange={(e) => updateHex(e.currentTarget.value)}
+                maxLength={7}
+                pattern="#[0-9A-Fa-f]{6}"
+                aria-invalid={Boolean(error("brandColor"))}
+              />
+            </label>
+            <div
+              className="brand-preview"
+              style={
+                {
+                  "--preview-brand": validHex(brandColor)
+                    ? brandColor
+                    : "#2F6FED",
+                } as CSSProperties
               }
-            />
-          </label>
-          <label>
-            HEX
-            <input
-              name="brandColor"
-              value={brandColor}
-              onChange={(e) => updateHex(e.currentTarget.value)}
-              maxLength={7}
-              pattern="#[0-9A-Fa-f]{6}"
-              aria-invalid={Boolean(error("brandColor"))}
-            />
-          </label>
-          <div
-            className="brand-preview"
-            style={
-              {
-                "--preview-brand": validHex(brandColor)
-                  ? brandColor
-                  : "#2F6FED",
-              } as CSSProperties
-            }
-          >
-            <span>Customer preview</span>
-            <strong>Get a quote</strong>
+            >
+              <span>Customer preview</span>
+              <strong>Get a quote</strong>
+            </div>
           </div>
-        </div>
-        {error("brandColor") && (
-          <small className="error">{error("brandColor")}</small>
-        )}
-      </fieldset>
-
-      <fieldset className="form-section google-profile-setup">
-        <legend>Google Business Profile</legend>
-        <p className="field-intro">
-          Find your business, confirm the correct listing, then paste its Google
-          Maps or review link.
-        </p>
-        <label>
-          Business name
-          <input
-            name="googleBusinessName"
-            value={googleBusinessName}
-            onChange={(e) => setGoogleBusinessName(e.currentTarget.value)}
-            placeholder="Your business name and town"
-          />
-        </label>
-        <a
-          className="button secondary"
-          href={searchUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Find on Google Maps{" "}
-          <span className="sr-only">(opens in a new tab)</span>
-        </a>
-        <label>
-          Google Maps or review link
-          <input
-            name="googleMapsUrl"
-            type="url"
-            defaultValue={
-              business.googleMapsUrl ?? business.googleReviewUrl ?? ""
-            }
-            placeholder="Paste the confirmed link"
-          />
-          {error("googleMapsUrl") && (
-            <small className="error">{error("googleMapsUrl")}</small>
+          {error("brandColor") && (
+            <small className="error">{error("brandColor")}</small>
           )}
-        </label>
-        <input type="hidden" name="googleReviewUrl" value="" />
-        <small>
-          We never guess which business is yours. A Maps link opens the
-          confirmed listing; a direct review link opens the review form.
-        </small>
-      </fieldset>
+        </fieldset>
+      </details>
+
+      <details className="profile-disclosure" open={!onboarding}>
+        <summary>
+          <span>Google Business Profile</span>
+          <small>Optional connection</small>
+        </summary>
+        <fieldset className="form-section google-profile-setup">
+          <legend>Google Business Profile</legend>
+          <p className="field-intro">
+            Find your business, confirm the correct listing, then paste its
+            Google Maps or review link.
+          </p>
+          <label>
+            Business name
+            <input
+              name="googleBusinessName"
+              value={googleBusinessName}
+              onChange={(e) => setGoogleBusinessName(e.currentTarget.value)}
+              placeholder="Your business name and town"
+            />
+          </label>
+          <a
+            className="button secondary"
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Find on Google Maps{" "}
+            <span className="sr-only">(opens in a new tab)</span>
+          </a>
+          <label>
+            Google Maps or review link
+            <input
+              name="googleMapsUrl"
+              type="url"
+              defaultValue={
+                business.googleMapsUrl ?? business.googleReviewUrl ?? ""
+              }
+              placeholder="Paste the confirmed link"
+            />
+            {error("googleMapsUrl") && (
+              <small className="error">{error("googleMapsUrl")}</small>
+            )}
+          </label>
+          <input type="hidden" name="googleReviewUrl" value="" />
+          <small>
+            We never guess which business is yours. A Maps link opens the
+            confirmed listing; a direct review link opens the review form.
+          </small>
+        </fieldset>
+      </details>
 
       {onboarding && <input type="hidden" name="intent" value="onboarding" />}
       {state.error && (
