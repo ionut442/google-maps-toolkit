@@ -3,7 +3,8 @@ import Link from "next/link";
 import styles from "./landing.module.css";
 
 export const metadata: Metadata = {
-  title: "LocalAction | One simple page for calls, quotes, WhatsApp and reviews",
+  title:
+    "LocalAction | One simple page for calls, quotes, WhatsApp and reviews",
   description:
     "Give customers one simple place to call, message, request a quote, see prices, check your service area and leave a review.",
 };
@@ -330,7 +331,9 @@ function FeatureMock({ type }: { type: (typeof features)[number]["mock"] }) {
         <div className={styles.miniField}>What do you need help with?</div>
         <div className={styles.miniField}>Where is the job?</div>
         <div className={styles.miniField}>Add a photo (optional)</div>
-        <div className={`${styles.miniAction} ${styles.miniActionPrimary}`}>Request my quote</div>
+        <div className={`${styles.miniAction} ${styles.miniActionPrimary}`}>
+          Request my quote
+        </div>
       </div>
     );
   }
@@ -339,7 +342,9 @@ function FeatureMock({ type }: { type: (typeof features)[number]["mock"] }) {
     return (
       <div className={styles.featureMock} aria-hidden="true">
         <div className={styles.miniActionRow}>
-          <div className={`${styles.miniAction} ${styles.miniActionPrimary}`}>Call now</div>
+          <div className={`${styles.miniAction} ${styles.miniActionPrimary}`}>
+            Call now
+          </div>
           <div className={styles.miniAction}>WhatsApp</div>
         </div>
       </div>
@@ -470,11 +475,13 @@ export default function Home() {
                 For local service businesses
               </div>
               <h1 className={styles.heroTitle}>
-                Calls, quotes, WhatsApp and reviews — <em>from one simple page.</em>
+                Calls, quotes, WhatsApp and reviews —{" "}
+                <em>from one simple page.</em>
               </h1>
               <p className={styles.heroCopy}>
-                Give customers one clean, mobile-friendly place to take the next step — contact you,
-                request a quote, see prices, check where you work and leave a review.
+                Give customers one clean, mobile-friendly place to take the next
+                step — contact you, request a quote, see prices, check where you
+                work and leave a review.
               </p>
               <div className={styles.heroActions}>
                 <Link className={styles.primaryButton} href="/signup">
@@ -487,20 +494,28 @@ export default function Home() {
               </div>
               <div className={styles.heroReassurance}>
                 <span>
-                  <Icon name="check" className={styles.tinyCheck} /> No website builder
+                  <Icon name="check" className={styles.tinyCheck} /> No website
+                  builder
                 </span>
                 <span>
                   <Icon name="check" className={styles.tinyCheck} /> No code
                 </span>
                 <span>
-                  <Icon name="check" className={styles.tinyCheck} /> Change anything later
+                  <Icon name="check" className={styles.tinyCheck} /> Change
+                  anything later
                 </span>
               </div>
             </div>
 
-            <div className={styles.heroVisual} aria-label="Example LocalAction customer page">
+            <div
+              className={styles.heroVisual}
+              aria-label="Example LocalAction customer page"
+            >
               <div className={styles.heroVisualBackdrop} />
-              <div className={`${styles.floatingCard} ${styles.floatQuote}`} aria-hidden="true">
+              <div
+                className={`${styles.floatingCard} ${styles.floatQuote}`}
+                aria-hidden="true"
+              >
                 <span className={styles.floatingIcon}>
                   <Icon name="document" />
                 </span>
@@ -509,7 +524,10 @@ export default function Home() {
                   <span>Bathroom tap replacement</span>
                 </span>
               </div>
-              <div className={`${styles.floatingCard} ${styles.floatArea}`} aria-hidden="true">
+              <div
+                className={`${styles.floatingCard} ${styles.floatArea}`}
+                aria-hidden="true"
+              >
                 <span className={styles.floatingIcon}>
                   <Icon name="mapPin" />
                 </span>
@@ -531,10 +549,12 @@ export default function Home() {
                   </div>
                   <h2 className={styles.phoneIntro}>How can we help?</h2>
                   <p className={styles.phoneCopy}>
-                    Repairs, installations and emergency plumbing across Greater Manchester.
+                    Repairs, installations and emergency plumbing across Greater
+                    Manchester.
                   </p>
                   <div className={styles.phonePrimary}>
-                    <Icon name="document" className={styles.buttonIcon} /> Get a quote
+                    <Icon name="document" className={styles.buttonIcon} /> Get a
+                    quote
                   </div>
                   <div className={styles.quickActions}>
                     <div className={styles.quickAction}>
@@ -591,12 +611,18 @@ export default function Home() {
         <section className={styles.problemSection}>
           <div className={`${styles.container} ${styles.problemGrid}`}>
             <div>
-              <h2 className={styles.problemTitle}>Customers shouldn&apos;t have to hunt for the next step.</h2>
+              <h2 className={styles.problemTitle}>
+                Customers shouldn&apos;t have to hunt for the next step.
+              </h2>
               <p className={styles.problemCopy}>
-                They already found your business. Now they want a handful of simple answers before they decide what to do next.
+                They already found your business. Now they want a handful of
+                simple answers before they decide what to do next.
               </p>
             </div>
-            <div className={styles.questionCloud} aria-label="Questions customers commonly have">
+            <div
+              className={styles.questionCloud}
+              aria-label="Questions customers commonly have"
+            >
               <span className={styles.questionChip}>
                 <Icon name="call" /> Can I call you now?
               </span>
@@ -641,7 +667,9 @@ export default function Home() {
                 <span className={styles.journeyNumber}>03</span>
                 <span>
                   <strong>Takes action</strong>
-                  <span>Calls · WhatsApps · requests a quote · leaves a review</span>
+                  <span>
+                    Calls · WhatsApps · requests a quote · leaves a review
+                  </span>
                 </span>
               </div>
             </div>
@@ -652,9 +680,12 @@ export default function Home() {
           <div className={styles.container}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionKicker}>What you get</span>
-              <h2 className={styles.sectionTitle}>Everything they need. Nothing they don&apos;t.</h2>
+              <h2 className={styles.sectionTitle}>
+                Everything they need. Nothing they don&apos;t.
+              </h2>
               <p className={styles.sectionCopy}>
-                Turn on the customer actions that make sense for your business. Keep the rest out of the way.
+                Turn on the customer actions that make sense for your business.
+                Keep the rest out of the way.
               </p>
             </div>
             <div className={styles.featureGrid}>
@@ -676,16 +707,22 @@ export default function Home() {
           <div className={styles.container}>
             <div className={styles.centeredHeader}>
               <span className={styles.sectionKicker}>How it works</span>
-              <h2 className={styles.sectionTitle}>From business details to a live page in three simple steps.</h2>
+              <h2 className={styles.sectionTitle}>
+                From business details to a live page in three simple steps.
+              </h2>
               <p className={styles.sectionCopy}>
-                No blank canvas and no website-building project. Start with the useful stuff and get your page ready.
+                No blank canvas and no website-building project. Start with the
+                useful stuff and get your page ready.
               </p>
             </div>
             <div className={styles.stepsGrid}>
               <article className={styles.stepCard}>
                 <span className={styles.stepNumber}>01</span>
                 <h3>Add your business</h3>
-                <p>Tell us the basics — your name, contact details, what you do and how customers should recognise you.</p>
+                <p>
+                  Tell us the basics — your name, contact details, what you do
+                  and how customers should recognise you.
+                </p>
                 <div className={styles.stepVisual} aria-hidden="true">
                   <span className={styles.fakeLabel}>Business name</span>
                   <div className={styles.fakeInput} />
@@ -696,7 +733,10 @@ export default function Home() {
               <article className={styles.stepCard}>
                 <span className={styles.stepNumber}>02</span>
                 <h3>Choose what customers can do</h3>
-                <p>Start with a sensible set of customer tools. Turn things on or off without configuring everything at once.</p>
+                <p>
+                  Start with a sensible set of customer tools. Turn things on or
+                  off without configuring everything at once.
+                </p>
                 <div className={styles.stepVisual} aria-hidden="true">
                   <div className={styles.fakeToolRow}>
                     <span className={styles.fakeToolIcon}>
@@ -717,12 +757,17 @@ export default function Home() {
               <article className={styles.stepCard}>
                 <span className={styles.stepNumber}>03</span>
                 <h3>Publish and share</h3>
-                <p>Your page is ready when you are. Share the link or a QR wherever customers already find your business.</p>
+                <p>
+                  Your page is ready when you are. Share the link or a QR
+                  wherever customers already find your business.
+                </p>
                 <div className={styles.stepVisual} aria-hidden="true">
                   <div className={styles.publishVisual}>
                     <div className={styles.miniPublishedPage}>
                       <strong>Oak &amp; Pipe Plumbing</strong>
-                      <div className={styles.miniPublishedButton}>Get a quote</div>
+                      <div className={styles.miniPublishedButton}>
+                        Get a quote
+                      </div>
                     </div>
                     <QrPattern />
                   </div>
@@ -741,10 +786,16 @@ export default function Home() {
         <section className={styles.section} id="who-its-for">
           <div className={styles.container}>
             <div className={styles.centeredHeader}>
-              <span className={styles.sectionKicker}>Built for local services</span>
-              <h2 className={styles.sectionTitle}>Made for businesses where every enquiry matters.</h2>
+              <span className={styles.sectionKicker}>
+                Built for local services
+              </span>
+              <h2 className={styles.sectionTitle}>
+                Made for businesses where every enquiry matters.
+              </h2>
               <p className={styles.sectionCopy}>
-                The page stays simple enough for a one-person trade business, while giving customers more useful ways to act than a basic contact page.
+                The page stays simple enough for a one-person trade business,
+                while giving customers more useful ways to act than a basic
+                contact page.
               </p>
             </div>
             <div className={styles.audienceGrid}>
@@ -758,7 +809,8 @@ export default function Home() {
               ))}
             </div>
             <p className={styles.audienceFootnote}>
-              Don&apos;t see your trade? LocalAction works for almost any local service business.
+              Don&apos;t see your trade? LocalAction works for almost any local
+              service business.
             </p>
           </div>
         </section>
@@ -766,16 +818,28 @@ export default function Home() {
         <section className={styles.softSection}>
           <div className={`${styles.container} ${styles.positioningGrid}`}>
             <div className={styles.positioningCopy}>
-              <span className={styles.sectionKicker}>Less building. More doing.</span>
-              <h2 className={styles.sectionTitle}>Not another website builder.</h2>
+              <span className={styles.sectionKicker}>
+                Less building. More doing.
+              </span>
+              <h2 className={styles.sectionTitle}>
+                Not another website builder.
+              </h2>
               <p className={styles.sectionCopy}>
-                You don&apos;t need to choose a template, move blocks around or spend an afternoon deciding what goes where. Add your business, choose the useful customer actions and publish.
+                You don&apos;t need to choose a template, move blocks around or
+                spend an afternoon deciding what goes where. Add your business,
+                choose the useful customer actions and publish.
               </p>
               <div className={styles.positioningNote}>
-                <strong>Already have a website?</strong> Keep it. <strong>Don&apos;t have one?</strong> That&apos;s fine too. LocalAction can work on its own or alongside the places customers already find you.
+                <strong>Already have a website?</strong> Keep it.{" "}
+                <strong>Don&apos;t have one?</strong> That&apos;s fine too.
+                LocalAction can work on its own or alongside the places
+                customers already find you.
               </div>
             </div>
-            <div className={styles.comparison} aria-label="Website builder and LocalAction comparison">
+            <div
+              className={styles.comparison}
+              aria-label="Website builder and LocalAction comparison"
+            >
               <div className={styles.comparisonHeader}>
                 <div>Typical page builder</div>
                 <div>LocalAction</div>
@@ -808,7 +872,10 @@ export default function Home() {
 
         <section className={styles.analyticsSection}>
           <div className={`${styles.container} ${styles.analyticsGrid}`}>
-            <div className={styles.dashboardMock} aria-label="Example LocalAction activity dashboard with sample data">
+            <div
+              className={styles.dashboardMock}
+              aria-label="Example LocalAction activity dashboard with sample data"
+            >
               <div className={styles.dashboardTop}>
                 <strong>Last 30 days</strong>
                 <span className={styles.sampleBadge}>Sample data</span>
@@ -857,9 +924,13 @@ export default function Home() {
             </div>
             <div className={styles.analyticsCopy}>
               <span className={styles.sectionKicker}>Simple activity</span>
-              <h2 className={styles.sectionTitle}>See what customers actually use.</h2>
+              <h2 className={styles.sectionTitle}>
+                See what customers actually use.
+              </h2>
               <p className={styles.sectionCopy}>
-                Your page isn&apos;t a black box. See when customers view it, request quotes, call, open WhatsApp or head to your review page — without a complicated analytics dashboard.
+                Your page isn&apos;t a black box. See when customers view it,
+                request quotes, call, open WhatsApp or head to your review page
+                — without a complicated analytics dashboard.
               </p>
               <div className={styles.analyticsPoints}>
                 <div className={styles.analyticsPoint}>
@@ -887,7 +958,10 @@ export default function Home() {
 
         <section className={styles.section}>
           <div className={`${styles.container} ${styles.reviewKitGrid}`}>
-            <div className={styles.reviewAssets} aria-label="Example LocalAction review materials">
+            <div
+              className={styles.reviewAssets}
+              aria-label="Example LocalAction review materials"
+            >
               <div className={styles.reviewSign}>
                 <span className={styles.reviewSignMark}>OP</span>
                 <h4>Happy with the job?</h4>
@@ -902,9 +976,13 @@ export default function Home() {
             </div>
             <div>
               <span className={styles.sectionKicker}>Review Kit</span>
-              <h2 className={styles.sectionTitle}>Turn a happy customer into an easier review journey.</h2>
+              <h2 className={styles.sectionTitle}>
+                Turn a happy customer into an easier review journey.
+              </h2>
               <p className={styles.sectionCopy}>
-                Connect the review destination you want customers to use, then generate ready-to-use materials from the same place you manage your customer page.
+                Connect the review destination you want customers to use, then
+                generate ready-to-use materials from the same place you manage
+                your customer page.
               </p>
               <div className={styles.reviewPoints}>
                 <div className={styles.reviewPoint}>
@@ -913,7 +991,10 @@ export default function Home() {
                   </span>
                   <span>
                     <strong>Review QR</strong>
-                    <span>Put an easy scan route on invoices, cards or at the counter.</span>
+                    <span>
+                      Put an easy scan route on invoices, cards or at the
+                      counter.
+                    </span>
                   </span>
                 </div>
                 <div className={styles.reviewPoint}>
@@ -922,7 +1003,10 @@ export default function Home() {
                   </span>
                   <span>
                     <strong>Printable sign</strong>
-                    <span>Generate a branded sign you can use where customers will actually see it.</span>
+                    <span>
+                      Generate a branded sign you can use where customers will
+                      actually see it.
+                    </span>
                   </span>
                 </div>
                 <div className={styles.reviewPoint}>
@@ -931,7 +1015,9 @@ export default function Home() {
                   </span>
                   <span>
                     <strong>Social graphic</strong>
-                    <span>Get a ready-made branded square graphic when you need one.</span>
+                    <span>
+                      Get a ready-made branded square graphic when you need one.
+                    </span>
                   </span>
                 </div>
               </div>
@@ -963,7 +1049,9 @@ export default function Home() {
           <div className={styles.container}>
             <div className={styles.centeredHeader}>
               <span className={styles.sectionKicker}>FAQ</span>
-              <h2 className={styles.sectionTitle}>A few things you might want to know first.</h2>
+              <h2 className={styles.sectionTitle}>
+                A few things you might want to know first.
+              </h2>
             </div>
             <div className={styles.faqList}>
               {faqs.map((faq) => (
@@ -982,7 +1070,8 @@ export default function Home() {
               <div className={styles.finalCtaCopy}>
                 <h2>Make it easier for customers to choose what to do next.</h2>
                 <p>
-                  Give them one simple place to call, message, request a quote, check the details they care about and leave a review.
+                  Give them one simple place to call, message, request a quote,
+                  check the details they care about and leave a review.
                 </p>
               </div>
               <div className={styles.finalCtaAction}>
