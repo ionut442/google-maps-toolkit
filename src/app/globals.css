@@ -42,6 +42,10 @@ body {
   font-size: 15px;
   line-height: 1.55;
 }
+
+body:has(#marketing-home) > .site-header {
+  display: none;
+}
 a {
   color: inherit;
   text-decoration: none;

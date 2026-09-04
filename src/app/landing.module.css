@@ -1,9 +1,5 @@
 /* LocalAction marketing homepage. Intentionally scoped away from the private app UI. */
 
-:global(body:has(#marketing-home) > .site-header) {
-  display: none;
-}
-
 .page {
   --marketing-ink: #222222;
   --marketing-muted: #686868;

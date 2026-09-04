@@ -16,10 +16,8 @@ import {
 } from "@/lib/review-assets";
 import { publicBusinessUrl, safeDownloadSlug } from "@/lib/public-url";
 import { profileSchema } from "@/lib/validation";
-import {
-  handleAnalyticsRequest,
-  POST as postAnalytics,
-} from "@/app/api/analytics/route";
+import { POST as postAnalytics } from "@/app/api/analytics/route";
+import { handleAnalyticsRequest } from "@/lib/analytics-request";
 import { renderToStaticMarkup } from "react-dom/server";
 import { publicModuleRegistry } from "@/components/public/module-renderer";
 import type { PublicBusiness } from "@/lib/public-business";
