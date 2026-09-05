@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { LandingEffects } from "@/components/landing-effects";
+import { LandingPhone } from "@/components/landing-phone";
 import styles from "./landing.module.css";
 
 export const metadata: Metadata = {
@@ -440,6 +442,7 @@ function QrPattern({ large = false }: { large?: boolean }) {
 export default function Home() {
   return (
     <div className={styles.page} id="marketing-home">
+      <LandingEffects />
       <header className={styles.marketingHeader}>
         <div className={`${styles.container} ${styles.nav}`}>
           <Link className={styles.logo} href="/" aria-label="LocalAction home">
@@ -463,6 +466,16 @@ export default function Home() {
               <Icon name="arrow" className={styles.buttonIcon} />
             </Link>
           </div>
+          <details className={styles.mobileMenu}>
+            <summary aria-label="Open navigation">Menu</summary>
+            <nav aria-label="Mobile navigation">
+              <a href="#how-it-works">How it works</a>
+              <a href="#what-you-get">What you get</a>
+              <a href="#who-its-for">Who it&apos;s for</a>
+              <a href="#faq">FAQ</a>
+              <Link href="/login">Log in</Link>
+            </nav>
+          </details>
         </div>
       </header>
 
@@ -538,71 +551,7 @@ export default function Home() {
               </div>
 
               <div className={styles.phone}>
-                <div className={styles.phoneScreen}>
-                  <div className={styles.phoneNotch} />
-                  <div className={styles.businessIdentity}>
-                    <div className={styles.businessAvatar}>OP</div>
-                    <div>
-                      <strong>Oak &amp; Pipe Plumbing</strong>
-                      <span>Local plumber · Manchester</span>
-                    </div>
-                  </div>
-                  <h2 className={styles.phoneIntro}>How can we help?</h2>
-                  <p className={styles.phoneCopy}>
-                    Repairs, installations and emergency plumbing across Greater
-                    Manchester.
-                  </p>
-                  <div className={styles.phonePrimary}>
-                    <Icon name="document" className={styles.buttonIcon} /> Get a
-                    quote
-                  </div>
-                  <div className={styles.quickActions}>
-                    <div className={styles.quickAction}>
-                      <Icon name="call" />
-                      Call
-                    </div>
-                    <div className={styles.quickAction}>
-                      <Icon name="message" />
-                      WhatsApp
-                    </div>
-                    <div className={styles.quickAction}>
-                      <Icon name="review" />
-                      Review
-                    </div>
-                  </div>
-                  <div className={styles.phoneCards}>
-                    <div className={styles.phoneCard}>
-                      <span className={styles.phoneCardIcon}>
-                        <Icon name="barChart" />
-                      </span>
-                      <span>
-                        <strong>Pricing</strong>
-                        <span>Clear starting prices</span>
-                      </span>
-                      <span className={styles.phoneCardValue}>From £65</span>
-                    </div>
-                    <div className={styles.phoneCard}>
-                      <span className={styles.phoneCardIcon}>
-                        <Icon name="mapPin" />
-                      </span>
-                      <span>
-                        <strong>Service area</strong>
-                        <span>Manchester · Stockport · Salford</span>
-                      </span>
-                      <span className={styles.phoneCardValue}>Check</span>
-                    </div>
-                    <div className={styles.phoneCard}>
-                      <span className={styles.phoneCardIcon}>
-                        <Icon name="shield" />
-                      </span>
-                      <span>
-                        <strong>Trust &amp; credentials</strong>
-                        <span>Business-provided information</span>
-                      </span>
-                      <span className={styles.phoneCardValue}>View</span>
-                    </div>
-                  </div>
-                </div>
+                <LandingPhone />
               </div>
             </div>
           </div>
