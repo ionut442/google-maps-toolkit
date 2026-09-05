@@ -1,0 +1,4565 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      LocalAction | One simple page for calls, quotes, WhatsApp and reviews
+    </title>
+    <meta
+      name="description"
+      content="Give customers one simple place to call, message, request a quote, see prices, check your service area and leave a review."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============ TOKENS ============ */
+      :root {
+        --paper: #f4efe2;
+        --paper2: #ece5d2;
+        --card: #fffcf3;
+        --white: #ffffff;
+        --ink: #171d1a;
+        --ink2: #3a423d;
+        --pine: #13332c;
+        --pine2: #0c231e;
+        --amber: #ffb020;
+        --amber2: #f39f0a;
+        --wa: #1f8f63;
+        --line: rgba(23, 29, 26, 0.16);
+        --line2: rgba(23, 29, 26, 0.3);
+        --pl: rgba(244, 239, 226, 0.2);
+        --pl2: rgba(244, 239, 226, 0.45);
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+        --body: "Public Sans", system-ui, sans-serif;
+        --disp: "Anton", Impact, sans-serif;
+        --hs: 6px 6px 0 rgba(23, 29, 26, 0.9);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: 96px;
+      }
+      body {
+        font-family: var(--body);
+        background: var(--paper);
+        color: var(--ink);
+        font-size: 17px;
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      body::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: 9990;
+        pointer-events: none;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+      }
+      img,
+      svg {
+        display: block;
+      }
+      a {
+        color: inherit;
+      }
+      ::selection {
+        background: var(--amber);
+        color: var(--ink);
+      }
+      :focus-visible {
+        outline: 3px solid var(--amber2);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      .skip {
+        position: absolute;
+        left: -999px;
+        top: 8px;
+        background: var(--ink);
+        color: var(--paper);
+        padding: 0.6rem 1rem;
+        z-index: 10000;
+        font-family: var(--mono);
+      }
+      .skip:focus {
+        left: 8px;
+      }
+      .wrap {
+        width: min(1200px, 92vw);
+        margin-inline: auto;
+      }
+      section {
+        scroll-margin-top: 88px;
+        position: relative;
+      }
+
+      /* ============ TYPE HELPERS ============ */
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.7rem;
+        font: 600 0.72rem/1 var(--mono);
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        padding: 0.55rem 0.9rem;
+        border: 2px solid currentColor;
+        border-radius: 6px;
+      }
+      .eyebrow::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        background: var(--amber);
+        border: 2px solid currentColor;
+        flex: none;
+      }
+      .dk .eyebrow {
+        color: var(--amber);
+      }
+      h1,
+      h2 {
+        font-family: var(--disp);
+        font-weight: 400;
+        text-transform: uppercase;
+        line-height: 0.98;
+        letter-spacing: 0.012em;
+      }
+      .h-xl {
+        font-size: clamp(2.7rem, 6.4vw, 5.1rem);
+      }
+      .h-lg {
+        font-size: clamp(2.1rem, 4.6vw, 3.7rem);
+      }
+      .h-md {
+        font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+      }
+      .amb {
+        color: var(--amber);
+      }
+      .lead {
+        font-size: 1.12rem;
+        line-height: 1.65;
+        max-width: 34em;
+        color: var(--ink2);
+      }
+      .dk .lead {
+        color: rgba(244, 239, 226, 0.82);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+
+      /* line-mask reveal */
+      .ln {
+        display: block;
+        overflow: hidden;
+        padding-bottom: 0.06em;
+        margin-bottom: -0.06em;
+      }
+      .ln > span {
+        display: block;
+        transform: translateY(115%);
+        transition: transform 0.9s cubic-bezier(0.2, 0.75, 0.15, 1);
+        transition-delay: var(--ld, 0s);
+      }
+      .in .ln > span {
+        transform: none;
+      }
+
+      /* scroll reveal */
+      [data-reveal] {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.8s cubic-bezier(0.2, 0.75, 0.2, 1);
+        transition-delay: var(--d, 0s);
+      }
+      [data-reveal].in {
+        opacity: 1;
+        transform: none;
+      }
+
+      /* ============ BUTTONS ============ */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        font: 700 1rem/1 var(--body);
+        padding: 1.05rem 1.6rem;
+        border: 2.5px solid var(--ink);
+        border-radius: 10px;
+        background: var(--amber);
+        color: var(--ink);
+        box-shadow: var(--hs);
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          transform 0.16s ease,
+          box-shadow 0.16s ease;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 8px 8px 0 rgba(23, 29, 26, 0.9);
+      }
+      .btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 1px 1px 0 rgba(23, 29, 26, 0.9);
+      }
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .btn-ghost {
+        background: transparent;
+        box-shadow: none;
+      }
+      .btn-ghost:hover {
+        background: rgba(23, 29, 26, 0.06);
+        box-shadow: none;
+        transform: none;
+      }
+      .dk .btn-ghost {
+        border-color: var(--pl2);
+        color: var(--paper);
+      }
+      .dk .btn-ghost:hover {
+        background: rgba(244, 239, 226, 0.08);
+      }
+      .btn-sm {
+        padding: 0.7rem 1.1rem;
+        font-size: 0.9rem;
+        box-shadow: 4px 4px 0 rgba(23, 29, 26, 0.9);
+      }
+      .btn-sm:hover {
+        box-shadow: 6px 6px 0 rgba(23, 29, 26, 0.9);
+      }
+      .link-arrow {
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        gap: 0.5rem;
+        align-items: center;
+        border-bottom: 2px solid var(--amber);
+        padding-bottom: 2px;
+      }
+      .link-arrow svg {
+        width: 16px;
+        height: 16px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        transition: transform 0.2s;
+      }
+      .link-arrow:hover svg {
+        transform: translateX(4px);
+      }
+
+      /* ============ HEADER ============ */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        background: var(--paper);
+        border-bottom: 2px solid var(--ink);
+        transition: box-shadow 0.25s;
+      }
+      header.scrolled {
+        box-shadow: 0 6px 0 rgba(23, 29, 26, 0.08);
+      }
+      .nav {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        height: 74px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        text-decoration: none;
+        font-family: var(--disp);
+        font-size: 1.45rem;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+      }
+      .brand .mark {
+        width: 30px;
+        height: 30px;
+        background: var(--amber);
+        border: 2.5px solid var(--ink);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        box-shadow: 3px 3px 0 var(--ink);
+      }
+      .brand .mark svg {
+        width: 16px;
+        height: 16px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.6;
+        stroke-linecap: round;
+      }
+      .brand em {
+        font-style: normal;
+        color: var(--amber2);
+      }
+      .nav-links {
+        display: flex;
+        gap: 1.9rem;
+        list-style: none;
+        margin-left: auto;
+      }
+      .nav-links a {
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        position: relative;
+        padding: 0.3rem 0;
+      }
+      .nav-links a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -2px;
+        height: 3px;
+        width: 0;
+        background: var(--amber);
+        transition: width 0.25s;
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+      .nav-cta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+      }
+      .login {
+        font-weight: 700;
+        text-decoration: none;
+        font-size: 0.95rem;
+        padding: 0.6rem 0.4rem;
+      }
+      .login:hover {
+        color: var(--amber2);
+      }
+      .burger {
+        display: none;
+        background: none;
+        border: 2.5px solid var(--ink);
+        border-radius: 8px;
+        width: 44px;
+        height: 44px;
+        cursor: pointer;
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+        justify-content: center;
+      }
+      .burger span {
+        width: 20px;
+        height: 2.5px;
+        background: var(--ink);
+        transition: 0.25s;
+      }
+      .mobile-panel {
+        display: none;
+        border-top: 2px solid var(--line);
+        background: var(--paper);
+        padding: 1rem 4vw 1.4rem;
+      }
+      .mobile-panel a {
+        display: block;
+        padding: 0.85rem 0;
+        text-decoration: none;
+        font-weight: 700;
+        border-bottom: 1px solid var(--line);
+      }
+      header.open .mobile-panel {
+        display: block;
+      }
+      header.open .burger span:nth-child(1) {
+        transform: translateY(7.5px) rotate(45deg);
+      }
+      header.open .burger span:nth-child(2) {
+        opacity: 0;
+      }
+      header.open .burger span:nth-child(3) {
+        transform: translateY(-7.5px) rotate(-45deg);
+      }
+
+      /* ============ HERO ============ */
+      .hero {
+        padding: 66px 0 110px;
+        overflow: hidden;
+      }
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.04fr 0.96fr;
+        gap: 48px;
+        align-items: center;
+      }
+      .hero .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.6rem;
+        font: 600 0.74rem/1 var(--mono);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        border: 2px solid var(--ink);
+        padding: 0.55rem 1rem;
+        border-radius: 999px;
+        background: var(--card);
+      }
+      .hero .chip .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--amber2);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 0 0 rgba(243, 159, 10, 0.5);
+        }
+        50% {
+          box-shadow: 0 0 0 6px rgba(243, 159, 10, 0);
+        }
+      }
+      .hero h1 {
+        margin: 1.4rem 0 1.5rem;
+      }
+      .hero .lead {
+        margin-bottom: 2rem;
+      }
+      .cta-row {
+        display: flex;
+        gap: 1.1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.9rem;
+      }
+      .assure {
+        display: flex;
+        gap: 1.4rem;
+        flex-wrap: wrap;
+        list-style: none;
+      }
+      .assure li {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font: 600 0.82rem/1 var(--mono);
+        letter-spacing: 0.04em;
+      }
+      .assure svg {
+        width: 17px;
+        height: 17px;
+        stroke: var(--amber2);
+        fill: none;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+
+      /* hero stage + phone */
+      .stage {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        padding: 1.5rem 0;
+      }
+      .stage::before {
+        content: "";
+        position: absolute;
+        width: 520px;
+        height: 520px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        border: 2px dashed rgba(23, 29, 26, 0.22);
+        border-radius: 50%;
+        animation: spin 70s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+      .stage .ghostword {
+        position: absolute;
+        top: -38px;
+        left: -30px;
+        font-family: var(--disp);
+        font-size: clamp(4rem, 9vw, 7.5rem);
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(23, 29, 26, 0.14);
+        letter-spacing: 0.02em;
+        pointer-events: none;
+        user-select: none;
+        white-space: nowrap;
+      }
+      .sample-tag {
+        position: absolute;
+        top: -6px;
+        right: 2%;
+        z-index: 6;
+        font: 700 0.68rem/1 var(--mono);
+        letter-spacing: 0.18em;
+        background: var(--ink);
+        color: var(--amber);
+        padding: 0.5rem 0.8rem;
+        border-radius: 6px;
+        transform: rotate(4deg);
+      }
+      .device {
+        position: relative;
+        width: 322px;
+        aspect-ratio: 322/655;
+        background: #101512;
+        border-radius: 46px;
+        padding: 10px;
+        box-shadow:
+          14px 16px 0 rgba(23, 29, 26, 0.16),
+          0 30px 60px rgba(23, 29, 26, 0.22);
+        z-index: 3;
+      }
+      .device::after {
+        content: "";
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 88px;
+        height: 20px;
+        background: #101512;
+        border-radius: 12px;
+        z-index: 9;
+      }
+      .screen {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: var(--card);
+        border-radius: 37px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .statusbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.9rem 1.4rem 0.4rem;
+        font: 600 0.62rem/1 var(--mono);
+        color: var(--ink2);
+        flex: none;
+        z-index: 8;
+      }
+      .statusbar .bars {
+        display: flex;
+        gap: 2px;
+        align-items: flex-end;
+      }
+      .statusbar .bars i {
+        width: 3px;
+        background: var(--ink2);
+        display: block;
+      }
+      .urlbar {
+        margin: 0.35rem 0.8rem 0.5rem;
+        background: var(--paper2);
+        border: 1.5px solid var(--line);
+        border-radius: 9px;
+        font: 500 0.6rem/1 var(--mono);
+        letter-spacing: 0.02em;
+        color: var(--ink2);
+        padding: 0.5rem 0.7rem;
+        display: flex;
+        gap: 0.4rem;
+        align-items: center;
+        flex: none;
+        z-index: 8;
+      }
+      .urlbar b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .views {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+      }
+      .view {
+        position: absolute;
+        inset: 0;
+        overflow-y: auto;
+        padding: 0 0.9rem 1rem;
+        opacity: 0;
+        transform: translateY(14px);
+        pointer-events: none;
+        transition:
+          opacity 0.35s ease,
+          transform 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+        scrollbar-width: none;
+      }
+      .view::-webkit-scrollbar {
+        display: none;
+      }
+      .view.on {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+      }
+      .pcard {
+        background: var(--white);
+        border: 1.5px solid var(--line);
+        border-radius: 12px;
+        padding: 0.8rem;
+        box-shadow: 0 2px 0 rgba(23, 29, 26, 0.05);
+      }
+      .pcard + .pcard {
+        margin-top: 0.55rem;
+      }
+      .pcard .prow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .pcard .prow + .prow {
+        margin-top: 0.4rem;
+      }
+      .plabel {
+        font: 600 0.58rem/1.2 var(--mono);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--ink2);
+      }
+      .pval {
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+      .pval.amber {
+        color: var(--amber2);
+      }
+      .pbtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        width: 100%;
+        background: var(--amber);
+        border: 2px solid var(--ink);
+        border-radius: 9px;
+        padding: 0.75rem;
+        font: 800 0.8rem/1 var(--body);
+        color: var(--ink);
+        cursor: pointer;
+        box-shadow: 3px 3px 0 var(--ink);
+        transition: 0.15s;
+      }
+      .pbtn:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .pbtn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0 0 0 var(--ink);
+      }
+      .pbtn svg {
+        width: 15px;
+        height: 15px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .pbtn.dark {
+        background: var(--ink);
+        color: var(--paper);
+      }
+      .pbtn.wa {
+        background: #dff3e8;
+        border-color: var(--wa);
+        color: #12603f;
+        box-shadow: 3px 3px 0 var(--wa);
+      }
+      .trio {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 0.55rem;
+      }
+      .trio .pbtn {
+        padding: 0.65rem 0.2rem;
+        font-size: 0.72rem;
+      }
+      .bhead {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        margin: 0.4rem 0 0.7rem;
+      }
+      .blogo {
+        width: 40px;
+        height: 40px;
+        border-radius: 11px;
+        background: var(--pine);
+        color: var(--paper);
+        display: grid;
+        place-items: center;
+        font: 400 1rem var(--disp);
+        flex: none;
+        border: 2px solid var(--ink);
+      }
+      .bhead .bn {
+        font-weight: 800;
+        font-size: 0.88rem;
+        line-height: 1.2;
+      }
+      .bhead .bs {
+        font: 500 0.6rem/1.3 var(--mono);
+        color: var(--ink2);
+        display: flex;
+        gap: 0.35rem;
+        align-items: center;
+      }
+      .bhead .bs svg {
+        width: 11px;
+        height: 11px;
+        stroke: var(--amber2);
+        fill: var(--amber2);
+        stroke-width: 1;
+      }
+      .howhelp {
+        font-family: var(--disp);
+        font-size: 1.25rem;
+        text-transform: uppercase;
+        margin: 0.5rem 0 0.15rem;
+      }
+      .howhelp-sub {
+        font-size: 0.72rem;
+        color: var(--ink2);
+        line-height: 1.45;
+        margin-bottom: 0.7rem;
+      }
+      .qfield {
+        border: 1.5px solid var(--line2);
+        border-radius: 9px;
+        padding: 0.6rem 0.7rem;
+        font-size: 0.74rem;
+        background: var(--white);
+        margin-bottom: 0.5rem;
+      }
+      .qfield .plabel {
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+      .qfield .ans {
+        font-weight: 700;
+        font-size: 0.8rem;
+      }
+      .back {
+        background: none;
+        border: none;
+        font: 700 0.66rem var(--mono);
+        letter-spacing: 0.1em;
+        display: flex;
+        gap: 0.35rem;
+        align-items: center;
+        cursor: pointer;
+        color: var(--ink2);
+        margin: 0.2rem 0 0.6rem;
+        text-transform: uppercase;
+      }
+      .back:hover {
+        color: var(--ink);
+      }
+      .bigcheck {
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        background: var(--amber);
+        border: 2.5px solid var(--ink);
+        display: grid;
+        place-items: center;
+        margin: 1.4rem auto 0.9rem;
+        box-shadow: 4px 4px 0 var(--ink);
+      }
+      .bigcheck svg {
+        width: 28px;
+        height: 28px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 3.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .qdone {
+        text-align: center;
+      }
+      .qdone h4 {
+        font-family: var(--disp);
+        text-transform: uppercase;
+        font-size: 1.15rem;
+        margin-bottom: 0.3rem;
+      }
+      .qdone p {
+        font-size: 0.72rem;
+        color: var(--ink2);
+      }
+
+      /* pings */
+      .ping {
+        position: absolute;
+        z-index: 7;
+        background: var(--card);
+        border: 2px solid var(--ink);
+        border-radius: 12px;
+        padding: 0.65rem 0.85rem;
+        display: flex;
+        gap: 0.6rem;
+        align-items: flex-start;
+        box-shadow: 5px 5px 0 rgba(23, 29, 26, 0.85);
+        max-width: 230px;
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+      }
+      .ping.show {
+        animation: pingIn 6.5s ease forwards;
+      }
+      .ping.bump {
+        animation:
+          pingIn 6.5s ease forwards,
+          flash 0.8s ease;
+      }
+      @keyframes flash {
+        0%,
+        100% {
+          background: var(--card);
+        }
+        40% {
+          background: #ffe9bc;
+        }
+      }
+      @keyframes pingIn {
+        0% {
+          opacity: 0;
+          transform: translateY(12px) scale(0.94);
+        }
+        8% {
+          opacity: 1;
+          transform: none;
+        }
+        86% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-8px);
+        }
+      }
+      .ping .pi {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        flex: none;
+        border: 2px solid var(--ink);
+        background: var(--amber);
+      }
+      .ping .pi.g {
+        background: #dff3e8;
+        border-color: var(--wa);
+      }
+      .ping .pi svg {
+        width: 15px;
+        height: 15px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .ping strong {
+        display: block;
+        font-size: 0.76rem;
+        line-height: 1.25;
+      }
+      .ping em {
+        display: block;
+        font: 500 0.62rem/1.4 var(--mono);
+        font-style: normal;
+        color: var(--ink2);
+      }
+      .ping-a {
+        top: 11%;
+        left: -10%;
+      }
+      .ping-b {
+        bottom: 9%;
+        right: -9%;
+      }
+      .who-next {
+        margin-top: 2rem;
+        text-align: center;
+        font: 600 0.74rem var(--mono);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .who-next svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--ink2);
+        fill: none;
+        stroke-width: 2;
+        stroke-linecap: round;
+        animation: bob 1.8s ease-in-out infinite;
+      }
+      @keyframes bob {
+        50% {
+          transform: translateY(6px);
+        }
+      }
+
+      /* hazard divider */
+      .hzd {
+        height: 14px;
+        background: repeating-linear-gradient(
+          -45deg,
+          var(--ink) 0 13px,
+          var(--amber) 13px 26px
+        );
+        border-block: 2.5px solid var(--ink);
+      }
+
+      /* ============ PROBLEM (dark) ============ */
+      .dk {
+        background: var(--pine);
+        color: var(--paper);
+      }
+      .dk h1,
+      .dk h2 {
+        color: var(--paper);
+      }
+      .problem {
+        padding: 96px 0 100px;
+        background: var(--pine);
+        color: var(--paper);
+        background-image: radial-gradient(
+          rgba(244, 239, 226, 0.06) 1.5px,
+          transparent 1.5px
+        );
+        background-size: 26px 26px;
+      }
+      .problem .lead {
+        margin-top: 1.2rem;
+      }
+      .qwall {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.1rem;
+        margin: 3rem 0 3.6rem;
+      }
+      .qchip {
+        border: 2px solid var(--pl2);
+        border-radius: 14px 14px 14px 3px;
+        padding: 1rem 1.4rem;
+        font: 600 1rem/1.3 var(--body);
+        background: rgba(244, 239, 226, 0.04);
+        position: relative;
+      }
+      .qchip::after {
+        content: "";
+        position: absolute;
+        left: -2px;
+        bottom: -11px;
+        border: 6px solid transparent;
+        border-top-color: var(--pl2);
+        border-left-color: var(--pl2);
+      }
+      .qchip:nth-child(1) {
+        transform: rotate(-2deg);
+      }
+      .qchip:nth-child(2) {
+        transform: rotate(1.5deg) translateY(10px);
+      }
+      .qchip:nth-child(3) {
+        transform: rotate(-1deg);
+      }
+      .qchip:nth-child(4) {
+        transform: rotate(2deg) translateY(6px);
+      }
+      .qchip:nth-child(5) {
+        transform: rotate(-1.6deg) translateY(-4px);
+      }
+      .qchip:nth-child(6) {
+        transform: rotate(1deg) translateY(12px);
+      }
+      .qchip .qm {
+        font-family: var(--mono);
+        color: var(--amber);
+        margin-right: 0.5rem;
+        font-size: 0.8rem;
+      }
+      .journey {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0;
+        border-top: 2px dashed var(--pl2);
+        padding-top: 2.4rem;
+        position: relative;
+      }
+      .jstep {
+        padding: 0 2rem;
+        position: relative;
+      }
+      .jstep:first-child {
+        padding-left: 0;
+      }
+      .jstep .jn {
+        font: 400 2.6rem/1 var(--disp);
+        color: transparent;
+        -webkit-text-stroke: 1.5px var(--amber);
+        margin-bottom: 0.8rem;
+      }
+      .jstep h3 {
+        font-size: 1.05rem;
+        font-weight: 800;
+        margin-bottom: 0.35rem;
+      }
+      .jstep p {
+        font-size: 0.92rem;
+        color: rgba(244, 239, 226, 0.72);
+      }
+      .jstep::after {
+        content: "→";
+        position: absolute;
+        right: -8px;
+        top: 6px;
+        font-family: var(--mono);
+        color: var(--amber);
+        font-size: 1.3rem;
+      }
+      .jstep:last-child::after {
+        content: "";
+      }
+
+      /* ============ FEATURES ============ */
+      .features {
+        padding: 100px 0 110px;
+        background: var(--paper);
+      }
+      .features .head {
+        max-width: 760px;
+        margin-bottom: 3.2rem;
+      }
+      .features .head .hint {
+        font: 600 0.74rem var(--mono);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--amber2);
+        margin-top: 1.1rem;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .fgrid {
+        display: grid;
+        grid-template-columns: 1fr 360px 1fr;
+        gap: 40px;
+        align-items: start;
+      }
+      .device-sticky {
+        position: sticky;
+        top: 110px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.9rem;
+      }
+      .fcount {
+        font: 600 0.72rem var(--mono);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+      }
+      .ticks {
+        display: flex;
+        gap: 5px;
+      }
+      .ticks i {
+        width: 16px;
+        height: 5px;
+        background: var(--line2);
+        border-radius: 2px;
+        transition: 0.3s;
+      }
+      .ticks i.on {
+        background: var(--amber2);
+        width: 26px;
+      }
+      .off-screen {
+        position: absolute;
+        inset: 0;
+        background: rgba(244, 239, 226, 0.94);
+        z-index: 12;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.7rem;
+        text-align: center;
+        padding: 2rem;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.3s;
+      }
+      .off-screen.on {
+        opacity: 1;
+      }
+      .off-screen .sw {
+        pointer-events: auto;
+      }
+      .off-screen p {
+        font: 600 0.78rem var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .fcol {
+        display: flex;
+        flex-direction: column;
+        gap: 2.4rem;
+      }
+      .feature {
+        border: 2px solid var(--line2);
+        border-radius: 14px;
+        background: var(--card);
+        padding: 1.7rem;
+        transition:
+          border-color 0.35s,
+          box-shadow 0.35s,
+          opacity 0.35s;
+        position: relative;
+      }
+      .feature.act {
+        border-color: var(--ink);
+        box-shadow: 7px 7px 0 rgba(23, 29, 26, 0.14);
+      }
+      .feature.off {
+        opacity: 0.55;
+      }
+      .feature.off .fsample {
+        filter: grayscale(0.6);
+      }
+      .fhead {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 0.8rem;
+      }
+      .fidx {
+        font: 400 1rem var(--disp);
+        background: var(--ink);
+        color: var(--amber);
+        width: 38px;
+        height: 38px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        flex: none;
+        padding-top: 2px;
+      }
+      .fhead h3 {
+        font-family: var(--disp);
+        font-size: 1.45rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+      }
+      .sw {
+        width: 52px;
+        height: 29px;
+        border: 2.5px solid var(--ink);
+        border-radius: 99px;
+        background: #d8d2c0;
+        cursor: pointer;
+        position: relative;
+        flex: none;
+        margin-left: auto;
+        transition: background 0.25s;
+      }
+      .sw::after {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 18px;
+        height: 18px;
+        background: var(--white);
+        border: 2.5px solid var(--ink);
+        border-radius: 50%;
+        transition: transform 0.25s cubic-bezier(0.5, 1.6, 0.4, 1);
+      }
+      .sw[aria-checked="true"] {
+        background: var(--amber);
+      }
+      .sw[aria-checked="true"]::after {
+        transform: translateX(22px);
+      }
+      .feature > p {
+        color: var(--ink2);
+        font-size: 0.98rem;
+        margin-bottom: 1.1rem;
+      }
+      .fsample {
+        background: var(--paper);
+        border: 1.5px dashed var(--line2);
+        border-radius: 10px;
+        padding: 1.1rem;
+        font-size: 0.9rem;
+      }
+      .fsample .plabel {
+        margin-bottom: 0.6rem;
+      }
+      .frow {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.42rem 0;
+        border-bottom: 1px dotted var(--line2);
+        align-items: center;
+      }
+      .frow:last-child {
+        border-bottom: none;
+      }
+      .frow .dots {
+        flex: 1;
+        border-bottom: 2px dotted var(--line2);
+        transform: translateY(-4px);
+        min-width: 14px;
+      }
+      .frow b {
+        white-space: nowrap;
+      }
+      .ok {
+        font: 700 0.68rem var(--mono);
+        letter-spacing: 0.06em;
+        background: #dff3e8;
+        border: 1.5px solid var(--wa);
+        color: #12603f;
+        padding: 0.22rem 0.55rem;
+        border-radius: 99px;
+      }
+      .mini-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font: 800 0.8rem var(--body);
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        padding: 0.5rem 0.9rem;
+        background: var(--amber);
+        box-shadow: 3px 3px 0 var(--ink);
+        margin-right: 0.5rem;
+        margin-top: 0.4rem;
+      }
+      .mini-btn.wa {
+        background: #dff3e8;
+        border-color: var(--wa);
+        color: #12603f;
+        box-shadow: 3px 3px 0 var(--wa);
+      }
+      .mini-btn.plain {
+        background: var(--white);
+      }
+      .stars {
+        color: var(--amber2);
+        letter-spacing: 0.14em;
+        font-size: 1.05rem;
+      }
+      .qr-sm {
+        width: 56px;
+        height: 56px;
+        background: var(--white);
+        border: 2px solid var(--ink);
+        border-radius: 6px;
+        padding: 4px;
+        display: grid;
+        grid-template-columns: repeat(13, 1fr);
+        grid-template-rows: repeat(13, 1fr);
+        gap: 0;
+        flex: none;
+      }
+      .qr-sm i {
+        background: transparent;
+      }
+      .qr-sm i.f {
+        background: var(--ink);
+      }
+
+      /* ============ HOW IT WORKS (stacked cards) ============ */
+      .how {
+        padding: 100px 0 120px;
+        background: var(--paper2);
+      }
+      .how .head {
+        max-width: 720px;
+        margin-bottom: 3.4rem;
+      }
+      .steps {
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+      }
+      .step-card {
+        position: sticky;
+        top: calc(96px + var(--i) * 26px);
+        background: var(--card);
+        border: 2.5px solid var(--ink);
+        border-radius: 18px;
+        padding: 2.6rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2.6rem;
+        align-items: center;
+        box-shadow: 0 -10px 30px rgba(23, 29, 26, 0.08);
+        min-height: 380px;
+      }
+      .step-num {
+        font: 400 4.2rem/1 var(--disp);
+        color: transparent;
+        -webkit-text-stroke: 2px var(--amber2);
+      }
+      .step-card h3 {
+        font-family: var(--disp);
+        font-size: 1.7rem;
+        text-transform: uppercase;
+        margin: 0.7rem 0 0.7rem;
+      }
+      .step-card .sc {
+        color: var(--ink2);
+        font-size: 0.99rem;
+        max-width: 30em;
+      }
+      .demo-panel {
+        background: var(--paper);
+        border: 2px solid var(--line2);
+        border-radius: 14px;
+        padding: 1.6rem;
+        position: relative;
+        min-height: 230px;
+      }
+      .dp-label {
+        font: 600 0.66rem var(--mono);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        margin-bottom: 1rem;
+        display: block;
+      }
+      .fake-field {
+        background: var(--white);
+        border: 2px solid var(--line2);
+        border-radius: 9px;
+        padding: 0.7rem 0.9rem;
+        margin-bottom: 0.8rem;
+      }
+      .fake-field .plabel {
+        margin-bottom: 0.3rem;
+      }
+      .fake-field .val {
+        font-weight: 800;
+        font-size: 0.95rem;
+        min-height: 1.4em;
+        display: block;
+      }
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 1em;
+        background: var(--amber2);
+        vertical-align: -2px;
+        animation: blink 1s steps(1) infinite;
+        margin-left: 1px;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .toollist {
+        list-style: none;
+      }
+      .toollist li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.65rem 0;
+        border-bottom: 1px dotted var(--line2);
+        font-weight: 700;
+        font-size: 0.95rem;
+      }
+      .toollist li:last-child {
+        border: none;
+      }
+      .pubcard {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+      .publink {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        background: var(--white);
+        border: 2px solid var(--ink);
+        border-radius: 9px;
+        padding: 0.6rem 0.9rem;
+        font: 600 0.78rem var(--mono);
+        margin-bottom: 1rem;
+        box-shadow: 3px 3px 0 rgba(23, 29, 26, 0.5);
+      }
+      .publink svg {
+        width: 15px;
+        height: 15px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+      .stamp {
+        position: absolute;
+        right: 1.2rem;
+        top: 1rem;
+        border: 3px solid var(--wa);
+        color: var(--wa);
+        font: 700 0.8rem var(--mono);
+        letter-spacing: 0.24em;
+        padding: 0.4rem 0.8rem;
+        border-radius: 8px;
+        transform: rotate(8deg) scale(1.4);
+        opacity: 0;
+        transition: 0.4s cubic-bezier(0.3, 1.5, 0.5, 1);
+      }
+      .stamp.show {
+        opacity: 1;
+        transform: rotate(-7deg) scale(1);
+      }
+      .how-cta {
+        text-align: center;
+        margin-top: 3.6rem;
+      }
+      .how-cta p {
+        font: 600 0.78rem var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        margin-bottom: 1.1rem;
+      }
+
+      /* ============ WHO (marquee) ============ */
+      .who {
+        background: var(--pine);
+        color: var(--paper);
+        padding: 96px 0 90px;
+        overflow: hidden;
+      }
+      .who .head {
+        max-width: 760px;
+        margin-bottom: 3rem;
+      }
+      .mq {
+        overflow: hidden;
+        padding: 0.7rem 0;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 8%,
+          #000 92%,
+          transparent
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent,
+          #000 8%,
+          #000 92%,
+          transparent
+        );
+      }
+      .mq-track {
+        display: flex;
+        gap: 14px;
+        width: max-content;
+        animation: mq 36s linear infinite;
+      }
+      .mq.rev .mq-track {
+        animation-direction: reverse;
+        animation-duration: 42s;
+      }
+      .mq:hover .mq-track {
+        animation-play-state: paused;
+      }
+      @keyframes mq {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.65rem;
+        font: 600 0.92rem/1 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--paper);
+        border: 2px solid var(--pl2);
+        padding: 0.85rem 1.3rem;
+        border-radius: 10px;
+        white-space: nowrap;
+        transition: 0.2s;
+      }
+      .tag::before {
+        content: "";
+        width: 8px;
+        height: 8px;
+        background: var(--amber);
+        flex: none;
+      }
+      .tag:hover {
+        background: var(--amber);
+        color: var(--ink);
+        border-color: var(--amber);
+      }
+      .tag.more {
+        border-style: dashed;
+      }
+      .who-note {
+        margin-top: 2.6rem;
+        font-size: 1.02rem;
+        color: rgba(244, 239, 226, 0.8);
+      }
+      .who-note b {
+        color: var(--amber);
+      }
+
+      /* ============ POSITIONING ============ */
+      .position {
+        padding: 100px 0 110px;
+        background: var(--pine2);
+        color: var(--paper);
+        background-image: radial-gradient(
+          rgba(244, 239, 226, 0.05) 1.5px,
+          transparent 1.5px
+        );
+        background-size: 26px 26px;
+      }
+      .pos-top {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 3rem;
+        align-items: start;
+        margin-bottom: 3.4rem;
+      }
+      .keep {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+      }
+      .keep .k {
+        border: 2px solid var(--pl2);
+        border-radius: 12px;
+        padding: 1.2rem 1.4rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: space-between;
+        background: rgba(244, 239, 226, 0.03);
+      }
+      .keep .k p {
+        font-weight: 700;
+        font-size: 1.02rem;
+      }
+      .kstamp {
+        font: 700 0.74rem var(--mono);
+        letter-spacing: 0.2em;
+        color: var(--amber);
+        border: 2.5px solid var(--amber);
+        padding: 0.45rem 0.8rem;
+        border-radius: 8px;
+        transform: rotate(-3deg);
+        white-space: nowrap;
+      }
+      .keep .solo {
+        font-size: 0.95rem;
+        color: rgba(244, 239, 226, 0.75);
+        text-align: center;
+        padding: 0.2rem 0 0;
+      }
+      .compare {
+        border: 2.5px solid var(--pl2);
+        border-radius: 16px;
+        overflow: hidden;
+        background: rgba(244, 239, 226, 0.03);
+      }
+      .cmp-head {
+        display: grid;
+        grid-template-columns: 1fr 54px 1fr;
+        font: 600 0.7rem var(--mono);
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        padding: 1.1rem 1.6rem;
+        border-bottom: 2px solid var(--pl2);
+      }
+      .cmp-head span:nth-child(1) {
+        color: rgba(244, 239, 226, 0.55);
+      }
+      .cmp-head span:nth-child(3) {
+        color: var(--amber);
+        text-align: right;
+      }
+      .cmp-row {
+        display: grid;
+        grid-template-columns: 1fr 54px 1fr;
+        align-items: center;
+        padding: 1.15rem 1.6rem;
+        border-bottom: 1px solid rgba(244, 239, 226, 0.12);
+        font-size: 1.02rem;
+      }
+      .cmp-row:last-child {
+        border-bottom: none;
+      }
+      .cmp-l {
+        position: relative;
+        color: rgba(244, 239, 226, 0.55);
+        width: fit-content;
+      }
+      .cmp-l::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 52%;
+        height: 2.5px;
+        width: 0;
+        background: var(--amber);
+        transform: rotate(-1.5deg);
+        transition: width 0.6s cubic-bezier(0.6, 0, 0.2, 1);
+      }
+      .cmp-row.in .cmp-l::after {
+        width: 100%;
+      }
+      .cmp-mid {
+        text-align: center;
+        color: var(--amber);
+        font-family: var(--mono);
+      }
+      .cmp-r {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 0.7rem;
+        font-weight: 800;
+        text-align: right;
+      }
+      .cmp-r .tick {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--amber);
+        border: 2px solid var(--ink);
+        display: grid;
+        place-items: center;
+        flex: none;
+        transform: scale(0);
+        transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.4, 1) 0.35s;
+      }
+      .cmp-row.in .cmp-r .tick {
+        transform: scale(1);
+      }
+      .cmp-r .tick svg {
+        width: 13px;
+        height: 13px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 3.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* ============ ACTIVITY ============ */
+      .activity {
+        padding: 100px 0 110px;
+        background: var(--paper);
+      }
+      .act-grid {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 4rem;
+        align-items: center;
+      }
+      .checks {
+        list-style: none;
+        margin: 1.8rem 0 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+      }
+      .checks li {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+        font-weight: 700;
+      }
+      .checks svg {
+        width: 22px;
+        height: 22px;
+        stroke: var(--amber2);
+        fill: none;
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+      .dash {
+        background: var(--card);
+        border: 2.5px solid var(--ink);
+        border-radius: 18px;
+        box-shadow: 10px 10px 0 rgba(23, 29, 26, 0.12);
+        overflow: hidden;
+      }
+      .dash-head {
+        display: flex;
+        align-items: center;
+        gap: 0.9rem;
+        padding: 1.1rem 1.4rem;
+        border-bottom: 2px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .dash-head .dh-t {
+        font-weight: 800;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .livedot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--wa);
+        animation: pulse 2s infinite;
+      }
+      .badge-sample {
+        font: 700 0.62rem var(--mono);
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        background: var(--paper2);
+        border: 1.5px solid var(--line2);
+        padding: 0.4rem 0.7rem;
+        border-radius: 6px;
+        color: var(--ink2);
+        margin-left: auto;
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2px;
+        background: var(--line);
+        border-bottom: 2px solid var(--line);
+      }
+      .metric {
+        background: var(--card);
+        padding: 1.3rem 1.4rem;
+      }
+      .metric .mv {
+        font: 600 2.3rem/1 var(--mono);
+        letter-spacing: -0.02em;
+      }
+      .metric .mv.amber {
+        color: var(--amber2);
+      }
+      .metric .ml {
+        font: 600 0.66rem var(--mono);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        margin-top: 0.4rem;
+      }
+      .spark {
+        padding: 1rem 1.4rem 0.4rem;
+        border-bottom: 2px solid var(--line);
+      }
+      .spark svg {
+        width: 100%;
+        height: 56px;
+      }
+      .spark path {
+        stroke: var(--amber2);
+        stroke-width: 2.5;
+        fill: none;
+        stroke-linecap: round;
+      }
+      .spark .fill {
+        fill: rgba(255, 176, 32, 0.14);
+        stroke: none;
+      }
+      .feed {
+        list-style: none;
+        padding: 0.4rem 0;
+        max-height: 230px;
+        overflow: hidden;
+      }
+      .feed li {
+        display: flex;
+        gap: 0.9rem;
+        align-items: center;
+        padding: 0.75rem 1.4rem;
+        border-bottom: 1px dotted var(--line);
+        animation: feedin 0.5s ease;
+      }
+      @keyframes feedin {
+        from {
+          opacity: 0;
+          transform: translateY(-10px);
+        }
+      }
+      .feed .fi {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        flex: none;
+        border: 2px solid var(--ink);
+        background: var(--amber);
+      }
+      .feed .fi.c {
+        background: #dff3e8;
+        border-color: var(--wa);
+      }
+      .feed .fi.r {
+        background: var(--paper2);
+      }
+      .feed .fi svg {
+        width: 15px;
+        height: 15px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .feed .ft strong {
+        display: block;
+        font-size: 0.88rem;
+        line-height: 1.25;
+      }
+      .feed .ft em {
+        font: 500 0.68rem var(--mono);
+        font-style: normal;
+        color: var(--ink2);
+      }
+      .feed .fw {
+        margin-left: auto;
+        font: 600 0.68rem var(--mono);
+        color: var(--ink2);
+        white-space: nowrap;
+      }
+
+      /* ============ REVIEW KIT ============ */
+      .reviewkit {
+        padding: 100px 0 120px;
+        background: var(--paper2);
+        overflow: hidden;
+      }
+      .rk-grid {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 3rem;
+        align-items: center;
+      }
+      .rk-caps {
+        margin-top: 2.4rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.6rem;
+      }
+      .rk-cap {
+        display: grid;
+        grid-template-columns: 52px 1fr;
+        gap: 1.1rem;
+      }
+      .rk-cap .ci {
+        width: 44px;
+        height: 44px;
+        background: var(--card);
+        border: 2px solid var(--ink);
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        box-shadow: 3px 3px 0 rgba(23, 29, 26, 0.7);
+      }
+      .rk-cap .ci svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.1;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .rk-cap h3 {
+        font-family: var(--disp);
+        text-transform: uppercase;
+        font-size: 1.15rem;
+        margin-bottom: 0.25rem;
+      }
+      .rk-cap p {
+        color: var(--ink2);
+        font-size: 0.95rem;
+        max-width: 26em;
+      }
+      .collage {
+        position: relative;
+        height: 560px;
+      }
+      .art {
+        position: absolute;
+        transition:
+          transform 0.4s cubic-bezier(0.3, 1.3, 0.4, 1),
+          box-shadow 0.4s;
+        will-change: transform;
+      }
+      .art:hover {
+        transform: rotate(0deg) translateY(-10px) !important;
+        z-index: 20;
+        box-shadow: 16px 18px 0 rgba(23, 29, 26, 0.16);
+      }
+      .sign {
+        width: 300px;
+        left: 50%;
+        top: 30px;
+        transform: translateX(-54%) rotate(-3deg);
+        background: var(--white);
+        border: 2.5px solid var(--ink);
+        border-radius: 16px;
+        padding: 1.7rem;
+        text-align: center;
+        box-shadow: 10px 12px 0 rgba(23, 29, 26, 0.14);
+        animation: breathe 7s ease-in-out infinite;
+      }
+      @keyframes breathe {
+        50% {
+          transform: translateX(-54%) rotate(-3deg) translateY(-8px);
+        }
+      }
+      .sign .sb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        justify-content: center;
+        font: 600 0.66rem var(--mono);
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--ink2);
+        margin-bottom: 1rem;
+      }
+      .sign .sb i {
+        width: 22px;
+        height: 22px;
+        background: var(--pine);
+        color: var(--paper);
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        font: 400 0.62rem var(--disp);
+        font-style: normal;
+      }
+      .sign h4 {
+        font-family: var(--disp);
+        text-transform: uppercase;
+        font-size: 1.6rem;
+        line-height: 1.02;
+        margin-bottom: 0.6rem;
+      }
+      .sign p {
+        font-size: 0.82rem;
+        color: var(--ink2);
+        line-height: 1.5;
+      }
+      .sign .qr {
+        margin: 1.1rem auto 0.9rem;
+      }
+      .sign .stars {
+        margin-bottom: 0.3rem;
+      }
+      .sign .fine {
+        font: 500 0.64rem var(--mono);
+        color: var(--ink2);
+      }
+      .bcard {
+        width: 210px;
+        right: 2%;
+        bottom: 60px;
+        transform: rotate(5deg);
+        background: var(--pine);
+        color: var(--paper);
+        border: 2.5px solid var(--ink);
+        border-radius: 14px;
+        padding: 1.2rem;
+        box-shadow: 8px 10px 0 rgba(23, 29, 26, 0.16);
+        animation: breathe2 8s ease-in-out infinite;
+      }
+      @keyframes breathe2 {
+        50% {
+          transform: rotate(5deg) translateY(-7px);
+        }
+      }
+      .bcard .bn {
+        font-family: var(--disp);
+        font-size: 1rem;
+        text-transform: uppercase;
+        margin-bottom: 0.8rem;
+      }
+      .bcard .row {
+        display: flex;
+        gap: 0.8rem;
+        align-items: center;
+      }
+      .bcard small {
+        font: 500 0.6rem/1.5 var(--mono);
+        color: rgba(244, 239, 226, 0.75);
+      }
+      .social {
+        width: 200px;
+        left: 0;
+        bottom: 20px;
+        transform: rotate(-6deg);
+        aspect-ratio: 1;
+        background: var(--amber);
+        border: 2.5px solid var(--ink);
+        border-radius: 14px;
+        padding: 1.2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        box-shadow: 8px 10px 0 rgba(23, 29, 26, 0.16);
+        animation: breathe3 9s ease-in-out infinite;
+      }
+      @keyframes breathe3 {
+        50% {
+          transform: rotate(-6deg) translateY(-9px);
+        }
+      }
+      .social .st {
+        font-family: var(--disp);
+        text-transform: uppercase;
+        font-size: 1.15rem;
+        line-height: 1.05;
+      }
+      .social .row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+      }
+      .social small {
+        font: 600 0.58rem var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .qr {
+        width: 104px;
+        height: 104px;
+        background: var(--white);
+        border: 2px solid var(--ink);
+        border-radius: 8px;
+        padding: 7px;
+        display: grid;
+        grid-template-columns: repeat(17, 1fr);
+        grid-template-rows: repeat(17, 1fr);
+      }
+      .qr.small {
+        width: 64px;
+        height: 64px;
+        padding: 5px;
+      }
+      .qr i {
+        background: transparent;
+      }
+      .qr i.f {
+        background: var(--ink);
+      }
+
+      /* ============ REASSURANCE STRIP ============ */
+      .strip {
+        background: var(--amber);
+        border-block: 2.5px solid var(--ink);
+        padding: 1.8rem 0;
+      }
+      .strip-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+      }
+      .rp {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        padding: 0 1.4rem;
+        border-left: 2px solid rgba(23, 29, 26, 0.25);
+        font: 700 0.82rem/1.3 var(--mono);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      .rp:first-child {
+        border-left: none;
+      }
+      .rp svg {
+        width: 24px;
+        height: 24px;
+        stroke: var(--ink);
+        fill: none;
+        stroke-width: 2.2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        flex: none;
+      }
+
+      /* ============ FAQ ============ */
+      .faq {
+        padding: 100px 0 110px;
+        background: var(--paper);
+      }
+      .faq-grid {
+        display: grid;
+        grid-template-columns: 0.85fr 1.15fr;
+        gap: 4rem;
+        align-items: start;
+      }
+      .faq-side {
+        position: sticky;
+        top: 110px;
+      }
+      .faq-side .lead {
+        margin-top: 1.2rem;
+      }
+      .faq-side .mini-cta {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.9rem;
+        align-items: flex-start;
+      }
+      .qa {
+        border: 2px solid var(--line2);
+        border-radius: 12px;
+        background: var(--card);
+        margin-bottom: 0.9rem;
+        overflow: hidden;
+        transition: border-color 0.3s;
+      }
+      .qa.open {
+        border-color: var(--ink);
+      }
+      .qa-q {
+        width: 100%;
+        background: none;
+        border: none;
+        font: 700 1.05rem/1.35 var(--body);
+        color: var(--ink);
+        text-align: left;
+        padding: 1.25rem 1.4rem;
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        align-items: center;
+        cursor: pointer;
+      }
+      .qa-q .pm {
+        width: 30px;
+        height: 30px;
+        border: 2.5px solid var(--ink);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        flex: none;
+        background: var(--amber);
+        transition: transform 0.35s;
+        font: 400 1.3rem/1 var(--body);
+        padding-bottom: 2px;
+      }
+      .qa.open .pm {
+        transform: rotate(45deg);
+      }
+      .qa-a {
+        display: grid;
+        grid-template-rows: 0fr;
+        transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .qa.open .qa-a {
+        grid-template-rows: 1fr;
+      }
+      .qa-a > div {
+        overflow: hidden;
+      }
+      .qa-a p {
+        padding: 0 1.4rem 1.3rem;
+        color: var(--ink2);
+        font-size: 0.98rem;
+      }
+
+      /* ============ FINAL CTA ============ */
+      .final {
+        padding: 120px 0;
+        background: var(--pine2);
+        color: var(--paper);
+        text-align: center;
+        overflow: hidden;
+        background-image: radial-gradient(
+          rgba(255, 176, 32, 0.08) 1px,
+          transparent 1px
+        );
+        background-size: 30px 30px;
+      }
+      .final .ghost {
+        position: absolute;
+        bottom: -40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--disp);
+        font-size: clamp(6rem, 18vw, 15rem);
+        color: transparent;
+        -webkit-text-stroke: 1.5px rgba(244, 239, 226, 0.08);
+        white-space: nowrap;
+        pointer-events: none;
+        text-transform: uppercase;
+      }
+      .final h2 {
+        max-width: 15em;
+        margin: 1.4rem auto 1.3rem;
+      }
+      .final .lead {
+        margin: 0 auto 2.4rem;
+      }
+      .final .login-line {
+        margin-top: 1.6rem;
+        font-size: 0.95rem;
+        color: rgba(244, 239, 226, 0.75);
+      }
+      .final .login-line a {
+        color: var(--amber);
+        font-weight: 700;
+        text-decoration: none;
+        border-bottom: 2px solid var(--amber);
+      }
+
+      /* ============ FOOTER ============ */
+      footer {
+        background: var(--ink);
+        color: var(--paper);
+        padding: 3.2rem 0;
+        border-top: 4px solid var(--amber);
+      }
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+      }
+      .foot .brand {
+        color: var(--paper);
+        font-size: 1.3rem;
+      }
+      .foot-links {
+        display: flex;
+        gap: 1.8rem;
+        flex-wrap: wrap;
+        list-style: none;
+      }
+      .foot-links a {
+        text-decoration: none;
+        font-size: 0.92rem;
+        color: rgba(244, 239, 226, 0.75);
+      }
+      .foot-links a:hover {
+        color: var(--amber);
+      }
+      .foot-note {
+        margin-top: 1.8rem;
+        font: 500 0.72rem var(--mono);
+        letter-spacing: 0.06em;
+        color: rgba(244, 239, 226, 0.45);
+      }
+
+      /* ============ RESPONSIVE ============ */
+      @media (max-width: 1080px) {
+        .ping-a {
+          left: -4%;
+        }
+        .ping-b {
+          right: -3%;
+        }
+      }
+      @media (max-width: 980px) {
+        .nav-links,
+        .nav-cta .login {
+          display: none;
+        }
+        .burger {
+          display: flex;
+          margin-left: auto;
+        }
+        .nav-cta {
+          margin-left: auto;
+        }
+        .burger {
+          margin-left: 0;
+        }
+        .nav {
+          gap: 1rem;
+        }
+        .nav-links {
+          margin-left: 0;
+        }
+        .hero-grid,
+        .pos-top,
+        .act-grid,
+        .rk-grid,
+        .faq-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero {
+          padding-top: 44px;
+        }
+        .stage {
+          margin-top: 1.5rem;
+        }
+        .fgrid {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+        .device-sticky {
+          position: relative;
+          top: 0;
+        }
+        .step-card {
+          grid-template-columns: 1fr;
+          gap: 1.6rem;
+          padding: 1.8rem;
+          min-height: 0;
+          position: relative;
+          top: 0;
+        }
+        .journey {
+          grid-template-columns: 1fr;
+          gap: 2rem;
+        }
+        .jstep {
+          padding: 0;
+        }
+        .jstep::after {
+          content: "↓";
+          right: auto;
+          left: 6px;
+          top: auto;
+          bottom: -28px;
+        }
+        .journey {
+          padding-bottom: 1rem;
+        }
+        .strip-grid {
+          grid-template-columns: repeat(2, 1fr);
+          gap: 1.2rem 0;
+        }
+        .rp {
+          border-left: none;
+          padding: 0.4rem 0.6rem;
+        }
+        .collage {
+          height: 600px;
+          max-width: 520px;
+          margin: 0 auto;
+        }
+        .faq-side {
+          position: static;
+        }
+        .cmp-head,
+        .cmp-row {
+          padding-left: 1rem;
+          padding-right: 1rem;
+          font-size: 0.92rem;
+        }
+      }
+      @media (max-width: 620px) {
+        body {
+          font-size: 16px;
+        }
+        .device {
+          width: 290px;
+        }
+        .ping {
+          max-width: 190px;
+        }
+        .ping-a {
+          left: -2%;
+          top: 6%;
+        }
+        .ping-b {
+          right: -2%;
+        }
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+        .sign {
+          width: 260px;
+        }
+        .cta-row .btn {
+          width: 100%;
+        }
+        .cmp-mid {
+          display: none;
+        }
+        .cmp-head,
+        .cmp-row {
+          grid-template-columns: 1fr 1fr;
+        }
+        .cmp-r {
+          font-size: 0.88rem;
+        }
+      }
+
+      /* ============ REDUCED MOTION ============ */
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.001s !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.001s !important;
+        }
+        [data-reveal] {
+          opacity: 1;
+          transform: none;
+        }
+        .ln > span {
+          transform: none;
+        }
+        .mq-track {
+          animation: none;
+          flex-wrap: wrap;
+          width: auto;
+        }
+        .ping {
+          opacity: 1;
+          transform: none;
+          animation: none !important;
+        }
+        .cmp-l::after {
+          width: 100%;
+        }
+        .cmp-r .tick {
+          transform: scale(1);
+        }
+        .stamp {
+          opacity: 1;
+          transform: rotate(-7deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+
+    <!-- ================= HEADER ================= -->
+    <header id="siteHeader">
+      <div class="wrap nav">
+        <a class="brand" href="#top" aria-label="LocalAction home">
+          <span class="mark" aria-hidden="true"
+            ><svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3" />
+              <path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg
+          ></span>
+          Local<em>Action</em>
+        </a>
+        <ul class="nav-links">
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#features">What you get</a></li>
+          <li><a href="#who">Who it's for</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <div class="nav-cta">
+          <a class="login" href="/login">Log in</a>
+          <a class="btn btn-sm" href="/signup">Create my page</a>
+          <button
+            class="burger"
+            id="burger"
+            aria-label="Toggle menu"
+            aria-expanded="false"
+          >
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+      <div class="mobile-panel">
+        <a href="#how">How it works</a>
+        <a href="#features">What you get</a>
+        <a href="#who">Who it's for</a>
+        <a href="#faq">FAQ</a>
+        <a href="/login">Log in</a>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- ================= HERO ================= -->
+      <section class="hero" id="top">
+        <div class="wrap hero-grid">
+          <div>
+            <span class="chip" data-reveal
+              ><span class="dot"></span>For local service businesses</span
+            >
+            <h1 class="h-xl" data-reveal>
+              <span class="ln"
+                ><span style="--ld: 0.05s">Calls, quotes,</span></span
+              >
+              <span class="ln"
+                ><span style="--ld: 0.15s"
+                  >WhatsApp <span class="amb">&amp; reviews</span> —</span
+                ></span
+              >
+              <span class="ln"
+                ><span style="--ld: 0.25s">from one simple page.</span></span
+              >
+            </h1>
+            <p class="lead" data-reveal style="--d: 0.3s">
+              Give customers one clean, mobile-friendly place to take the next
+              step — contact you, request a quote, see prices, check where you
+              work and leave a review.
+            </p>
+            <div class="cta-row" data-reveal style="--d: 0.4s">
+              <a class="btn" href="/signup"
+                >Create my page
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg
+              ></a>
+              <a class="btn btn-ghost" href="#how">See how it works</a>
+            </div>
+            <ul class="assure" data-reveal style="--d: 0.5s">
+              <li>
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg>No
+                website builder
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg>No
+                code
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg
+                >Change anything later
+              </li>
+            </ul>
+          </div>
+
+          <div class="stage" data-reveal style="--d: 0.25s">
+            <div class="ghostword" aria-hidden="true">LOCAL<br />ACTION</div>
+            <span class="sample-tag">Sample page</span>
+
+            <div class="ping ping-a" id="pingA" aria-hidden="true">
+              <span class="pi"
+                ><svg viewBox="0 0 24 24">
+                  <path d="M6 3h9l4 4v14H6z" />
+                  <path d="M9 12h6M9 16h6" /></svg
+              ></span>
+              <div>
+                <strong>New quote request</strong
+                ><em>Bathroom tap replacement · just now</em>
+              </div>
+            </div>
+            <div class="ping ping-b" id="pingB" aria-hidden="true">
+              <span class="pi g"
+                ><svg viewBox="0 0 24 24">
+                  <path
+                    d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z"
+                  />
+                  <path d="M9.5 10.5l2 2 3.5-4" /></svg
+              ></span>
+              <div>
+                <strong>Service area checked</strong
+                ><em>Manchester is covered</em>
+              </div>
+            </div>
+
+            <div class="device">
+              <div class="screen">
+                <div class="statusbar">
+                  <span>9:41</span
+                  ><span class="bars" aria-hidden="true"
+                    ><i style="height: 4px"></i><i style="height: 6px"></i
+                    ><i style="height: 8px"></i><i style="height: 10px"></i
+                  ></span>
+                </div>
+                <div class="urlbar">
+                  🔒 localaction.page/<b>oak-and-pipe</b>
+                </div>
+                <div class="views">
+                  <!-- main -->
+                  <div class="view on" id="vMain">
+                    <div class="bhead">
+                      <span class="blogo">O&amp;P</span>
+                      <div>
+                        <div class="bn">Oak &amp; Pipe Plumbing</div>
+                        <div class="bs">
+                          Local plumber · Manchester
+                          <svg viewBox="0 0 24 24">
+                            <path
+                              d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.5L12 16.9 6.1 20l1.3-6.5L2.5 9l6.6-.8L12 2z"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                    <h3 class="howhelp">How can we help?</h3>
+                    <p class="howhelp-sub">
+                      Repairs, installations and emergency plumbing across
+                      Greater Manchester.
+                    </p>
+                    <button class="pbtn" id="heroQuoteBtn">
+                      <svg viewBox="0 0 24 24">
+                        <path d="M6 3h9l4 4v14H6z" />
+                        <path d="M9 12h6M9 16h6" /></svg
+                      >Get a quote
+                    </button>
+                    <div class="trio">
+                      <button class="pbtn dark">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
+                          /></svg
+                        >Call
+                      </button>
+                      <button class="pbtn wa">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.3A8 8 0 1 1 21 12z"
+                          />
+                          <path d="M9 10c.5 2.5 2.5 4.5 5 5l1-1.5 2 1" /></svg
+                        >WhatsApp
+                      </button>
+                      <button class="pbtn plain">
+                        <svg viewBox="0 0 24 24">
+                          <path
+                            d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.5L12 16.9 6.1 20l1.3-6.5L2.5 9l6.6-.8L12 2z"
+                            fill="currentColor"
+                            stroke="none"
+                          /></svg
+                        >Review
+                      </button>
+                    </div>
+                    <div class="pcard" style="margin-top: 0.7rem">
+                      <div class="prow">
+                        <span class="plabel"
+                          >Pricing · Clear starting prices</span
+                        ><span class="pval amber">From £65</span>
+                      </div>
+                    </div>
+                    <div class="pcard">
+                      <div class="prow">
+                        <span class="plabel">Service area</span
+                        ><button
+                          class="pbtn plain"
+                          style="
+                            width: auto;
+                            padding: 0.35rem 0.7rem;
+                            font-size: 0.66rem;
+                          "
+                        >
+                          Check
+                        </button>
+                      </div>
+                      <div
+                        class="pval"
+                        style="
+                          font-size: 0.76rem;
+                          font-weight: 600;
+                          color: var(--ink2);
+                        "
+                      >
+                        Manchester · Stockport · Salford
+                      </div>
+                    </div>
+                    <div class="pcard">
+                      <div class="prow">
+                        <span class="plabel"
+                          >Trust &amp; credentials · Business-provided
+                          information</span
+                        ><button
+                          class="pbtn plain"
+                          style="
+                            width: auto;
+                            padding: 0.35rem 0.7rem;
+                            font-size: 0.66rem;
+                          "
+                        >
+                          View
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- quote -->
+                  <div class="view" id="vQuote">
+                    <button class="back" id="heroBack">← Back</button>
+                    <h3 class="howhelp">Get a quote</h3>
+                    <p class="howhelp-sub">
+                      A couple of details and Oak &amp; Pipe will get back to
+                      you.
+                    </p>
+                    <div class="qfield">
+                      <span class="plabel">What do you need help with?</span
+                      ><span class="ans">Bathroom tap replacement</span>
+                    </div>
+                    <div class="qfield">
+                      <span class="plabel">Where is the job?</span
+                      ><span class="ans">Manchester</span>
+                    </div>
+                    <div
+                      class="qfield"
+                      style="
+                        display: flex;
+                        gap: 0.5rem;
+                        align-items: center;
+                        color: var(--ink2);
+                      "
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                      >
+                        <rect x="3" y="5" width="18" height="14" rx="2" />
+                        <circle cx="9" cy="10" r="1.6" />
+                        <path d="M5 17l5-4 4 3 3-2 2 3" /></svg
+                      ><span style="font-size: 0.78rem; font-weight: 600"
+                        >Add a photo (optional)</span
+                      >
+                    </div>
+                    <button class="pbtn" id="heroSend">Request my quote</button>
+                  </div>
+                  <!-- done -->
+                  <div class="view" id="vDone">
+                    <div class="qdone">
+                      <div class="bigcheck">
+                        <svg viewBox="0 0 24 24">
+                          <path d="M4 12.5l5 5L20 6.5" />
+                        </svg>
+                      </div>
+                      <h4>Quote request sent</h4>
+                      <p>
+                        Oak &amp; Pipe Plumbing has your details and can call
+                        you straight back.
+                      </p>
+                      <button
+                        class="back"
+                        id="heroAgain"
+                        style="margin: 1rem auto 0"
+                      >
+                        ← Back to page
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="who-next">
+              See the actual page in action
+              <svg viewBox="0 0 24 24"><path d="M12 4v14M6 13l6 6 6-6" /></svg>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="hzd" aria-hidden="true"></div>
+
+      <!-- ================= PROBLEM ================= -->
+      <section class="problem" id="problem">
+        <div class="wrap">
+          <span class="eyebrow" data-reveal data-scramble
+            >The customer problem</span
+          >
+          <h2
+            class="h-lg"
+            style="margin-top: 1.3rem; max-width: 14em"
+            data-reveal
+          >
+            <span class="ln"><span>Customers shouldn't have</span></span>
+            <span class="ln"
+              ><span style="--ld: 0.12s"
+                >to hunt for the <span class="amb">next step.</span></span
+              ></span
+            >
+          </h2>
+          <p class="lead" data-reveal style="--d: 0.15s">
+            They already found your business. Now they want a handful of simple
+            answers before they decide what to do next.
+          </p>
+
+          <div class="qwall" aria-label="Common customer questions">
+            <span class="qchip" data-reveal style="--d: 0.05s"
+              ><span class="qm">“</span>Can I call you now?</span
+            >
+            <span class="qchip" data-reveal style="--d: 0.12s"
+              ><span class="qm">“</span>Do you cover my area?</span
+            >
+            <span class="qchip" data-reveal style="--d: 0.19s"
+              ><span class="qm">“</span>What does it cost?</span
+            >
+            <span class="qchip" data-reveal style="--d: 0.26s"
+              ><span class="qm">“</span>Can I request a quote?</span
+            >
+            <span class="qchip" data-reveal style="--d: 0.33s"
+              ><span class="qm">“</span>Can I send details?</span
+            >
+            <span class="qchip" data-reveal style="--d: 0.4s"
+              ><span class="qm">“</span>Where can I leave a review?</span
+            >
+          </div>
+
+          <div class="journey">
+            <div class="jstep" data-reveal>
+              <div class="jn">01</div>
+              <h3>Customer finds you</h3>
+              <p>Search, social, QR or your website</p>
+            </div>
+            <div class="jstep" data-reveal style="--d: 0.15s">
+              <div class="jn">02</div>
+              <h3>Opens your page</h3>
+              <p>One clean place with the useful details</p>
+            </div>
+            <div class="jstep" data-reveal style="--d: 0.3s">
+              <div class="jn">03</div>
+              <h3>Takes action</h3>
+              <p>Calls · WhatsApps · requests a quote · leaves a review</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WHAT YOU GET ================= -->
+      <section class="features" id="features">
+        <div class="wrap">
+          <div class="head">
+            <span class="eyebrow" data-reveal data-scramble>What you get</span>
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>Everything they need.</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s">Nothing they don't.</span></span
+              >
+            </h2>
+            <p class="lead" style="margin-top: 1.2rem" data-reveal>
+              Turn on the customer actions that make sense for your business.
+              Keep the rest out of the way.
+            </p>
+            <p class="hint" data-reveal style="--d: 0.15s">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+              >
+                <path
+                  d="M8 12h8M12 4v2M12 18v2M4.9 7.9l1.4 1.4M17.7 14.7l1.4 1.4M4.9 16.1l1.4-1.4"
+                />
+              </svg>
+              Flick a switch — the sample page keeps up
+            </p>
+          </div>
+
+          <div class="fgrid">
+            <!-- left: features 01–03 -->
+            <div class="fcol">
+              <article class="feature" data-i="0" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">01</span>
+                  <h3>Get a Quote</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Get a Quote"
+                  ></button>
+                </div>
+                <p>
+                  Collect the details you actually need before calling back.
+                  Customers can answer your questions and send useful job
+                  information.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample form</span>
+                  <div class="frow">
+                    <span>What do you need help with?</span
+                    ><span class="dots"></span><b>▸</b>
+                  </div>
+                  <div class="frow">
+                    <span>Where is the job?</span><span class="dots"></span
+                    ><b>▸</b>
+                  </div>
+                  <div class="frow">
+                    <span>Add a photo (optional)</span><span class="dots"></span
+                    ><b>＋</b>
+                  </div>
+                  <div style="margin-top: 0.7rem">
+                    <span class="mini-btn">Request my quote</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="feature" data-i="1" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">02</span>
+                  <h3>Call &amp; WhatsApp</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Call and WhatsApp"
+                  ></button>
+                </div>
+                <p>
+                  Make contacting you a one-tap decision, without forcing
+                  customers to search around for a phone number.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample actions</span>
+                  <div>
+                    <span
+                      class="mini-btn"
+                      style="
+                        background: var(--ink);
+                        color: var(--paper);
+                        box-shadow: 3px 3px 0 rgba(23, 29, 26, 0.4);
+                      "
+                      >📞 Call now</span
+                    ><span class="mini-btn wa">💬 WhatsApp</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="feature" data-i="2" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">03</span>
+                  <h3>Pricing</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Pricing"
+                  ></button>
+                </div>
+                <p>
+                  Show an hourly rate, a simple price list or an easy starting
+                  estimate.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample price list</span>
+                  <div class="frow">
+                    <span>Call-out</span><span class="dots"></span><b>£65</b>
+                  </div>
+                  <div class="frow">
+                    <span>Hourly rate</span><span class="dots"></span
+                    ><b>£80/hr</b>
+                  </div>
+                  <div class="frow">
+                    <span>Tap replacement</span><span class="dots"></span
+                    ><b>From £95</b>
+                  </div>
+                </div>
+              </article>
+            </div>
+
+            <!-- middle: sticky phone -->
+            <div>
+              <div class="device-sticky">
+                <div class="fcount">
+                  <span id="fIdx">01</span>/06
+                  <span class="ticks" id="fTicks" aria-hidden="true"
+                    ><i class="on"></i><i></i><i></i><i></i><i></i><i></i
+                  ></span>
+                </div>
+                <div class="device" style="width: 300px">
+                  <div class="screen">
+                    <div class="statusbar">
+                      <span>9:41</span
+                      ><span class="bars" aria-hidden="true"
+                        ><i style="height: 4px"></i><i style="height: 6px"></i
+                        ><i style="height: 8px"></i><i style="height: 10px"></i
+                      ></span>
+                    </div>
+                    <div class="urlbar">
+                      🔒 localaction.page/<b>oak-and-pipe</b>
+                    </div>
+                    <div class="views" style="padding-top: 0.2rem">
+                      <div class="view scr" data-s="0">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Get a quote
+                        </h3>
+                        <p class="howhelp-sub">
+                          Answer a few quick questions so we can call you back
+                          ready.
+                        </p>
+                        <div class="qfield">
+                          <span class="plabel">What do you need help with?</span
+                          ><span
+                            class="ans"
+                            style="color: var(--ink2); font-weight: 500"
+                            >Bathroom tap replacement</span
+                          >
+                        </div>
+                        <div class="qfield">
+                          <span class="plabel">Where is the job?</span
+                          ><span
+                            class="ans"
+                            style="color: var(--ink2); font-weight: 500"
+                            >Manchester</span
+                          >
+                        </div>
+                        <div
+                          class="qfield"
+                          style="
+                            display: flex;
+                            gap: 0.5rem;
+                            align-items: center;
+                            color: var(--ink2);
+                          "
+                        >
+                          <span style="font-size: 0.76rem; font-weight: 600"
+                            >＋ Add a photo (optional)</span
+                          >
+                        </div>
+                        <button class="pbtn" tabindex="-1">
+                          Request my quote
+                        </button>
+                      </div>
+
+                      <div class="view scr" data-s="1">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Talk to us
+                        </h3>
+                        <p class="howhelp-sub">
+                          One tap and you're through — no number hunting.
+                        </p>
+                        <button
+                          class="pbtn dark"
+                          style="margin-bottom: 0.6rem"
+                          tabindex="-1"
+                        >
+                          <svg viewBox="0 0 24 24">
+                            <path
+                              d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
+                            /></svg
+                          >Call now
+                        </button>
+                        <button class="pbtn wa" tabindex="-1">
+                          <svg viewBox="0 0 24 24">
+                            <path
+                              d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.3A8 8 0 1 1 21 12z"
+                            />
+                            <path d="M9 10c.5 2.5 2.5 4.5 5 5l1-1.5 2 1" /></svg
+                          >WhatsApp
+                        </button>
+                        <p class="howhelp-sub" style="margin-top: 0.8rem">
+                          Mon–Sat · usually answers during working hours.
+                        </p>
+                      </div>
+
+                      <div class="view scr" data-s="2">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Pricing
+                        </h3>
+                        <p class="howhelp-sub">
+                          Clear starting prices — no guesswork before you call.
+                        </p>
+                        <div class="pcard">
+                          <div class="frow">
+                            <span>Call-out</span><span class="dots"></span
+                            ><b>£65</b>
+                          </div>
+                          <div class="frow">
+                            <span>Hourly rate</span><span class="dots"></span
+                            ><b>£80/hr</b>
+                          </div>
+                          <div class="frow">
+                            <span>Tap replacement</span
+                            ><span class="dots"></span><b>From £95</b>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="view scr" data-s="3">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Service area
+                        </h3>
+                        <p class="howhelp-sub">
+                          Check we cover your area before you get in touch.
+                        </p>
+                        <div class="pcard">
+                          <div class="frow">
+                            <span><b>Manchester</b></span
+                            ><span class="ok">COVERED ✓</span>
+                          </div>
+                          <div class="frow">
+                            <span><b>Stockport</b></span
+                            ><span class="ok">COVERED ✓</span>
+                          </div>
+                          <div class="frow">
+                            <span><b>Salford</b></span
+                            ><span class="ok">COVERED ✓</span>
+                          </div>
+                        </div>
+                        <button
+                          class="pbtn plain"
+                          style="margin-top: 0.7rem"
+                          tabindex="-1"
+                        >
+                          Check
+                        </button>
+                      </div>
+
+                      <div class="view scr" data-s="4">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Trust &amp; FAQs
+                        </h3>
+                        <p class="howhelp-sub">
+                          Business-provided information, up front.
+                        </p>
+                        <div class="pcard">
+                          <div class="frow">
+                            <span>Public liability insurance</span
+                            ><span class="ok">CURRENT</span>
+                          </div>
+                          <div class="frow">
+                            <span>Gas Safe number</span
+                            ><span class="ok">PROVIDED</span>
+                          </div>
+                          <div class="frow">
+                            <span>Common question</span
+                            ><span class="ok">ANSWERED</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="view scr" data-s="5">
+                        <h3 class="howhelp" style="margin-top: 0.2rem">
+                          Reviews
+                        </h3>
+                        <p class="howhelp-sub">
+                          Had a good job done? Tell the next customer.
+                        </p>
+                        <div class="pcard" style="text-align: center">
+                          <div class="stars">★★★★★</div>
+                          <button
+                            class="pbtn"
+                            style="margin-top: 0.6rem"
+                            tabindex="-1"
+                          >
+                            Leave a review
+                          </button>
+                        </div>
+                        <div class="pcard">
+                          <div class="prow">
+                            <span class="plabel">Review QR</span
+                            ><span class="ok">READY</span>
+                          </div>
+                          <div class="prow">
+                            <span class="plabel">Printable sign</span
+                            ><span class="ok">READY</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="off-screen" id="offScreen">
+                        <svg
+                          width="34"
+                          height="34"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        >
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M8 12h8" />
+                        </svg>
+                        <p>Hidden from your page</p>
+                        <button
+                          class="sw"
+                          role="switch"
+                          aria-checked="false"
+                          id="offSw"
+                          aria-label="Turn this action back on"
+                          style="background: #d8d2c0"
+                        ></button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="fcount" style="letter-spacing: 0.08em">
+                  ↑ Oak &amp; Pipe Plumbing · sample page
+                </div>
+              </div>
+            </div>
+
+            <!-- right: features 04–06 -->
+            <div class="fcol">
+              <article class="feature" data-i="3" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">04</span>
+                  <h3>Service Area</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Service Area"
+                  ></button>
+                </div>
+                <p>
+                  Make it clear where you work so customers can answer the first
+                  question before they even contact you.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample coverage</span>
+                  <div class="frow">
+                    <span><b>Manchester</b></span
+                    ><span class="ok">COVERED ✓</span>
+                  </div>
+                  <div class="frow">
+                    <span><b>Stockport</b></span
+                    ><span class="ok">COVERED ✓</span>
+                  </div>
+                  <div class="frow">
+                    <span><b>Salford</b></span
+                    ><span class="ok">COVERED ✓</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="feature" data-i="4" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">05</span>
+                  <h3>Trust &amp; FAQs</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Trust and FAQs"
+                  ></button>
+                </div>
+                <p>
+                  Answer common doubts and show useful business-provided
+                  credentials before they become reasons to leave.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample trust info</span>
+                  <div class="frow">
+                    <span>Public liability insurance</span
+                    ><span class="ok">CURRENT</span>
+                  </div>
+                  <div class="frow">
+                    <span>Gas Safe number</span><span class="ok">PROVIDED</span>
+                  </div>
+                  <div class="frow">
+                    <span>Common question</span><span class="ok">ANSWERED</span>
+                  </div>
+                </div>
+              </article>
+
+              <article class="feature" data-i="5" data-reveal>
+                <div class="fhead">
+                  <span class="fidx">06</span>
+                  <h3>Google Reviews</h3>
+                  <button
+                    class="sw"
+                    role="switch"
+                    aria-checked="true"
+                    aria-label="Toggle Google Reviews"
+                  ></button>
+                </div>
+                <p>
+                  Give happy customers a simple route to your chosen review
+                  destination, with QR materials ready to use.
+                </p>
+                <div class="fsample">
+                  <span class="plabel">Sample review kit</span>
+                  <div style="display: flex; align-items: center; gap: 1rem">
+                    <div class="qr-sm" data-qr="7" aria-hidden="true"></div>
+                    <div>
+                      <div class="stars">★★★★★</div>
+                      <span class="mini-btn plain" style="margin-top: 0.4rem"
+                        >Leave a review</span
+                      >
+                    </div>
+                  </div>
+                  <div class="frow" style="margin-top: 0.6rem">
+                    <span>Review QR</span><span class="ok">READY</span>
+                  </div>
+                  <div class="frow">
+                    <span>Printable sign</span><span class="ok">READY</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HOW IT WORKS ================= -->
+      <section class="how" id="how">
+        <div class="wrap">
+          <div class="head">
+            <span class="eyebrow" data-reveal data-scramble>How it works</span>
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>From business details to a</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s"
+                  >live page in
+                  <span class="amb">three simple steps.</span></span
+                ></span
+              >
+            </h2>
+            <p class="lead" style="margin-top: 1.2rem" data-reveal>
+              No blank canvas and no website-building project. Start with the
+              useful stuff and get your page ready.
+            </p>
+          </div>
+
+          <div class="steps">
+            <div class="step-card" style="--i: 0" data-step="1">
+              <div>
+                <div class="step-num">01</div>
+                <h3>Add your business</h3>
+                <p class="sc">
+                  Tell us the basics — your name, contact details, what you do
+                  and how customers should recognise you.
+                </p>
+              </div>
+              <div class="demo-panel">
+                <span class="dp-label">Business details</span>
+                <div class="fake-field">
+                  <span class="plabel">Business name</span
+                  ><span class="val" id="typeBiz"></span>
+                </div>
+                <div class="fake-field">
+                  <span class="plabel">Phone number</span
+                  ><span class="val" id="typeTel"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-card" style="--i: 1" data-step="2">
+              <div>
+                <div class="step-num">02</div>
+                <h3>Choose what customers can do</h3>
+                <p class="sc">
+                  Start with a sensible set of customer tools. Turn things on or
+                  off without configuring everything at once.
+                </p>
+              </div>
+              <div class="demo-panel">
+                <span class="dp-label">Customer tools</span>
+                <ul class="toollist">
+                  <li>
+                    Get a quote
+                    <button
+                      class="sw st"
+                      role="switch"
+                      aria-checked="false"
+                      aria-label="Get a quote toggle"
+                      tabindex="-1"
+                    ></button>
+                  </li>
+                  <li>
+                    Pricing
+                    <button
+                      class="sw st"
+                      role="switch"
+                      aria-checked="false"
+                      aria-label="Pricing toggle"
+                      tabindex="-1"
+                    ></button>
+                  </li>
+                  <li>
+                    Call &amp; WhatsApp
+                    <button
+                      class="sw st"
+                      role="switch"
+                      aria-checked="false"
+                      aria-label="Call and WhatsApp toggle"
+                      tabindex="-1"
+                    ></button>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="step-card" style="--i: 2" data-step="3">
+              <div>
+                <div class="step-num">03</div>
+                <h3>Publish and share</h3>
+                <p class="sc">
+                  Your page is ready when you are. Share the link or a QR
+                  wherever customers already find your business.
+                </p>
+              </div>
+              <div class="demo-panel">
+                <span class="dp-label">Live page</span>
+                <span class="stamp" id="pubStamp">Published</span>
+                <div class="pubcard">
+                  <span class="blogo">O&amp;P</span>
+                  <div>
+                    <div style="font-weight: 800">Oak &amp; Pipe Plumbing</div>
+                    <div
+                      style="font: 500 0.68rem var(--mono); color: var(--ink2)"
+                    >
+                      Local plumber · Manchester
+                    </div>
+                  </div>
+                  <span
+                    class="mini-btn"
+                    style="margin-left: auto; margin-top: 0"
+                    >Get a quote</span
+                  >
+                </div>
+                <div class="publink">
+                  <svg viewBox="0 0 24 24">
+                    <path d="M10 14a5 5 0 0 0 7 0l2-2a5 5 0 0 0-7-7l-1 1" />
+                    <path
+                      d="M14 10a5 5 0 0 0-7 0l-2 2a5 5 0 0 0 7 7l1-1"
+                    /></svg
+                  >localaction.page/oak-and-pipe
+                </div>
+                <div
+                  class="qr"
+                  data-qr="3"
+                  style="width: 84px; height: 84px"
+                  aria-hidden="true"
+                ></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="how-cta" data-reveal>
+            <p>That's the whole setup</p>
+            <a class="btn" href="/signup"
+              >Create my page
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg
+            ></a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= WHO IT'S FOR ================= -->
+      <section class="who dk" id="who">
+        <div class="wrap">
+          <span class="eyebrow" data-reveal data-scramble
+            >Built for local services</span
+          >
+          <h2
+            class="h-lg"
+            style="margin-top: 1.3rem; max-width: 15em"
+            data-reveal
+          >
+            <span class="ln"><span>Made for businesses where</span></span>
+            <span class="ln"
+              ><span style="--ld: 0.12s"
+                >every enquiry <span class="amb">matters.</span></span
+              ></span
+            >
+          </h2>
+          <p class="lead" style="margin-top: 1.2rem" data-reveal>
+            The page stays simple enough for a one-person trade business, while
+            giving customers more useful ways to act than a basic contact page.
+          </p>
+        </div>
+        <div style="margin-top: 3rem">
+          <div class="mq">
+            <div class="mq-track">
+              <span class="tag">Plumbing</span
+              ><span class="tag">Electrical</span><span class="tag">HVAC</span
+              ><span class="tag">Cleaning</span><span class="tag">Roofing</span
+              ><span class="tag">Landscaping</span
+              ><span class="tag">Handyman</span><span class="tag">Painting</span
+              ><span class="tag">Pressure washing</span
+              ><span class="tag">Mobile detailing</span
+              ><span class="tag">Pest control</span
+              ><span class="tag more">And more</span>
+              <span class="tag" aria-hidden="true">Plumbing</span
+              ><span class="tag" aria-hidden="true">Electrical</span
+              ><span class="tag" aria-hidden="true">HVAC</span
+              ><span class="tag" aria-hidden="true">Cleaning</span
+              ><span class="tag" aria-hidden="true">Roofing</span
+              ><span class="tag" aria-hidden="true">Landscaping</span
+              ><span class="tag" aria-hidden="true">Handyman</span
+              ><span class="tag" aria-hidden="true">Painting</span
+              ><span class="tag" aria-hidden="true">Pressure washing</span
+              ><span class="tag" aria-hidden="true">Mobile detailing</span
+              ><span class="tag" aria-hidden="true">Pest control</span
+              ><span class="tag more" aria-hidden="true">And more</span>
+            </div>
+          </div>
+          <div class="mq rev">
+            <div class="mq-track">
+              <span class="tag">Pest control</span
+              ><span class="tag">Mobile detailing</span
+              ><span class="tag">Pressure washing</span
+              ><span class="tag">Painting</span><span class="tag">Handyman</span
+              ><span class="tag">Landscaping</span
+              ><span class="tag">Roofing</span><span class="tag">Cleaning</span
+              ><span class="tag">HVAC</span><span class="tag">Electrical</span
+              ><span class="tag">Plumbing</span
+              ><span class="tag more">And more</span>
+              <span class="tag" aria-hidden="true">Pest control</span
+              ><span class="tag" aria-hidden="true">Mobile detailing</span
+              ><span class="tag" aria-hidden="true">Pressure washing</span
+              ><span class="tag" aria-hidden="true">Painting</span
+              ><span class="tag" aria-hidden="true">Handyman</span
+              ><span class="tag" aria-hidden="true">Landscaping</span
+              ><span class="tag" aria-hidden="true">Roofing</span
+              ><span class="tag" aria-hidden="true">Cleaning</span
+              ><span class="tag" aria-hidden="true">HVAC</span
+              ><span class="tag" aria-hidden="true">Electrical</span
+              ><span class="tag" aria-hidden="true">Plumbing</span
+              ><span class="tag more" aria-hidden="true">And more</span>
+            </div>
+          </div>
+        </div>
+        <div class="wrap">
+          <p class="who-note" data-reveal>
+            Don't see your trade?
+            <b>LocalAction works for almost any local service business.</b>
+          </p>
+        </div>
+      </section>
+
+      <div class="hzd" aria-hidden="true"></div>
+
+      <!-- ================= POSITIONING ================= -->
+      <section class="position dk" id="position">
+        <div class="wrap">
+          <div class="pos-top">
+            <div>
+              <span class="eyebrow" data-reveal data-scramble
+                >Less building. More doing.</span
+              >
+              <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+                <span class="ln"><span>Not another</span></span>
+                <span class="ln"
+                  ><span style="--ld: 0.12s">website builder.</span></span
+                >
+              </h2>
+              <p class="lead" style="margin-top: 1.2rem" data-reveal>
+                You don't need to choose a template, move blocks around or spend
+                an afternoon deciding what goes where. Add your business, choose
+                the useful customer actions and publish.
+              </p>
+            </div>
+            <div class="keep" data-reveal style="--d: 0.2s">
+              <div class="k">
+                <p>Already have a website?</p>
+                <span class="kstamp">KEEP IT.</span>
+              </div>
+              <div class="k">
+                <p>Don't have one?</p>
+                <span class="kstamp">THAT'S FINE TOO.</span>
+              </div>
+              <p class="solo">
+                LocalAction can work on its own or alongside the places
+                customers already find you.
+              </p>
+            </div>
+          </div>
+
+          <div class="compare" data-reveal>
+            <div class="cmp-head">
+              <span>Typical page builder</span><span></span
+              ><span>LocalAction</span>
+            </div>
+            <div class="cmp-row">
+              <span class="cmp-l">Choose a template</span
+              ><span class="cmp-mid">→</span
+              ><span class="cmp-r"
+                >Add your business
+                <span class="tick"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M4 12.5l5 5L20 6.5" /></svg></span
+              ></span>
+            </div>
+            <div class="cmp-row">
+              <span class="cmp-l">Design pages</span
+              ><span class="cmp-mid">→</span
+              ><span class="cmp-r"
+                >Choose customer actions
+                <span class="tick"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M4 12.5l5 5L20 6.5" /></svg></span
+              ></span>
+            </div>
+            <div class="cmp-row">
+              <span class="cmp-l">Build forms</span
+              ><span class="cmp-mid">→</span
+              ><span class="cmp-r"
+                >Start with sensible defaults
+                <span class="tick"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M4 12.5l5 5L20 6.5" /></svg></span
+              ></span>
+            </div>
+            <div class="cmp-row">
+              <span class="cmp-l">Configure layouts</span
+              ><span class="cmp-mid">→</span
+              ><span class="cmp-r"
+                >Turn things on or off
+                <span class="tick"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M4 12.5l5 5L20 6.5" /></svg></span
+              ></span>
+            </div>
+            <div class="cmp-row">
+              <span class="cmp-l">Keep tweaking</span
+              ><span class="cmp-mid">→</span
+              ><span class="cmp-r"
+                >Publish
+                <span class="tick"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M4 12.5l5 5L20 6.5" /></svg></span
+              ></span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= ACTIVITY ================= -->
+      <section class="activity" id="activity">
+        <div class="wrap act-grid">
+          <div>
+            <span class="eyebrow" data-reveal data-scramble
+              >Simple activity</span
+            >
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>See what customers</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s"
+                  >actually <span class="amb">use.</span></span
+                ></span
+              >
+            </h2>
+            <p class="lead" style="margin-top: 1.2rem" data-reveal>
+              Your page isn't a black box. See when customers view it, request
+              quotes, call, open WhatsApp or head to your review page — without
+              a complicated analytics dashboard.
+            </p>
+            <ul class="checks">
+              <li data-reveal style="--d: 0.1s">
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg
+                >Simple activity overview
+              </li>
+              <li data-reveal style="--d: 0.2s">
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg
+                >Recent quote requests
+              </li>
+              <li data-reveal style="--d: 0.3s">
+                <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5" /></svg
+                >Just the numbers that help you follow up
+              </li>
+            </ul>
+          </div>
+
+          <div
+            class="dash"
+            data-reveal
+            style="--d: 0.15s"
+            aria-label="Sample activity dashboard"
+          >
+            <div class="dash-head">
+              <span class="dh-t"
+                ><span class="livedot" aria-hidden="true"></span>Last 30
+                days</span
+              >
+              <span class="badge-sample">Sample data</span>
+            </div>
+            <div class="metrics">
+              <div class="metric">
+                <div class="mv" data-count="238">0</div>
+                <div class="ml">Page views</div>
+              </div>
+              <div class="metric">
+                <div class="mv amber" data-count="21">0</div>
+                <div class="ml">Quote requests</div>
+              </div>
+              <div class="metric">
+                <div class="mv" data-count="34">0</div>
+                <div class="ml">Calls</div>
+              </div>
+              <div class="metric">
+                <div class="mv" data-count="12">0</div>
+                <div class="ml">Review clicks</div>
+              </div>
+            </div>
+            <div class="spark">
+              <svg
+                viewBox="0 0 300 56"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path
+                  class="fill"
+                  d="M0 44 L20 40 L40 42 L60 33 L80 36 L100 28 L120 30 L140 22 L160 26 L180 18 L200 21 L220 14 L240 17 L260 10 L280 13 L300 6 L300 56 L0 56 Z"
+                />
+                <path
+                  id="sparkLine"
+                  d="M0 44 L20 40 L40 42 L60 33 L80 36 L100 28 L120 30 L140 22 L160 26 L180 18 L200 21 L220 14 L240 17 L260 10 L280 13 L300 6"
+                />
+              </svg>
+            </div>
+            <ul class="feed" id="feed">
+              <li>
+                <span class="fi"
+                  ><svg viewBox="0 0 24 24">
+                    <path d="M6 3h9l4 4v14H6z" />
+                    <path d="M9 12h6M9 16h6" /></svg></span
+                ><span class="ft"
+                  ><strong>New quote request</strong
+                  ><em>Bathroom tap replacement</em></span
+                ><span class="fw">8 min ago</span>
+              </li>
+              <li>
+                <span class="fi c"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"
+                    /></svg></span
+                ><span class="ft"
+                  ><strong>Customer tapped Call</strong
+                  ><em>0161 496 0000</em></span
+                ><span class="fw">22 min ago</span>
+              </li>
+              <li>
+                <span class="fi r"
+                  ><svg viewBox="0 0 24 24">
+                    <path
+                      d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.5L12 16.9 6.1 20l1.3-6.5L2.5 9l6.6-.8L12 2z"
+                      fill="currentColor"
+                      stroke="none"
+                    /></svg></span
+                ><span class="ft"
+                  ><strong>Customer opened Review</strong
+                  ><em>Review destination</em></span
+                ><span class="fw">1 hr ago</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= REVIEW KIT ================= -->
+      <section class="reviewkit" id="reviewkit">
+        <div class="wrap rk-grid">
+          <div>
+            <span class="eyebrow" data-reveal data-scramble>Review Kit</span>
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>Turn a happy customer into</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s"
+                  >an easier <span class="amb">review journey.</span></span
+                ></span
+              >
+            </h2>
+            <p class="lead" style="margin-top: 1.2rem" data-reveal>
+              Connect the review destination you want customers to use, then
+              generate ready-to-use materials from the same place you manage
+              your customer page.
+            </p>
+
+            <div class="rk-caps">
+              <div class="rk-cap" data-reveal style="--d: 0.1s">
+                <span class="ci"
+                  ><svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <path d="M14 14h3v3h-3zM18 18h3v3h-3z" /></svg
+                ></span>
+                <div>
+                  <h3>Review QR</h3>
+                  <p>
+                    Put an easy scan route on invoices, cards or at the counter.
+                  </p>
+                </div>
+              </div>
+              <div class="rk-cap" data-reveal style="--d: 0.2s">
+                <span class="ci"
+                  ><svg viewBox="0 0 24 24">
+                    <rect x="4" y="3" width="16" height="18" rx="2" />
+                    <path d="M8 8h8M8 12h8M8 16h5" /></svg
+                ></span>
+                <div>
+                  <h3>Printable sign</h3>
+                  <p>
+                    Generate a branded sign you can use where customers will
+                    actually see it.
+                  </p>
+                </div>
+              </div>
+              <div class="rk-cap" data-reveal style="--d: 0.3s">
+                <span class="ci"
+                  ><svg viewBox="0 0 24 24">
+                    <rect x="3" y="3" width="18" height="18" rx="2" />
+                    <circle cx="9" cy="9" r="2" />
+                    <path d="M4 18l5-5 4 4 3-3 4 4" /></svg
+                ></span>
+                <div>
+                  <h3>Social graphic</h3>
+                  <p>
+                    Get a ready-made branded square graphic when you need one.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="collage" data-reveal style="--d: 0.15s">
+            <div class="art sign">
+              <div class="sb"><i>O&amp;P</i> Oak &amp; Pipe Plumbing</div>
+              <h4>Happy with the job?</h4>
+              <p>Scan here to leave Oak &amp; Pipe Plumbing a review.</p>
+              <div class="qr" data-qr="11" aria-hidden="true"></div>
+              <div class="stars">★★★★★</div>
+              <p class="fine">Your feedback means a lot.</p>
+            </div>
+            <div class="art bcard">
+              <div class="bn">Oak &amp; Pipe<br />Plumbing</div>
+              <div class="row">
+                <div class="qr small" data-qr="5" aria-hidden="true"></div>
+                <small>SCAN TO<br />LEAVE A<br />REVIEW ★</small>
+              </div>
+            </div>
+            <div class="art social">
+              <div class="st">Happy with<br />the job?</div>
+              <div class="row">
+                <small>Oak &amp; Pipe Plumbing<br />★★★★★</small>
+                <div class="qr small" data-qr="9" aria-hidden="true"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= REASSURANCE ================= -->
+      <section class="strip" aria-label="Reassurance points">
+        <div class="wrap strip-grid">
+          <div class="rp" data-reveal>
+            <svg viewBox="0 0 24 24">
+              <path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13 5l-2 14" /></svg
+            >No coding
+          </div>
+          <div class="rp" data-reveal style="--d: 0.08s">
+            <svg viewBox="0 0 24 24">
+              <rect x="7" y="2" width="10" height="20" rx="2" />
+              <path d="M11 18h2" /></svg
+            >Mobile friendly
+          </div>
+          <div class="rp" data-reveal style="--d: 0.16s">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M12 3a4 4 0 0 1 4 4c3 0 5 2 5 5 0 2-1 4-3 4H6c-2 0-3-2-3-4 0-3 2-5 5-5a4 4 0 0 1 4-4z"
+                fill="none"
+              />
+              <circle cx="12" cy="12" r="2.5" /></svg
+            >Your branding
+          </div>
+          <div class="rp" data-reveal style="--d: 0.24s">
+            <svg viewBox="0 0 24 24">
+              <path d="M4 10a8 8 0 0 1 14-4M20 14a8 8 0 0 1-14 4" />
+              <path d="M18 2v4h-4M6 22v-4h4" /></svg
+            >Change anytime
+          </div>
+          <div class="rp" data-reveal style="--d: 0.32s">
+            <svg viewBox="0 0 24 24">
+              <path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11z" />
+              <circle cx="12" cy="10" r="2.5" /></svg
+            >Built for local services
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FAQ ================= -->
+      <section class="faq" id="faq">
+        <div class="wrap faq-grid">
+          <div class="faq-side">
+            <span class="eyebrow" data-reveal data-scramble>FAQ</span>
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>A few things you might</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s">want to know first.</span></span
+              >
+            </h2>
+            <div class="mini-cta" data-reveal>
+              <a class="btn" href="/signup">Create my page</a>
+              <a class="link-arrow" href="#how"
+                >Or see how it works
+                <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg
+              ></a>
+            </div>
+          </div>
+
+          <div>
+            <div class="qa open" data-reveal>
+              <button class="qa-q" aria-expanded="true">
+                Do I need a website?<span class="pm">+</span>
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    No. Your LocalAction page can work on its own. If you
+                    already have a website, you can use LocalAction alongside
+                    it.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.05s">
+              <button class="qa-q" aria-expanded="false">
+                Do I need any technical knowledge?<span class="pm">+</span>
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    No. LocalAction is designed for business owners, not
+                    developers. Add your details, choose what customers should
+                    be able to do and publish.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.1s">
+              <button class="qa-q" aria-expanded="false">
+                Can I change my page later?<span class="pm">+</span>
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    Yes. Update your business information, switch customer tools
+                    on or off and change their settings whenever you need.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.15s">
+              <button class="qa-q" aria-expanded="false">
+                Can customers request a quote?<span class="pm">+</span>
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    Yes. You choose the questions customers answer, and quote
+                    requests are kept in your dashboard so you can follow them
+                    up.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.2s">
+              <button class="qa-q" aria-expanded="false">
+                Does LocalAction replace my Google Business Profile?<span
+                  class="pm"
+                  >+</span
+                >
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    No. LocalAction works alongside your Google Business Profile
+                    and the other places customers find you. It does not
+                    automatically change or manage your Google listing.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.25s">
+              <button class="qa-q" aria-expanded="false">
+                Can I use my own business colours and logo?<span class="pm"
+                  >+</span
+                >
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    Yes. You can personalise the public page so it feels like
+                    your business rather than a generic template.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.3s">
+              <button class="qa-q" aria-expanded="false">
+                How do the review features work?<span class="pm">+</span>
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    You connect the review destination you want customers to
+                    use. LocalAction can then use it for your review action and
+                    generated QR materials.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="hzd" aria-hidden="true"></div>
+
+      <!-- ================= FINAL CTA ================= -->
+      <section class="final dk" id="cta">
+        <div class="ghost" aria-hidden="true">LocalAction</div>
+        <div class="wrap">
+          <span class="eyebrow" data-reveal data-scramble
+            >Ready when you are</span
+          >
+          <h2 class="h-lg" data-reveal>
+            <span class="ln"><span>Make it easier for customers</span></span>
+            <span class="ln"
+              ><span style="--ld: 0.12s"
+                >to choose <span class="amb">what to do next.</span></span
+              ></span
+            >
+          </h2>
+          <p class="lead" style="text-align: center" data-reveal>
+            Give them one simple place to call, message, request a quote, check
+            the details they care about and leave a review.
+          </p>
+          <div data-reveal style="--d: 0.15s">
+            <a
+              class="btn"
+              style="font-size: 1.15rem; padding: 1.25rem 2.2rem"
+              href="/signup"
+              >Create my page
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg
+            ></a>
+          </div>
+          <p class="login-line" data-reveal style="--d: 0.25s">
+            Already have an account? <a href="/login">Log in</a>
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- ================= FOOTER ================= -->
+    <footer>
+      <div class="wrap">
+        <div class="foot">
+          <a class="brand" href="#top"
+            ><span class="mark" aria-hidden="true"
+              ><svg
+                viewBox="0 0 24 24"
+                style="
+                  stroke: var(--ink);
+                  fill: none;
+                  stroke-width: 2.6;
+                  stroke-linecap: round;
+                  width: 16px;
+                  height: 16px;
+                "
+              >
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></svg></span
+            >Local<em>Action</em></a
+          >
+          <ul class="foot-links">
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#features">What you get</a></li>
+            <li><a href="#who">Who it's for</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="/login">Log in</a></li>
+          </ul>
+        </div>
+        <p class="foot-note">
+          © LocalAction — One simple page for calls, quotes, WhatsApp and
+          reviews. Built for local service businesses.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      (function () {
+        "use strict";
+        var RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        /* ---------- header ---------- */
+        var header = document.getElementById("siteHeader");
+        var burger = document.getElementById("burger");
+        window.addEventListener(
+          "scroll",
+          function () {
+            header.classList.toggle("scrolled", window.scrollY > 8);
+          },
+          { passive: true },
+        );
+        burger.addEventListener("click", function () {
+          var open = header.classList.toggle("open");
+          burger.setAttribute("aria-expanded", open);
+        });
+        header.querySelectorAll(".mobile-panel a").forEach(function (a) {
+          a.addEventListener("click", function () {
+            header.classList.remove("open");
+            burger.setAttribute("aria-expanded", "false");
+          });
+        });
+
+        /* ---------- scramble ---------- */
+        function scramble(el) {
+          var final = el.dataset.final || el.textContent;
+          el.dataset.final = final;
+          if (RM) {
+            el.textContent = final;
+            return;
+          }
+          var glyphs = "#£/%&<>0123456789",
+            total = Math.max(14, final.length * 2),
+            frame = 0;
+          (function tick() {
+            frame++;
+            var out = "";
+            for (var i = 0; i < final.length; i++) {
+              out +=
+                i < (frame / total) * final.length
+                  ? final[i]
+                  : glyphs[Math.floor(Math.random() * glyphs.length)];
+            }
+            el.textContent = out;
+            if (frame < total) requestAnimationFrame(tick);
+            else el.textContent = final;
+          })();
+        }
+
+        /* ---------- reveal observer ---------- */
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                if (e.target.hasAttribute("data-scramble")) scramble(e.target);
+                io.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.18, rootMargin: "0px 0px -40px 0px" },
+        );
+        document
+          .querySelectorAll("[data-reveal], [data-scramble]")
+          .forEach(function (el) {
+            io.observe(el);
+          });
+
+        /* ---------- comparison rows ---------- */
+        var cmpIO = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                cmpIO.unobserve(e.target);
+              }
+            });
+          },
+          { threshold: 0.6 },
+        );
+        document.querySelectorAll(".cmp-row").forEach(function (r) {
+          cmpIO.observe(r);
+        });
+
+        /* ---------- QR generator ---------- */
+        function mulberry(seed) {
+          return function () {
+            seed |= 0;
+            seed = (seed + 0x6d2b79f5) | 0;
+            var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }
+        function finderAt(cell, r, c) {
+          return (
+            (r < 7 && c < 7) ||
+            (r < 7 && c >= cell - 7) ||
+            (r >= cell - 7 && c < 7)
+          );
+        }
+        function finderDark(cell, r, c) {
+          function local(rr, cc) {
+            var ring = Math.max(Math.abs(rr - 3), Math.abs(cc - 3));
+            return ring === 3 || ring <= 1;
+          }
+          if (r < 7 && c < 7) return local(r, c);
+          if (r < 7 && c >= cell - 7) return local(r, c - (cell - 7));
+          if (r >= cell - 7 && c < 7) return local(r - (cell - 7), c);
+          return false;
+        }
+        document.querySelectorAll("[data-qr]").forEach(function (el) {
+          var cell = el.classList.contains("qr-sm") ? 13 : 17;
+          el.style.gridTemplateColumns = "repeat(" + cell + ",1fr)";
+          el.style.gridTemplateRows = "repeat(" + cell + ",1fr)";
+          var rnd = mulberry(parseInt(el.dataset.qr, 10) * 7919 + 13);
+          var frag = document.createDocumentFragment();
+          for (var r = 0; r < cell; r++)
+            for (var c = 0; c < cell; c++) {
+              var i = document.createElement("i");
+              var dark = finderAt(cell, r, c)
+                ? finderDark(cell, r, c)
+                : rnd() < 0.44;
+              if (dark) i.className = "f";
+              frag.appendChild(i);
+            }
+          el.appendChild(frag);
+        });
+
+        /* ---------- hero quote flow ---------- */
+        var vMain = document.getElementById("vMain"),
+          vQuote = document.getElementById("vQuote"),
+          vDone = document.getElementById("vDone");
+        function showView(v) {
+          [vMain, vQuote, vDone].forEach(function (x) {
+            x.classList.remove("on");
+          });
+          v.classList.add("on");
+          v.scrollTop = 0;
+        }
+        document
+          .getElementById("heroQuoteBtn")
+          .addEventListener("click", function () {
+            showView(vQuote);
+          });
+        document
+          .getElementById("heroBack")
+          .addEventListener("click", function () {
+            showView(vMain);
+          });
+        document
+          .getElementById("heroAgain")
+          .addEventListener("click", function () {
+            showView(vMain);
+          });
+        document
+          .getElementById("heroSend")
+          .addEventListener("click", function () {
+            showView(vDone);
+            var p = document.getElementById("pingA");
+            p.classList.remove("show");
+            void p.offsetWidth;
+            p.classList.add("show", "bump");
+            setTimeout(function () {
+              p.classList.remove("bump");
+            }, 900);
+          });
+
+        /* ---------- hero ping loop ---------- */
+        var pingA = document.getElementById("pingA"),
+          pingB = document.getElementById("pingB");
+        function restartPing(el) {
+          el.classList.remove("show");
+          void el.offsetWidth;
+          el.classList.add("show");
+        }
+        if (!RM) {
+          restartPing(pingA);
+          setTimeout(function () {
+            restartPing(pingB);
+          }, 3200);
+          setInterval(function () {
+            restartPing(pingA);
+          }, 13000);
+          setInterval(function () {
+            restartPing(pingB);
+          }, 13000);
+        } else {
+          pingA.classList.add("show");
+          pingB.classList.add("show");
+        }
+
+        /* ---------- features: sticky phone + switches ---------- */
+        var features = Array.prototype.slice.call(
+          document.querySelectorAll(".feature"),
+        );
+        var screens = Array.prototype.slice.call(
+          document.querySelectorAll(".features .scr"),
+        );
+        var ticks = Array.prototype.slice.call(
+          document.querySelectorAll("#fTicks i"),
+        );
+        var fIdx = document.getElementById("fIdx");
+        var offScreen = document.getElementById("offScreen");
+        var offSw = document.getElementById("offSw");
+        var enabled = [true, true, true, true, true, true];
+        var current = 0;
+
+        function paintFeaturePhone(i) {
+          current = i;
+          screens.forEach(function (s, si) {
+            s.classList.toggle("on", si === i);
+          });
+          ticks.forEach(function (t, ti) {
+            t.classList.toggle("on", ti === i);
+          });
+          fIdx.textContent = ("0" + (i + 1)).slice(-2);
+          if (enabled[i]) {
+            offScreen.classList.remove("on");
+          } else {
+            offScreen.classList.add("on");
+            offSw.setAttribute("aria-checked", "false");
+          }
+        }
+        features.forEach(function (f) {
+          var i = +f.dataset.i;
+          var sw = f.querySelector(".sw");
+          sw.addEventListener("click", function () {
+            enabled[i] = !enabled[i];
+            sw.setAttribute("aria-checked", enabled[i]);
+            f.classList.toggle("off", !enabled[i]);
+            if (i === current) paintFeaturePhone(i);
+          });
+        });
+        offSw.addEventListener("click", function () {
+          enabled[current] = true;
+          var sw = features[current].querySelector(".sw");
+          sw.setAttribute("aria-checked", "true");
+          features[current].classList.remove("off");
+          paintFeaturePhone(current);
+        });
+
+        var featIO = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) {
+                var i = +e.target.dataset.i;
+                features.forEach(function (f) {
+                  f.classList.toggle("act", f === e.target);
+                });
+                paintFeaturePhone(i);
+              }
+            });
+          },
+          { rootMargin: "-42% 0px -42% 0px", threshold: 0 },
+        );
+        features.forEach(function (f) {
+          featIO.observe(f);
+        });
+        if (screens.length) screens[0].classList.add("on");
+
+        /* ---------- how it works: typing + toggles + stamp ---------- */
+        function typeInto(el, text, done) {
+          if (RM) {
+            el.textContent = text;
+            done && done();
+            return;
+          }
+          el.textContent = "";
+          var caret = document.createElement("span");
+          caret.className = "caret";
+          el.appendChild(caret);
+          var i = 0;
+          (function step() {
+            if (i < text.length) {
+              caret.insertAdjacentText("beforebegin", text[i++]);
+              setTimeout(step, 34 + Math.random() * 40);
+            } else {
+              setTimeout(function () {
+                caret.remove();
+                done && done();
+              }, 300);
+            }
+          })();
+        }
+        var stepFired = {};
+        var stepIO = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              var s = e.target.dataset.step;
+              if (stepFired[s]) return;
+              stepFired[s] = true;
+              if (s === "1") {
+                typeInto(
+                  document.getElementById("typeBiz"),
+                  "Oak & Pipe Plumbing",
+                  function () {
+                    typeInto(
+                      document.getElementById("typeTel"),
+                      "0161 496 0000",
+                    );
+                  },
+                );
+              }
+              if (s === "2") {
+                var sws = e.target.querySelectorAll(".sw.st");
+                sws.forEach(function (sw, i) {
+                  setTimeout(
+                    function () {
+                      sw.setAttribute("aria-checked", "true");
+                    },
+                    RM ? 0 : 350 + i * 420,
+                  );
+                });
+              }
+              if (s === "3") {
+                setTimeout(
+                  function () {
+                    document.getElementById("pubStamp").classList.add("show");
+                  },
+                  RM ? 0 : 500,
+                );
+              }
+            });
+          },
+          { threshold: 0.5 },
+        );
+        document.querySelectorAll(".step-card").forEach(function (c) {
+          stepIO.observe(c);
+        });
+
+        /* ---------- count up ---------- */
+        var cntIO = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (e) {
+              if (!e.isIntersecting) return;
+              var el = e.target,
+                target = +el.dataset.count;
+              cntIO.unobserve(el);
+              if (RM) {
+                el.textContent = target;
+                return;
+              }
+              var t0 = null;
+              (function frame(ts) {
+                if (!t0) t0 = ts;
+                var p = Math.min((ts - t0) / 1000, 1);
+                el.textContent = Math.round(target * (1 - Math.pow(1 - p, 3)));
+                if (p < 1) requestAnimationFrame(frame);
+              })(performance.now());
+            });
+          },
+          { threshold: 0.6 },
+        );
+        document.querySelectorAll("[data-count]").forEach(function (el) {
+          cntIO.observe(el);
+        });
+
+        /* ---------- sparkline draw ---------- */
+        var spark = document.getElementById("sparkLine");
+        if (spark && !RM) {
+          var len = spark.getTotalLength();
+          spark.style.strokeDasharray = len;
+          spark.style.strokeDashoffset = len;
+          var spIO = new IntersectionObserver(
+            function (es) {
+              es.forEach(function (e) {
+                if (e.isIntersecting) {
+                  spark.style.transition = "stroke-dashoffset 1.6s ease";
+                  spark.style.strokeDashoffset = 0;
+                  spIO.disconnect();
+                }
+              });
+            },
+            { threshold: 0.4 },
+          );
+          spIO.observe(spark);
+        }
+
+        /* ---------- activity feed loop (sample data) ---------- */
+        var feed = document.getElementById("feed");
+        var pool = [
+          ["New quote request", "Bathroom tap replacement", "fi"],
+          ["Customer tapped Call", "0161 496 0000", "fi c"],
+          ["Customer opened Review", "Review destination", "fi r"],
+          ["Service area checked", "Stockport is covered", "fi c"],
+          ["New quote request", "Boiler service", "fi"],
+          ["Customer opened WhatsApp", "Message started", "fi c"],
+        ];
+        var icons = {
+          fi: '<svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h6"/></svg>',
+          "fi c":
+            '<svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a12 12 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>',
+          "fi r":
+            '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.2 6.6.8-4.9 4.6 1.3 6.5L12 16.9 6.1 20l1.3-6.5L2.5 9l6.6-.8L12 2z" fill="currentColor" stroke="none"/></svg>',
+        };
+        var fi = 3;
+        if (!RM) {
+          setInterval(function () {
+            var item = pool[fi % pool.length];
+            fi++;
+            var li = document.createElement("li");
+            li.innerHTML =
+              '<span class="' +
+              item[2] +
+              '">' +
+              icons[item[2]] +
+              '</span><span class="ft"><strong>' +
+              item[0] +
+              "</strong><em>" +
+              item[1] +
+              '</em></span><span class="fw">just now</span>';
+            feed.insertBefore(li, feed.firstChild);
+            while (feed.children.length > 4) feed.removeChild(feed.lastChild);
+          }, 6000);
+        }
+
+        /* ---------- FAQ accordion ---------- */
+        document.querySelectorAll(".qa-q").forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            var qa = btn.parentElement;
+            var open = qa.classList.toggle("open");
+            btn.setAttribute("aria-expanded", open);
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
