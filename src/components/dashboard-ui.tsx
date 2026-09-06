@@ -111,7 +111,6 @@ export function ToolEditorShell({
   type,
   title,
   intro,
-  enabled,
   children,
   aside,
   fullWidth = false,
@@ -120,7 +119,6 @@ export function ToolEditorShell({
   type: ModuleType;
   title: string;
   intro: string;
-  enabled: boolean;
   children: React.ReactNode;
   aside?: React.ReactNode;
   fullWidth?: boolean;
@@ -134,7 +132,6 @@ export function ToolEditorShell({
       <header className="tool-editor-header">
         <ToolIcon type={type} />
         <div>
-          <StatusBadge on={enabled} />
           <h1>{title}</h1>
           <p>{intro}</p>
         </div>

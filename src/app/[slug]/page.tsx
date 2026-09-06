@@ -1,15 +1,9 @@
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { PublicModuleRenderer } from "@/components/public/module-renderer";
-import { accessibleBrandColor } from "@/lib/brand";
-import { resolvePublicPrimaryAction, safeHttpUrl } from "@/lib/public-actions";
+import { BusinessPage } from "@/components/public/business-page";
 import { getPublicBusiness, type PublicBusiness } from "@/lib/public-business";
 import { calculateEstimate, formatMoney } from "@/lib/pricing";
-import { AnalyticsPageView } from "@/components/public/analytics-client";
 import { applicationBaseUrl } from "@/lib/environment";
-import Link from "next/link";
-import { businessTypeLabel } from "@/lib/domain";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -49,30 +43,6 @@ export async function generateMetadata({
     },
     twitter: { card: "summary", title, description },
   };
-}
-
-function primaryFor(business: PublicBusiness) {
-  const contact = business.modules.find(
-    (module) => module.type === "CALL_WHATSAPP",
-  );
-  const whatsappMessage =
-    contact?.type === "CALL_WHATSAPP"
-      ? contact.config.whatsappMessage
-      : undefined;
-  const primary = resolvePublicPrimaryAction({
-    configured: business.primaryAction,
-    enabledTypes: business.modules.map((module) => module.type),
-    phone: business.phone,
-    whatsapp: business.whatsapp,
-    whatsappMessage,
-    reviewUrl: business.googleReviewUrl,
-  });
-  if (!primary || contact?.type !== "CALL_WHATSAPP") return primary;
-  if (primary.type === "CALL")
-    return { ...primary, label: contact.config.callLabel };
-  if (primary.type === "WHATSAPP")
-    return { ...primary, label: contact.config.whatsappLabel };
-  return primary;
 }
 
 function pricingHandoff(
@@ -119,63 +89,12 @@ export default async function PublicActionPage({
   const business = await getPublicBusiness(slug);
   if (!business) notFound();
 
-  const brand = accessibleBrandColor(business.brandColor);
-  const primary = primaryFor(business);
-  const logoUrl = safeHttpUrl(business.logoUrl);
   const handoff = pricingHandoff(business, query);
-  const style = {
-    "--action-brand": brand.background,
-    "--action-brand-foreground": brand.foreground,
-    "--action-brand-border": brand.border,
-    "--action-brand-soft": brand.soft,
-  } as CSSProperties;
-
   return (
-    <main className="public-action-page" style={style}>
-      <AnalyticsPageView slug={business.slug} />
-      <div className="action-page-shell">
-        <header className="action-identity">
-          <p className="action-kicker">
-            {businessTypeLabel(business.industry, business.customIndustryLabel)}
-          </p>
-          {logoUrl ? (
-            // Owner-provided absolute URLs cannot use next/image without an unsafe wildcard host.
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              className="action-logo"
-              src={logoUrl}
-              alt={`${business.name} logo`}
-              width={80}
-              height={80}
-              referrerPolicy="no-referrer"
-            />
-          ) : (
-            <div className="action-monogram" aria-hidden="true">
-              {business.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-          <h1>{business.name}</h1>
-          {business.description && (
-            <p className="action-description">{business.description}</p>
-          )}
-        </header>
-
-        <PublicModuleRenderer
-          business={business}
-          primary={primary}
-          pricingContext={handoff?.selection}
-          pricingSummary={handoff?.summary}
-        />
-
-        <footer className="action-footer">
-          <span>{business.name}</span>
-          <span aria-hidden="true">•</span>
-          <span>Powered by LocalAction</span>
-          <span aria-hidden="true">•</span>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-        </footer>
-      </div>
-    </main>
+    <BusinessPage
+      business={business}
+      pricingContext={handoff?.selection}
+      pricingSummary={handoff?.summary}
+    />
   );
 }

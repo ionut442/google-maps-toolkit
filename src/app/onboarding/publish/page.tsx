@@ -13,11 +13,7 @@ import { StepShell } from "@/components/step-shell";
 import { SubmitButton } from "@/components/submit-button";
 import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
-import {
-  canPublishBusiness,
-  type PrimaryAction,
-  validPrimaryActions,
-} from "@/lib/domain";
+import { canPublishBusiness } from "@/lib/domain";
 import { publicBusinessUrl } from "@/lib/public-url";
 
 export default async function PublishPage() {
@@ -26,19 +22,17 @@ export default async function PublishPage() {
   const url = publicBusinessUrl(business.slug);
   const detailsReady = Boolean(business.phone && business.description);
   const toolsReady = business.modules.some((module) => module.enabled);
-  const actionReady = Boolean(
-    business.primaryAction &&
-    validPrimaryActions(business.modules).includes(
-      business.primaryAction as PrimaryAction,
-    ),
-  );
+  const missingDetails = [
+    ...(!business.description ? ["short description"] : []),
+    ...(!business.phone ? ["phone number"] : []),
+  ];
   const publishable = canPublishBusiness(business, business.modules);
   const asset =
     "/dashboard/businesses/" + business.id + "/assets/business-page-qr";
 
   return (
     <StepShell
-      step={6}
+      step={5}
       title={business.published ? "You’re live" : "Your page is ready"}
       intro={
         business.published
@@ -83,17 +77,17 @@ export default async function PublishPage() {
                 <ChecklistItem
                   ready={detailsReady}
                   label="Business details added"
-                  href="/onboarding/details"
+                  detail={
+                    missingDetails.length
+                      ? `Missing: ${missingDetails.join(" and ")}`
+                      : undefined
+                  }
+                  href="/onboarding/details?from=publish"
                 />
                 <ChecklistItem
                   ready={toolsReady}
                   label="Customer tools selected"
                   href="/onboarding/tools"
-                />
-                <ChecklistItem
-                  ready={actionReady}
-                  label="Main action chosen"
-                  href="/onboarding/primary"
                 />
               </ul>
               {!publishable && (
@@ -131,10 +125,12 @@ export default async function PublishPage() {
 function ChecklistItem({
   ready,
   label,
+  detail,
   href,
 }: {
   ready: boolean;
   label: string;
+  detail?: string;
   href: string;
 }) {
   return (
@@ -144,7 +140,10 @@ function ChecklistItem({
       ) : (
         <CircleAlert size={19} aria-hidden="true" />
       )}
-      <span>{label}</span>
+      <span>
+        {label}
+        {detail && <small>{detail}</small>}
+      </span>
       {!ready && <Link href={href}>Finish this</Link>}
     </li>
   );

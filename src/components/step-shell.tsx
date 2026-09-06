@@ -15,14 +15,14 @@ export function StepShell({
     { label: "Your business", active: step <= 3, complete: step > 3 },
     {
       label: "Customer tools",
-      active: step >= 4 && step <= 5,
-      complete: step > 5,
+      active: step === 4,
+      complete: step > 4,
     },
-    { label: "Preview & publish", active: step === 6, complete: false },
+    { label: "Preview & publish", active: step === 5, complete: false },
   ];
   return (
     <main className="setup-shell">
-      <aside className="setup-progress" aria-label={`Step ${step} of 6`}>
+      <aside className="setup-progress" aria-label={`Step ${step} of 5`}>
         <Link className="app-wordmark" href="/">
           <span aria-hidden="true">L</span>LocalAction
         </Link>
@@ -39,13 +39,13 @@ export function StepShell({
             </li>
           ))}
         </ol>
-        <small>Step {step} of 6</small>
+        <small>Step {step} of 5</small>
       </aside>
       <div className="setup-content">
         <div className="progress" aria-hidden="true">
-          <span style={{ width: `${(step / 6) * 100}%` }} />
+          <span style={{ width: `${(step / 5) * 100}%` }} />
         </div>
-        <span className="eyebrow">Step {step} of 6</span>
+        <span className="eyebrow">Step {step} of 5</span>
         <h1>{title}</h1>
         <p className="setup-intro">{intro}</p>
         {children}

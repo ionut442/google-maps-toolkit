@@ -3,14 +3,18 @@ import { industries, primaryActions } from "./domain";
 
 const httpUrl = z
   .string()
-  .url()
+  .trim()
   .refine((value) => {
     try {
-      return ["http:", "https:"].includes(new URL(value).protocol);
+      const url = new URL(value);
+      return (
+        ["http:", "https:"].includes(url.protocol) &&
+        (url.hostname === "localhost" || url.hostname.includes("."))
+      );
     } catch {
       return false;
     }
-  }, "Use a valid HTTP or HTTPS URL");
+  }, "Enter a complete website address starting with http:// or https://");
 const optionalUrl = z
   .union([z.literal(""), httpUrl])
   .transform((v) => v || null);
@@ -40,8 +44,20 @@ export const industrySchema = z
 export const profileSchema = z.object({
   name: z.string().trim().min(2).max(100),
   description: z.string().trim().min(10).max(500),
-  phone: z.string().trim().min(7).max(40),
-  whatsapp: z.string().trim().min(7).max(40),
+  phone: z
+    .string()
+    .trim()
+    .regex(
+      /^\+?\d{7,15}$/,
+      "Use 7 to 15 numbers, with an optional + at the start",
+    ),
+  whatsapp: z
+    .string()
+    .trim()
+    .regex(
+      /^\+?\d{7,15}$/,
+      "Use 7 to 15 numbers, with an optional + at the start",
+    ),
   email: z.string().trim().toLowerCase().pipe(z.email()),
   website: optionalUrl,
   logoUrl: optionalUrl,

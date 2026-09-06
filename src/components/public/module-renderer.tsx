@@ -230,7 +230,7 @@ function ServiceAreaPresentation({
         <>
           <AreaMap points={points} compact />
           <p className="map-note">
-            Pins show the centre of each area, not exact service boundaries.
+            The map frames this business&apos;s saved service areas.
           </p>
         </>
       )}

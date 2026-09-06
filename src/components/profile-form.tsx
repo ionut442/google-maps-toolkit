@@ -19,13 +19,21 @@ type Profile = {
 };
 
 const validHex = (value: string) => /^#[0-9A-F]{6}$/.test(value);
+const sanitizePhoneInput = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 15);
+  return value.trimStart().startsWith("+") ? `+${digits}` : digits;
+};
 
 export function ProfileForm({
   business,
   onboarding = false,
+  publishMissing = [],
+  returnToPublish = false,
 }: {
   business: Profile;
   onboarding?: boolean;
+  publishMissing?: Array<"description" | "phone">;
+  returnToPublish?: boolean;
 }) {
   const [state, action, pending] = useActionState(saveProfileAction, {});
   const [phone, setPhone] = useState(business.phone);
@@ -47,9 +55,10 @@ export function ProfileForm({
   );
 
   function updatePhone(value: string) {
-    setPhone(value);
+    const normalized = sanitizePhoneInput(value);
+    setPhone(normalized);
     setWhatsapp((current) =>
-      synchronizedWhatsapp(value, current, whatsappSynced),
+      synchronizedWhatsapp(normalized, current, whatsappSynced),
     );
   }
 
@@ -60,6 +69,19 @@ export function ProfileForm({
 
   return (
     <form action={action} className="profile-form surface-card">
+      {publishMissing.length > 0 && (
+        <div className="form-attention" role="alert">
+          <strong>Finish these business details before publishing:</strong>
+          <span>
+            {publishMissing
+              .map((field) =>
+                field === "description" ? "short description" : "phone number",
+              )
+              .join(", ")}
+            .
+          </span>
+        </div>
+      )}
       <fieldset className="form-section">
         <legend>Business details</legend>
         <div className="form-grid">
@@ -85,7 +107,9 @@ export function ProfileForm({
               <small className="error">{error("email")}</small>
             )}
           </label>
-          <label className="wide">
+          <label
+            className={`wide ${publishMissing.includes("description") ? "missing-required" : ""}`.trim()}
+          >
             Short description
             <textarea
               name="description"
@@ -95,12 +119,18 @@ export function ProfileForm({
               maxLength={500}
               rows={3}
               placeholder="What you do and who you help"
+              aria-invalid={
+                publishMissing.includes("description") ||
+                Boolean(error("description"))
+              }
             />
             {error("description") && (
               <small className="error">{error("description")}</small>
             )}
           </label>
-          <label className="phone-field">
+          <label
+            className={`phone-field ${publishMissing.includes("phone") ? "missing-required" : ""}`.trim()}
+          >
             Phone number
             <input
               name="phone"
@@ -108,7 +138,13 @@ export function ProfileForm({
               value={phone}
               onChange={(e) => updatePhone(e.currentTarget.value)}
               required
-              placeholder="+40 700 000 000"
+              inputMode="tel"
+              pattern="\+?[0-9]{7,15}"
+              title="Use 7 to 15 numbers, with an optional + at the start"
+              placeholder="+40700000000"
+              aria-invalid={
+                publishMissing.includes("phone") || Boolean(error("phone"))
+              }
             />
             {error("phone") && (
               <small className="error">{error("phone")}</small>
@@ -122,10 +158,13 @@ export function ProfileForm({
                 type="tel"
                 value={whatsapp}
                 onChange={(e) => {
-                  setWhatsapp(e.currentTarget.value);
+                  setWhatsapp(sanitizePhoneInput(e.currentTarget.value));
                   setWhatsappSynced(false);
                 }}
                 required
+                inputMode="tel"
+                pattern="\+?[0-9]{7,15}"
+                title="Use 7 to 15 numbers, with an optional + at the start"
               />
               <button
                 type="button"
@@ -152,6 +191,8 @@ export function ProfileForm({
             <input
               name="website"
               type="url"
+              pattern="https?://.+"
+              title="Enter a complete address starting with http:// or https://"
               defaultValue={business.website ?? ""}
               placeholder="https://"
             />
@@ -176,6 +217,8 @@ export function ProfileForm({
             <input
               name="logoUrl"
               type="url"
+              pattern="https?://.+"
+              title="Enter a complete address starting with http:// or https://"
               defaultValue={business.logoUrl ?? ""}
               placeholder="https://"
             />
@@ -290,6 +333,9 @@ export function ProfileForm({
       </details>
 
       {onboarding && <input type="hidden" name="intent" value="onboarding" />}
+      {returnToPublish && (
+        <input type="hidden" name="returnTo" value="publish" />
+      )}
       {state.error && (
         <p className="error callout" role="alert">
           {state.error}
@@ -304,7 +350,9 @@ export function ProfileForm({
         {pending
           ? "Saving…"
           : onboarding
-            ? "Save and choose tools"
+            ? returnToPublish
+              ? "Save and return to final check"
+              : "Save and choose tools"
             : "Save profile"}
       </button>
     </form>

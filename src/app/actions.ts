@@ -128,7 +128,7 @@ function stepPath(step: number) {
         2: "/onboarding/industry",
         3: "/onboarding/details",
         4: "/onboarding/tools",
-        5: "/onboarding/primary",
+        5: "/onboarding/publish",
         6: "/onboarding/publish",
       } as Record<number, string>
     )[step] ?? "/dashboard"
@@ -213,6 +213,8 @@ export async function saveProfileAction(
     }
   }
   revalidatePath("/dashboard");
+  if (String(formData.get("returnTo")) === "publish")
+    redirect("/onboarding/publish");
   if (String(formData.get("intent")) === "onboarding")
     redirect("/onboarding/tools");
   return { success: "Business profile saved." };
@@ -536,7 +538,7 @@ export async function finishToolsAction() {
     where: { id: business.id },
     data: { onboardingStep: Math.max(business.onboardingStep, 5) },
   });
-  redirect("/onboarding/primary");
+  redirect("/onboarding/publish");
 }
 
 export async function setPrimaryAction(formData: FormData) {
@@ -572,7 +574,7 @@ export async function setPublishedAction(formData: FormData) {
   const publish = String(formData.get("published")) === "true";
   if (publish && !canPublishBusiness(business, business.modules)) {
     throw new Error(
-      "Complete profile and choose an available primary action before publishing",
+      "Complete the required business details and enable at least one customer tool before publishing",
     );
   }
   await db.business.update({

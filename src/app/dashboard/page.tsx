@@ -32,15 +32,18 @@ export default async function DashboardPage() {
         title={`Good to see you, ${business.name}`}
         intro="Here’s how your customer page is doing."
         action={
-          business.published ? (
-            <Link
-              className="button secondary"
-              href={`/${business.slug}`}
-              target="_blank"
-            >
-              View customer page <ExternalLink size={16} />
-            </Link>
-          ) : undefined
+          <Link
+            className="button secondary"
+            href={
+              business.published
+                ? `/${business.slug}`
+                : `/preview/${business.slug}`
+            }
+            target="_blank"
+          >
+            {business.published ? "View customer page" : "Preview draft"}{" "}
+            <ExternalLink size={16} />
+          </Link>
         }
       />
 
@@ -61,6 +64,11 @@ export default async function DashboardPage() {
             <span>{url}</span>
             <CopyLink value={url} />
           </div>
+          <p className="page-link-explanation">
+            {business.published
+              ? "This public link is live and can be shared with customers."
+              : "This becomes your public business link after publishing. Until then, use the private draft preview above."}
+          </p>
           <div className="status-card-footer">
             <span>
               <strong>{enabledTools}</strong> customer tools enabled
@@ -88,7 +96,11 @@ export default async function DashboardPage() {
           <div>
             <span className="section-kicker">Share your page</span>
             <h2>Business Page QR</h2>
-            <p>Print or share a direct route to every customer action.</p>
+            <p>
+              {business.published
+                ? "Print or share a direct route to your customer page."
+                : "Publish the page to activate its shareable link and QR code."}
+            </p>
           </div>
           {business.published && (
             <a

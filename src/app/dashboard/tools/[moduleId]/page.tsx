@@ -49,7 +49,6 @@ export default async function ToolPage({
       type={type}
       title={toolEditorTitles[type]}
       intro={toolDescriptions[type]}
-      enabled={tool.enabled}
       fullWidth={ownsPreview}
       statusControl={
         <ToolStatusSwitch

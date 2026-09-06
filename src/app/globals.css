@@ -1,5 +1,3 @@
-@import "maplibre-gl/dist/maplibre-gl.css";
-
 :root {
   --canvas: #fffdf6;
   --background: #f4efe2;
@@ -1731,8 +1729,11 @@ body:has(.public-action-page) > .site-header {
   color: var(--ink);
 }
 .area-map {
+  display: block;
+  width: 100%;
   min-height: 320px;
   overflow: hidden;
+  border: 0;
   border-radius: 13px;
 }
 .file-state {
@@ -3055,6 +3056,101 @@ select:focus {
 
 .progress span {
   background: var(--primary);
+}
+
+/* Interface corrections: consistent spacing, contrast and field feedback. */
+.setup-progress li:not(.active) {
+  color: #f4efe2;
+}
+
+.setup-progress > small {
+  color: #f4efe2;
+}
+
+.setup-progress li.active {
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+}
+
+.page-eyebrow + h1,
+.eyebrow + h1 {
+  margin-top: 0.9rem;
+}
+
+.section-kicker + h2,
+.service-area-preview > small + h2 {
+  margin-top: 0.75rem;
+}
+
+.metrics > div:first-child {
+  padding-left: 1rem;
+}
+
+.search-result {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.search-result > span,
+.search-result strong,
+.search-result small {
+  text-align: left;
+}
+
+.service-area-section {
+  gap: 1.35rem;
+}
+
+.form-attention {
+  display: grid;
+  gap: 0.25rem;
+  border: 2px solid var(--danger);
+  border-radius: 9px;
+  background: #fff3ef;
+  padding: 0.9rem 1rem;
+  color: var(--danger);
+}
+
+.missing-required input,
+.missing-required textarea {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgb(190 54 39 / 12%);
+}
+
+.publish-checklist li > span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.publish-checklist li > span small {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.page-link-explanation,
+.review-link-note {
+  color: var(--muted);
+}
+
+.page-link-explanation {
+  margin: 0.85rem 0 0;
+}
+
+.review-link-note {
+  max-width: 760px;
+  margin: -0.75rem 0 1.5rem;
+}
+
+.draft-preview-banner {
+  position: sticky;
+  z-index: 20;
+  top: 0;
+  border-bottom: 2px solid var(--ink);
+  background: var(--primary);
+  color: var(--ink);
+  padding: 0.75rem 1rem;
+  font-weight: 750;
+  text-align: center;
 }
 
 .auth-page::before {

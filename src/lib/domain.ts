@@ -161,7 +161,6 @@ export function moduleSwapIndex(
 
 export function canPublishBusiness(
   business: {
-    primaryAction: string | null;
     phone: string;
     description: string;
   },
@@ -170,9 +169,6 @@ export function canPublishBusiness(
   return Boolean(
     business.phone &&
     business.description &&
-    business.primaryAction &&
-    validPrimaryActions(modules).includes(
-      business.primaryAction as PrimaryAction,
-    ),
+    modules.some((module) => module.enabled),
   );
 }

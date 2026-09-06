@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { StatusBadge, ToolIcon } from "@/components/dashboard-ui";
+import { ToolIcon } from "@/components/dashboard-ui";
 import { ToolStatusSwitch } from "@/components/tool-status-switch";
 import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
 import {
@@ -33,7 +33,6 @@ export function ToolList({
           <article className="tool-summary-card" key={tool.id}>
             <div className="tool-card-top">
               <ToolIcon type={type} />
-              <StatusBadge on={tool.enabled} />
             </div>
             <div>
               <h2>{labels[type]}</h2>

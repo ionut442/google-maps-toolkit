@@ -327,7 +327,7 @@ export function ServiceAreaEditor({
             <>
               <AreaMap points={points} />
               <p className="map-note">
-                Pins show the centre of each area, not exact service boundaries.
+                The map frames your saved areas; place names are listed below.
               </p>
             </>
           ) : (

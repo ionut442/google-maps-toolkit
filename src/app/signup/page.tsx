@@ -6,7 +6,7 @@ export default function SignupPage() {
   return (
     <main className="auth-page">
       <div>
-        <span className="eyebrow">Step 1 of 6</span>
+        <span className="eyebrow">Step 1 of 5</span>
         <h1>Create your account</h1>
         <p>Start with your email and business name.</p>
         <AuthForm action={signupAction} kind="signup" />

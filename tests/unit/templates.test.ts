@@ -67,9 +67,8 @@ describe("industry templates", () => {
     expect(moduleSwapIndex(3, 0, "up")).toBeNull();
     expect(moduleSwapIndex(3, 1, "sideways")).toBeNull();
   });
-  it("only permits publishing with a valid enabled primary action", () => {
+  it("permits publishing with complete details and an enabled customer tool", () => {
     const business = {
-      primaryAction: "QUOTE_REQUEST",
       phone: "+40700111222",
       description: "Local service business",
     };
@@ -78,6 +77,11 @@ describe("industry templates", () => {
     ).toBe(true);
     expect(
       canPublishBusiness(business, [{ type: "QUOTE_REQUEST", enabled: false }]),
+    ).toBe(false);
+    expect(
+      canPublishBusiness({ ...business, phone: "" }, [
+        { type: "QUOTE_REQUEST", enabled: true },
+      ]),
     ).toBe(false);
   });
 });

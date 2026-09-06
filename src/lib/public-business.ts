@@ -32,6 +32,15 @@ export type PublicBusiness = {
   modules: PublicModule[];
 };
 
+type PreviewableBusiness = Omit<PublicBusiness, "modules"> & {
+  modules: Array<{
+    type: string;
+    enabled?: boolean;
+    sortOrder: number;
+    config: string;
+  }>;
+};
+
 function parsePublicModule(module: {
   type: string;
   sortOrder: number;
@@ -47,6 +56,31 @@ function parsePublicModule(module: {
   } catch {
     return null;
   }
+}
+
+export function toPublicBusiness(
+  business: PreviewableBusiness,
+): PublicBusiness {
+  return {
+    name: business.name,
+    slug: business.slug,
+    logoUrl: business.logoUrl,
+    description: business.description,
+    phone: business.phone,
+    whatsapp: business.whatsapp,
+    email: business.email,
+    website: business.website,
+    brandColor: business.brandColor,
+    industry: business.industry,
+    customIndustryLabel: business.customIndustryLabel,
+    googleReviewUrl: business.googleReviewUrl,
+    primaryAction: business.primaryAction,
+    modules: business.modules
+      .filter((module) => module.enabled !== false)
+      .map(parsePublicModule)
+      .filter((module): module is PublicModule => Boolean(module))
+      .sort((a, b) => a.sortOrder - b.sortOrder),
+  };
 }
 
 export async function findPublicBusinessBySlug(
@@ -76,12 +110,7 @@ export async function findPublicBusinessBySlug(
     },
   });
   if (!business) return null;
-  return {
-    ...business,
-    modules: business.modules
-      .map(parsePublicModule)
-      .filter((module): module is PublicModule => Boolean(module)),
-  };
+  return toPublicBusiness(business);
 }
 
 export const getPublicBusiness = cache(findPublicBusinessBySlug);

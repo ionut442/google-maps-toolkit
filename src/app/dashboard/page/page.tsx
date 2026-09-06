@@ -9,7 +9,6 @@ import {
   StatusBadge,
 } from "@/components/dashboard-ui";
 import { PageOrderList } from "@/components/page-order-list";
-import { PrimaryForm } from "@/components/primary-form";
 import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
 import { publicBusinessUrl } from "@/lib/public-url";
@@ -23,17 +22,20 @@ export default async function MyPagePage() {
       <PageHeader
         eyebrow="My Page"
         title="Your customer page"
-        intro="Choose what customers see first and how the page flows."
+        intro="Arrange the customer tools in the order that works for your business."
         action={
-          business.published ? (
-            <Link
-              className="button secondary"
-              href={`/${business.slug}`}
-              target="_blank"
-            >
-              Open live page <ExternalLink size={16} />
-            </Link>
-          ) : undefined
+          <Link
+            className="button secondary"
+            href={
+              business.published
+                ? `/${business.slug}`
+                : `/preview/${business.slug}`
+            }
+            target="_blank"
+          >
+            {business.published ? "Open live page" : "Open draft preview"}{" "}
+            <ExternalLink size={16} />
+          </Link>
         }
       />
       <div className="page-builder-layout">
@@ -67,14 +69,6 @@ export default async function MyPagePage() {
             </form>
           </SectionCard>
           <SectionCard>
-            <span className="section-kicker">First impression</span>
-            <h2>Main customer action</h2>
-            <p>
-              Make the most useful next step prominent at the top of your page.
-            </p>
-            <PrimaryForm business={business} />
-          </SectionCard>
-          <SectionCard>
             <span className="section-kicker">Layout</span>
             <h2>Page order</h2>
             <p>
@@ -85,7 +79,7 @@ export default async function MyPagePage() {
           </SectionCard>
         </div>
         <aside className="sticky-preview">
-          <span className="section-kicker">Live customer preview</span>
+          <span className="section-kicker">Customer preview</span>
           <CustomerPreview business={business} />
         </aside>
       </div>

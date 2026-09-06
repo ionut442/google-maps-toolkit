@@ -15,7 +15,7 @@ export default async function ReviewKitPage() {
       <PageHeader
         eyebrow="Review Kit"
         title="Turn happy customers into reviews"
-        intro="Ready-made assets for counters, invoices, social posts, and printed signs."
+        intro="These assets use your confirmed Google link, separately from the business-page link you share with customers."
         action={
           reviewUrl ? (
             <a
@@ -30,45 +30,52 @@ export default async function ReviewKitPage() {
         }
       />
       {reviewUrl ? (
-        <div className="review-kit-grid">
-          {[
-            {
-              key: "review-qr",
-              title: "Review QR",
-              copy: "A compact QR for receipts and counters.",
-            },
-            {
-              key: "printable-review-sign",
-              title: "Printable review sign",
-              copy: "An A4 graphic ready for high-resolution printing.",
-            },
-            {
-              key: "social-review-graphic",
-              title: "Social review graphic",
-              copy: "A square branded graphic for social channels.",
-            },
-          ].map((asset) => (
-            <article className="asset-card" key={asset.key}>
-              <div className="asset-image-wrap">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={`${base}/${asset.key}`}
-                  alt={`${asset.title} for ${business.name}`}
-                />
-              </div>
-              <div>
-                <h2>{asset.title}</h2>
-                <p>{asset.copy}</p>
-                <a
-                  className="button secondary"
-                  href={`${base}/${asset.key}?download=1`}
-                >
-                  Download PNG
-                </a>
-              </div>
-            </article>
-          ))}
-        </div>
+        <>
+          <p className="review-link-note">
+            A direct Google review link opens the review form. A Google Maps
+            link opens the confirmed listing, where customers can choose to
+            leave a review.
+          </p>
+          <div className="review-kit-grid">
+            {[
+              {
+                key: "review-qr",
+                title: "Review QR",
+                copy: "A compact QR for receipts and counters.",
+              },
+              {
+                key: "printable-review-sign",
+                title: "Printable review sign",
+                copy: "An A4 graphic ready for high-resolution printing.",
+              },
+              {
+                key: "social-review-graphic",
+                title: "Social review graphic",
+                copy: "A square branded graphic for social channels.",
+              },
+            ].map((asset) => (
+              <article className="asset-card" key={asset.key}>
+                <div className="asset-image-wrap">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={`${base}/${asset.key}`}
+                    alt={`${asset.title} for ${business.name}`}
+                  />
+                </div>
+                <div>
+                  <h2>{asset.title}</h2>
+                  <p>{asset.copy}</p>
+                  <a
+                    className="button secondary"
+                    href={`${base}/${asset.key}?download=1`}
+                  >
+                    Download PNG
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        </>
       ) : (
         <EmptyState
           title="Connect your Google listing first"
