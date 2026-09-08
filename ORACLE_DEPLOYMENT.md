@@ -1,10 +1,10 @@
 # Oracle deployment and updates
 
-The production application is available at `https://redsearch.qd.je`. DigitalPlat DNS points the hostname to the Oracle VM. Public TCP ports 80 and 443 terminate at Caddy, which redirects HTTP to HTTPS and reverse-proxies to `127.0.0.1:3040`. Port 3040 must never be exposed publicly.
+The canonical production application is available at `https://local-action.com`. DNS for `local-action.com` and `www.local-action.com` points to the Oracle VM. Public TCP ports 80 and 443 terminate at Caddy, which serves the canonical hostname, permanently redirects `www.local-action.com` and the legacy `redsearch.qd.je` hostname to `https://local-action.com{uri}`, and reverse-proxies only the canonical hostname to `127.0.0.1:3040`. Port 3040 must never be exposed publicly.
 
 The application runs as the dedicated, non-login `googlemaps` user from `/opt/google-maps-toolbox` under `google-maps-toolbox.service`. Caddy runs under `caddy.service`. Both services are enabled at boot. The protected runtime file is `/opt/google-maps-toolbox/.env.production` and must remain mode `0600`, owned by `googlemaps:googlemaps`.
 
-Production uses `APP_URL=https://redsearch.qd.je`, enables trusted proxy headers, and treats Caddy's `X-Forwarded-For` value as the authoritative client IP. Caddy must remain the only public ingress because its default reverse-proxy behavior discards spoofed client forwarding values before setting the upstream header.
+Production uses `APP_URL=https://local-action.com`, enables trusted proxy headers, and treats Caddy's `X-Forwarded-For` value as the authoritative client IP. Caddy must remain the only public ingress because its default reverse-proxy behavior discards spoofed client forwarding values before setting the upstream header.
 
 The VM has approximately 956 MiB RAM and a persistent 4 GiB `/swapfile` with mode `0600`. Keep `vm.swappiness=10`; verify swap before dependency installation or production builds. The persisted firewall policy permits public TCP 80 and 443 for Caddy and SSH TCP 22 for administration.
 
@@ -29,4 +29,4 @@ List and inspect the archive before transfer, calculate its SHA-256 hash, then c
 11. Verify `google-maps-toolbox-email-retry.timer` and `google-maps-toolbox-retention.timer` remain enabled and successful.
 12. Remove the uploaded archive after successful validation. Retain the previous recovery point until the deployment is accepted.
 
-After an update, validate both the loopback origin and `https://redsearch.qd.je`. Confirm Caddy still presents a valid certificate for the hostname, HTTP redirects to HTTPS, public routes respond, port 3040 remains loopback-only, and the unrelated design-services email scheduler remains active.
+After an update, validate the loopback origin and `https://local-action.com`. Confirm Caddy presents valid certificates for `local-action.com` and `www.local-action.com`; HTTP redirects to HTTPS; `www.local-action.com` and `redsearch.qd.je` preserve path/query while permanently redirecting to the canonical hostname; public routes respond; port 3040 remains loopback-only; and the unrelated design-services email scheduler remains active.
