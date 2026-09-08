@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
 import { accessibleBrandColor } from "@/lib/brand";
 import { businessTypeLabel } from "@/lib/domain";
@@ -44,9 +45,10 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
         <span />
         <span />
         <span />
+        <strong>Draft preview</strong>
       </div>
       <div className="customer-preview-viewport">
-        <div className="customer-preview-page" inert>
+        <div className="customer-preview-page">
           <header className="action-identity">
             <p className="action-kicker">
               {businessTypeLabel(
@@ -80,7 +82,13 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
         </div>
       </div>
       <p className="preview-interaction-note">
-        Preview only — links and forms are disabled here.
+        Links and forms work in this draft.
+        <Link
+          href={`/preview/${encodeURIComponent(safeBusiness.slug)}`}
+          target="_blank"
+        >
+          Open full interactive preview
+        </Link>
       </p>
     </div>
   );

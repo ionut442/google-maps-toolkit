@@ -30,15 +30,22 @@ export type PublicBusiness = {
   googleReviewUrl: string | null;
   primaryAction: string | null;
   modules: PublicModule[];
+  trustEvidence?: Array<{
+    id: string;
+    entryId: string;
+    mediaType: string;
+    originalFilename: string;
+  }>;
 };
 
-type PreviewableBusiness = Omit<PublicBusiness, "modules"> & {
+type PreviewableBusiness = Omit<PublicBusiness, "modules" | "trustEvidence"> & {
   modules: Array<{
     type: string;
     enabled?: boolean;
     sortOrder: number;
     config: string;
   }>;
+  trustEvidence?: PublicBusiness["trustEvidence"];
 };
 
 function parsePublicModule(module: {
@@ -75,6 +82,7 @@ export function toPublicBusiness(
     customIndustryLabel: business.customIndustryLabel,
     googleReviewUrl: business.googleReviewUrl,
     primaryAction: business.primaryAction,
+    trustEvidence: business.trustEvidence ?? [],
     modules: business.modules
       .filter((module) => module.enabled !== false)
       .map(parsePublicModule)
@@ -106,6 +114,15 @@ export async function findPublicBusinessBySlug(
         where: { enabled: true },
         orderBy: { sortOrder: "asc" },
         select: { type: true, sortOrder: true, config: true },
+      },
+      trustEvidence: {
+        orderBy: { createdAt: "asc" },
+        select: {
+          id: true,
+          entryId: true,
+          mediaType: true,
+          originalFilename: true,
+        },
       },
     },
   });

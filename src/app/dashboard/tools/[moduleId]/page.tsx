@@ -23,12 +23,15 @@ import { listOwnedTrustEvidence } from "@/lib/trust-evidence";
 
 export default async function ToolPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ moduleId: string }>;
+  searchParams: Promise<{ returnTo?: string }>;
 }) {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
   const { moduleId } = await params;
+  const { returnTo } = await searchParams;
   const tool = business.modules.find((candidate) => candidate.id === moduleId);
   if (!tool || !moduleTypes.includes(tool.type as ModuleType)) notFound();
   const type = tool.type as ModuleType;
@@ -50,6 +53,8 @@ export default async function ToolPage({
       title={toolEditorTitles[type]}
       intro={toolDescriptions[type]}
       fullWidth={ownsPreview}
+      backHref={returnTo === "publish" ? "/onboarding/publish" : undefined}
+      backLabel={returnTo === "publish" ? "Final check" : undefined}
       statusControl={
         <ToolStatusSwitch
           businessId={business.id}

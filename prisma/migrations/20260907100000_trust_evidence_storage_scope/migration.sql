@@ -1,0 +1,1 @@
+ALTER TABLE "TrustEvidence" ADD COLUMN "storageScope" TEXT NOT NULL DEFAULT 'PRIVATE';

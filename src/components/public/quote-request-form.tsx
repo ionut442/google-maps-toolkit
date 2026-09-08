@@ -16,10 +16,10 @@ function describedBy(field: QuoteField, hasError: boolean) {
 
 function FieldLabel({ field }: { field: QuoteField }) {
   return (
-    <>
+    <span className="quote-field-label">
       {field.label}
       {field.required && <span aria-hidden="true"> *</span>}
-    </>
+    </span>
   );
 }
 

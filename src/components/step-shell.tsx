@@ -11,6 +11,12 @@ export function StepShell({
   intro: string;
   children: React.ReactNode;
 }) {
+  const previous =
+    {
+      3: { href: "/onboarding/industry", label: "Business type" },
+      4: { href: "/onboarding/details", label: "Business details" },
+      5: { href: "/onboarding/tools", label: "Customer tools" },
+    }[step] ?? null;
   const phases = [
     { label: "Your business", active: step <= 3, complete: step > 3 },
     {
@@ -45,7 +51,14 @@ export function StepShell({
         <div className="progress" aria-hidden="true">
           <span style={{ width: `${(step / 5) * 100}%` }} />
         </div>
-        <span className="eyebrow">Step {step} of 5</span>
+        <div className="setup-step-heading">
+          <span className="eyebrow">Step {step} of 5</span>
+          {previous && (
+            <Link className="setup-back-link" href={previous.href}>
+              ← Back to {previous.label}
+            </Link>
+          )}
+        </div>
         <h1>{title}</h1>
         <p className="setup-intro">{intro}</p>
         {children}

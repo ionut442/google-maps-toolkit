@@ -146,7 +146,8 @@ describe("database ownership and toolkit integration", () => {
       new File([evidencePng], "replacement.png", { type: "image/png" }),
       storage,
     );
-    expect(storage.objects.size).toBe(1);
+    expect(storage.objects.size).toBe(2);
+    expect(await listOwnedTrustEvidence(owner.id, business.id)).toHaveLength(2);
     await saveOwnedTrustConfig(
       owner.id,
       business.id,
@@ -228,6 +229,9 @@ describe("database ownership and toolkit integration", () => {
     expect(
       loaded.modules.find((item) => item.type === "SERVICE_AREA")!.enabled,
     ).toBe(true);
+    expect(
+      loaded.modules.find((item) => item.type === "SERVICE_AREA")!.customizedAt,
+    ).toBeInstanceOf(Date);
   });
   it("creates a business, applies template, and enforces ownership", async () => {
     const owner = await client.user.create({

@@ -4,6 +4,7 @@ import { BusinessPage } from "@/components/public/business-page";
 import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
 import { toPublicBusiness } from "@/lib/public-business";
+import { listOwnedTrustEvidence } from "@/lib/trust-evidence";
 
 export const metadata: Metadata = {
   title: "Draft page preview",
@@ -19,6 +20,12 @@ export default async function DraftPreviewPage({
   const business = await requireOwnedBusiness(user.id);
   const { slug } = await params;
   if (business.slug !== slug) notFound();
+  const trustEvidence = await listOwnedTrustEvidence(user.id, business.id);
 
-  return <BusinessPage business={toPublicBusiness(business)} preview />;
+  return (
+    <BusinessPage
+      business={toPublicBusiness({ ...business, trustEvidence })}
+      preview
+    />
+  );
 }

@@ -253,8 +253,10 @@ function ServiceAreaPresentation({
 }
 
 function TrustPresentation({
+  business,
   module,
 }: {
+  business: PublicBusiness;
   module: Extract<PublicModule, { type: "TRUST" }>;
 }) {
   const entries = module.config.entries.filter(
@@ -274,18 +276,48 @@ function TrustPresentation({
         </div>
       </div>
       <ul className="trust-list">
-        {entries.map((item) => (
-          <li key={item.id}>
-            <ShieldCheck size={20} aria-hidden="true" />
-            <span>
-              <strong>{item.name}</strong>
-              {item.description && <span>{item.description}</span>}
-              {item.referenceNumber && (
-                <small>Reference: {item.referenceNumber}</small>
-              )}
-            </span>
-          </li>
-        ))}
+        {entries.map((item) => {
+          const evidence = (business.trustEvidence ?? []).filter(
+            (file) => file.entryId === item.id,
+          );
+          return (
+            <li key={item.id}>
+              <ShieldCheck size={20} aria-hidden="true" />
+              <span>
+                <strong>{item.name}</strong>
+                {item.description && <span>{item.description}</span>}
+                {item.referenceNumber && (
+                  <small>Reference: {item.referenceNumber}</small>
+                )}
+                {evidence.length > 0 && (
+                  <span className="public-credential-files">
+                    {evidence.map((file) => (
+                      <a
+                        href={`/trust-evidence/${file.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        key={file.id}
+                      >
+                        {file.mediaType.startsWith("image/") ? (
+                          // Dynamic owner uploads are served through the public evidence route.
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            className="public-credential-image"
+                            src={`/trust-evidence/${file.id}`}
+                            alt={`${item.name}: ${file.originalFilename}`}
+                            loading="lazy"
+                          />
+                        ) : (
+                          `View ${file.originalFilename}`
+                        )}
+                      </a>
+                    ))}
+                  </span>
+                )}
+              </span>
+            </li>
+          );
+        })}
       </ul>
       <p className="trust-disclaimer">Information provided by this business.</p>
     </section>
@@ -340,8 +372,10 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
   },
   TRUST: {
     analyticsEvent: "trust_signals_viewed",
-    render: ({ module }) =>
-      module.type === "TRUST" ? <TrustPresentation module={module} /> : null,
+    render: ({ business, module }) =>
+      module.type === "TRUST" ? (
+        <TrustPresentation business={business} module={module} />
+      ) : null,
   },
   FAQ: {
     analyticsEvent: "faq_viewed",

@@ -32,11 +32,11 @@ export function BusinessPage({
       {!preview && <AnalyticsPageView slug={business.slug} />}
       {preview && (
         <div className="draft-preview-banner">
-          Draft preview — only you can see this page. Links and forms are
-          disabled.
+          Interactive draft preview — only you can see this page. Links and
+          forms work just as they will when published.
         </div>
       )}
-      <div className="action-page-shell" inert={preview || undefined}>
+      <div className="action-page-shell">
         <header className="action-identity">
           <p className="action-kicker">
             {businessTypeLabel(business.industry, business.customIndustryLabel)}

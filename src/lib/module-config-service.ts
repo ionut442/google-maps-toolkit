@@ -5,7 +5,11 @@ import {
   type ModuleConfigByType,
   type ModuleType,
 } from "./domain";
-import { privateStorage, type PrivateObjectStorage } from "./storage";
+import {
+  privateStorage,
+  publicStorage,
+  type PrivateObjectStorage,
+} from "./storage";
 
 export async function saveOwnedModuleConfig<T extends ModuleType>(
   userId: string,
@@ -19,7 +23,11 @@ export async function saveOwnedModuleConfig<T extends ModuleType>(
   const config = parseModuleConfig(type, input);
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(config), enabled: true },
+    data: {
+      config: JSON.stringify(config),
+      enabled: true,
+      customizedAt: new Date(),
+    },
   });
   return { slug: business.slug, config: config as ModuleConfigByType[T] };
 }
@@ -28,7 +36,8 @@ export async function saveOwnedTrustConfig(
   userId: string,
   businessId: string,
   input: unknown,
-  storage: PrivateObjectStorage = privateStorage,
+  storage: PrivateObjectStorage = publicStorage,
+  legacyStorage: PrivateObjectStorage = privateStorage,
 ) {
   const business = await requireOwnedBusiness(userId, businessId);
   const item = business.modules.find((module) => module.type === "TRUST");
@@ -40,12 +49,16 @@ export async function saveOwnedTrustConfig(
       businessId,
       ...(retainedIds.length ? { entryId: { notIn: retainedIds } } : {}),
     },
-    select: { id: true, objectKey: true },
+    select: { id: true, objectKey: true, storageScope: true },
   });
   await db.$transaction([
     db.businessModule.update({
       where: { id: item.id },
-      data: { config: JSON.stringify(config), enabled: true },
+      data: {
+        config: JSON.stringify(config),
+        enabled: true,
+        customizedAt: new Date(),
+      },
     }),
     ...(removed.length
       ? [
@@ -56,7 +69,11 @@ export async function saveOwnedTrustConfig(
       : []),
   ]);
   await Promise.allSettled(
-    removed.map((entry) => storage.delete(entry.objectKey)),
+    removed.map((entry) =>
+      (entry.storageScope === "PUBLIC" ? storage : legacyStorage).delete(
+        entry.objectKey,
+      ),
+    ),
   );
   return { slug: business.slug, config };
 }

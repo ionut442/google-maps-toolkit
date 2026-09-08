@@ -15,25 +15,36 @@ import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
 import { canPublishBusiness } from "@/lib/domain";
 import { publicBusinessUrl } from "@/lib/public-url";
+import {
+  allEnabledToolsReady,
+  onboardingToolReady,
+} from "@/lib/onboarding-readiness";
+import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
+import { toolEditorHref } from "@/lib/tool-presentation";
 
 export default async function PublishPage() {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
   const url = publicBusinessUrl(business.slug);
   const detailsReady = Boolean(business.phone && business.description);
-  const toolsReady = business.modules.some((module) => module.enabled);
+  const enabledTools = business.modules.filter(
+    (module) =>
+      module.enabled && moduleTypes.includes(module.type as ModuleType),
+  );
+  const toolsReady = allEnabledToolsReady(enabledTools, business);
   const missingDetails = [
     ...(!business.description ? ["short description"] : []),
     ...(!business.phone ? ["phone number"] : []),
   ];
-  const publishable = canPublishBusiness(business, business.modules);
+  const publishable =
+    canPublishBusiness(business, business.modules) && toolsReady;
   const asset =
     "/dashboard/businesses/" + business.id + "/assets/business-page-qr";
 
   return (
     <StepShell
       step={5}
-      title={business.published ? "You’re live" : "Your page is ready"}
+      title={business.published ? "You’re live" : "Final check"}
       intro={
         business.published
           ? "Your customer page is published and ready to share."
@@ -72,7 +83,7 @@ export default async function PublishPage() {
             </>
           ) : (
             <>
-              <h2>Final check</h2>
+              <h2>Finish your enabled tools</h2>
               <ul className="publish-checklist">
                 <ChecklistItem
                   ready={detailsReady}
@@ -84,11 +95,25 @@ export default async function PublishPage() {
                   }
                   href="/onboarding/details?from=publish"
                 />
-                <ChecklistItem
-                  ready={toolsReady}
-                  label="Customer tools selected"
-                  href="/onboarding/tools"
-                />
+                {enabledTools.map((module) => {
+                  const type = module.type as ModuleType;
+                  const ready = onboardingToolReady(module, business);
+                  return (
+                    <ChecklistItem
+                      key={module.id}
+                      ready={ready}
+                      label={labels[type]}
+                      detail={
+                        ready
+                          ? "Saved and ready"
+                          : type === "CALL_WHATSAPP" || type === "SAVE_CONTACT"
+                            ? "Add a phone number in Business details"
+                            : "Review this tool and save your changes"
+                      }
+                      href={`${toolEditorHref(module.id)}?returnTo=publish`}
+                    />
+                  );
+                })}
               </ul>
               {!publishable && (
                 <p className="publish-blocked-message">
@@ -144,7 +169,7 @@ function ChecklistItem({
         {label}
         {detail && <small>{detail}</small>}
       </span>
-      {!ready && <Link href={href}>Finish this</Link>}
+      <Link href={href}>{ready ? "Edit" : "Finish this"}</Link>
     </li>
   );
 }

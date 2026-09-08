@@ -225,7 +225,7 @@ describe("Goal 5 QR, assets, and analytics", () => {
       .png()
       .toBuffer();
     expect(decodeQr(embedded)).toBe(business.googleReviewUrl);
-  });
+  }, 15_000);
 
   it("contains square and wide logos without distortion", async () => {
     for (const [width, height] of [

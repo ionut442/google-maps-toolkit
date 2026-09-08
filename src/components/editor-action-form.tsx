@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
+import { CheckCircle2 } from "lucide-react";
 
 /** Keep drafts intact when a server-side save fails. */
 export function EditorActionForm({
@@ -53,10 +54,19 @@ export function EditorActionForm({
         {children}
       </fieldset>
       <p
-        className={failed ? "form-feedback error" : "form-feedback"}
+        className={
+          failed
+            ? "form-feedback form-save-feedback error"
+            : message
+              ? "form-feedback form-save-feedback success"
+              : "form-feedback form-save-feedback"
+        }
         role={failed ? "alert" : "status"}
         aria-live="polite"
       >
+        {!pending && message && !failed && (
+          <CheckCircle2 size={20} aria-hidden="true" />
+        )}
         {pending ? "Saving…" : message}
       </p>
     </form>

@@ -32,9 +32,21 @@ export type SubmitQuoteResult =
       retryAfterSeconds?: number;
     };
 
-async function publicQuoteContext(slug: string, client: PrismaClient) {
+async function publicQuoteContext(
+  slug: string,
+  client: PrismaClient,
+  previewUserId?: string,
+) {
   const business = await client.business.findFirst({
-    where: { slug, published: true },
+    where: {
+      slug,
+      OR: [
+        { published: true },
+        ...(previewUserId
+          ? [{ memberships: { some: { userId: previewUserId } } }]
+          : []),
+      ],
+    },
     select: {
       id: true,
       name: true,
@@ -80,13 +92,18 @@ export async function submitPublicQuote(input: {
   transport?: EmailTransport;
   analyticsSink?: AnalyticsHookSink;
   now?: Date;
+  previewUserId?: string;
 }): Promise<SubmitQuoteResult> {
   if (quoteHoneypotTriggered(input.formData))
     return { ok: true, accepted: false };
   const client = input.client ?? db;
   const storage = input.storage ?? privateStorage;
   const now = input.now ?? new Date();
-  const context = await publicQuoteContext(input.slug, client);
+  const context = await publicQuoteContext(
+    input.slug,
+    client,
+    input.previewUserId,
+  );
   if (!context)
     return {
       ok: false,

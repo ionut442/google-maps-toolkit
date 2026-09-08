@@ -12,6 +12,7 @@ vi.mock("@/app/actions", () => ({
   addQuoteFieldAction: vi.fn(),
   deleteQuoteFieldAction: vi.fn(),
   moveQuoteFieldAction: vi.fn(),
+  saveQuoteAction: vi.fn(),
   updateQuoteFieldAction: vi.fn(),
   updateQuoteFormMetaAction: vi.fn(),
   toggleModuleAction: vi.fn(),
@@ -54,6 +55,8 @@ describe("purpose-built editor presentation", () => {
     expect(html.match(/class="question-editor-card"/g)).toHaveLength(3);
     expect(html).not.toMatch(/class="question-editor-card"[^>]*open/);
     expect(html).toContain("Customer form preview");
+    expect(html).toContain("Save quote form");
+    expect(html).toContain('class="quote-field-label"');
     expect(html).toContain('aria-label="Preview only, answers are not sent"');
     expect(html).toMatch(
       /<details class="advanced-options"><summary>More options<\/summary>[\s\S]*name="min"/,

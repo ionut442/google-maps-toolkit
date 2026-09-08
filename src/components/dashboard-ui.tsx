@@ -115,6 +115,8 @@ export function ToolEditorShell({
   aside,
   fullWidth = false,
   statusControl,
+  backHref = "/dashboard/tools",
+  backLabel = "All tools",
 }: {
   type: ModuleType;
   title: string;
@@ -123,11 +125,13 @@ export function ToolEditorShell({
   aside?: React.ReactNode;
   fullWidth?: boolean;
   statusControl?: React.ReactNode;
+  backHref?: string;
+  backLabel?: string;
 }) {
   return (
     <main className="dashboard-page tool-editor-page">
-      <Link className="back-link" href="/dashboard/tools">
-        <ArrowLeft size={17} aria-hidden="true" /> All tools
+      <Link className="back-link" href={backHref}>
+        <ArrowLeft size={17} aria-hidden="true" /> {backLabel}
       </Link>
       <header className="tool-editor-header">
         <ToolIcon type={type} />

@@ -28,7 +28,9 @@ type Evidence = {
   entryId: string;
   originalFilename: string;
   sizeBytes: number;
+  mediaType: string;
 };
+const MAX_EVIDENCE_FILES = 6;
 const id = () =>
   "trust_" + crypto.randomUUID().replaceAll("-", "").slice(0, 12);
 const statusLabels: Record<TrustState, string> = {
@@ -165,7 +167,9 @@ export function TrustEditor({
           )}
           <div className="credential-card-list">
             {config.entries.map((entry, index) => {
-              const file = evidence.find((item) => item.entryId === entry.id);
+              const files = evidence.filter(
+                (item) => item.entryId === entry.id,
+              );
               const state = trustEntryState(entry.expiresOn);
               return (
                 <details className="credential-card" key={entry.id}>
@@ -181,9 +185,9 @@ export function TrustEditor({
                           ? "Expires " + dateLabel(entry.expiresOn)
                           : "No expiry date"}{" "}
                         ·{" "}
-                        {file
-                          ? "Supporting file attached"
-                          : "No supporting file"}
+                        {files.length
+                          ? `${files.length} public file${files.length === 1 ? "" : "s"}`
+                          : "No public files"}
                       </small>
                     </span>
                     <span
@@ -253,38 +257,69 @@ export function TrustEditor({
                         />
                       </label>
                     </div>
-                    <section className="private-evidence-card">
+                    <section className="private-evidence-card public-evidence-card">
                       <FileLock2 size={23} aria-hidden="true" />
                       <div>
-                        <strong>Private supporting file</strong>
+                        <strong>Public credential files</strong>
                         <p>
-                          Files stay owner-only and never appear on your public
-                          page.
+                          Certificate images and PDFs are visible from your
+                          public page.
                         </p>
                       </div>
                       {!persistedIds.has(entry.id) ? (
                         <small>
                           Save this new credential before attaching a file.
                         </small>
-                      ) : file ? (
-                        <>
-                          <div className="file-state">
-                            <FileCheck2 size={20} aria-hidden="true" />
-                            <span>
-                              <strong>{file.originalFilename}</strong>
-                              <small>
-                                {Math.ceil(file.sizeBytes / 1024)} KB · Private
-                              </small>
-                            </span>
-                          </div>
-                          <div className="row-actions">
-                            <a
-                              className="button secondary"
-                              href={"/dashboard/trust-evidence/" + file.id}
+                      ) : (
+                        <div className="stack-form credential-file-manager">
+                          {files.map((file) => (
+                            <div className="file-state" key={file.id}>
+                              <FileCheck2 size={20} aria-hidden="true" />
+                              <span>
+                                <strong>{file.originalFilename}</strong>
+                                <small>
+                                  {Math.ceil(file.sizeBytes / 1024)} KB · Public
+                                </small>
+                              </span>
+                              <a
+                                className="button secondary"
+                                href={"/trust-evidence/" + file.id}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                View
+                              </a>
+                              <form action={removeTrustEvidenceAction}>
+                                <input
+                                  type="hidden"
+                                  name="businessId"
+                                  value={businessId}
+                                />
+                                <input
+                                  type="hidden"
+                                  name="entryId"
+                                  value={entry.id}
+                                />
+                                <input
+                                  type="hidden"
+                                  name="evidenceId"
+                                  value={file.id}
+                                />
+                                <SubmitButton
+                                  className="secondary danger-text"
+                                  pendingLabel="Removing…"
+                                >
+                                  <Trash2 size={17} aria-hidden="true" /> Remove
+                                  file
+                                </SubmitButton>
+                              </form>
+                            </div>
+                          ))}
+                          {files.length < MAX_EVIDENCE_FILES && (
+                            <form
+                              action={uploadTrustEvidenceAction}
+                              className="stack-form"
                             >
-                              Download
-                            </a>
-                            <form action={removeTrustEvidenceAction}>
                               <input
                                 type="hidden"
                                 name="businessId"
@@ -295,50 +330,31 @@ export function TrustEditor({
                                 name="entryId"
                                 value={entry.id}
                               />
+                              <label>
+                                Supporting file{" "}
+                                <span className="optional">Optional</span>
+                                <input
+                                  type="file"
+                                  name="evidence"
+                                  accept="application/pdf,image/jpeg,image/png"
+                                  multiple
+                                  required
+                                />
+                              </label>
                               <SubmitButton
-                                className="secondary danger-text"
-                                pendingLabel="Removing…"
+                                className="secondary"
+                                pendingLabel="Uploading…"
                               >
-                                <Trash2 size={17} aria-hidden="true" /> Remove
-                                file
+                                <Upload size={17} aria-hidden="true" /> Upload
+                                files
                               </SubmitButton>
+                              <small>
+                                Up to {MAX_EVIDENCE_FILES} public PDF, JPG or
+                                PNG files; maximum 5 MB each.
+                              </small>
                             </form>
-                          </div>
-                        </>
-                      ) : (
-                        <form
-                          action={uploadTrustEvidenceAction}
-                          className="stack-form"
-                        >
-                          <input
-                            type="hidden"
-                            name="businessId"
-                            value={businessId}
-                          />
-                          <input
-                            type="hidden"
-                            name="entryId"
-                            value={entry.id}
-                          />
-                          <label>
-                            Supporting file{" "}
-                            <span className="optional">Optional</span>
-                            <input
-                              type="file"
-                              name="evidence"
-                              accept="application/pdf,image/jpeg,image/png"
-                              required
-                            />
-                          </label>
-                          <SubmitButton
-                            className="secondary"
-                            pendingLabel="Uploading…"
-                          >
-                            <Upload size={17} aria-hidden="true" /> Upload
-                            private file
-                          </SubmitButton>
-                          <small>PDF, JPG or PNG; maximum 5 MB.</small>
-                        </form>
+                          )}
+                        </div>
                       )}
                     </section>
                     <div className="question-secondary-actions">
@@ -400,7 +416,7 @@ export function TrustEditor({
             <input type="hidden" name="config" value={JSON.stringify(config)} />
             <div className="editor-save-bar">
               <SubmitButton>Save changes</SubmitButton>
-              <small>Supporting files remain private.</small>
+              <small>Attached files are public on your customer page.</small>
             </div>
           </EditorActionForm>
         </div>

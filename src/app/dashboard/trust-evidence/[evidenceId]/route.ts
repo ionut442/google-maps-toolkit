@@ -1,5 +1,5 @@
 import { currentUser } from "@/lib/auth";
-import { privateStorage } from "@/lib/storage";
+import { privateStorage, publicStorage } from "@/lib/storage";
 import { findOwnedTrustEvidence } from "@/lib/trust-evidence";
 
 export async function GET(
@@ -13,7 +13,9 @@ export async function GET(
   if (!evidence) return new Response("Not found", { status: 404 });
   let bytes: Uint8Array;
   try {
-    bytes = await privateStorage.read(evidence.objectKey);
+    const storage =
+      evidence.storageScope === "PUBLIC" ? publicStorage : privateStorage;
+    bytes = await storage.read(evidence.objectKey);
   } catch {
     return new Response("Not found", { status: 404 });
   }
@@ -28,7 +30,7 @@ export async function GET(
       "Content-Type": evidence.mediaType,
       "Content-Length": String(bytes.byteLength),
       "Content-Disposition": `attachment; filename="credential-evidence.${extension}"`,
-      "Cache-Control": "private, no-store",
+      "Cache-Control": "public, max-age=3600",
       "X-Content-Type-Options": "nosniff",
       "Content-Security-Policy": "default-src 'none'; sandbox",
     },

@@ -1,6 +1,10 @@
 import type { PrismaClient } from "@prisma/client";
 import { db } from "./db";
-import { privateStorage, type PrivateObjectStorage } from "./storage";
+import {
+  privateStorage,
+  publicStorage,
+  type PrivateObjectStorage,
+} from "./storage";
 
 export const ANALYTICS_RETENTION_DAYS = 90;
 export const QUOTE_RETENTION_DAYS = 365;
@@ -66,17 +70,23 @@ export async function purgeExpiredOperationalData(
 
 export async function deleteBusinessData(
   businessId: string,
-  options: { client?: PrismaClient; storage?: PrivateObjectStorage } = {},
+  options: {
+    client?: PrismaClient;
+    storage?: PrivateObjectStorage;
+    publicStorage?: PrivateObjectStorage;
+  } = {},
 ) {
   const client = options.client ?? db;
   const storage = options.storage ?? privateStorage;
+  const credentialStorage =
+    options.publicStorage ?? options.storage ?? publicStorage;
   const business = await client.business.findUnique({
     where: { id: businessId },
     select: {
       id: true,
       published: true,
       quoteRequests: { select: { uploads: { select: { objectKey: true } } } },
-      trustEvidence: { select: { objectKey: true } },
+      trustEvidence: { select: { objectKey: true, storageScope: true } },
     },
   });
   if (!business) return { deleted: false, objectCount: 0 };
@@ -85,15 +95,20 @@ export async function deleteBusinessData(
       where: { id: business.id },
       data: { published: false },
     });
-  const objectKeys = [
-    ...business.quoteRequests.flatMap((quote) =>
-      quote.uploads.map((upload) => upload.objectKey),
-    ),
-    ...business.trustEvidence.map((evidence) => evidence.objectKey),
-  ];
-  const deletedObjects = await Promise.allSettled(
-    objectKeys.map((objectKey) => storage.delete(objectKey)),
+  const privateObjectKeys = business.quoteRequests.flatMap((quote) =>
+    quote.uploads.map((upload) => upload.objectKey),
   );
+  const legacyCredentialKeys = business.trustEvidence
+    .filter((evidence) => evidence.storageScope !== "PUBLIC")
+    .map((evidence) => evidence.objectKey);
+  const publicObjectKeys = business.trustEvidence
+    .filter((evidence) => evidence.storageScope === "PUBLIC")
+    .map((evidence) => evidence.objectKey);
+  const deletedObjects = await Promise.allSettled([
+    ...privateObjectKeys.map((objectKey) => storage.delete(objectKey)),
+    ...legacyCredentialKeys.map((objectKey) => storage.delete(objectKey)),
+    ...publicObjectKeys.map((objectKey) => credentialStorage.delete(objectKey)),
+  ]);
   const failed = deletedObjects.filter(
     (result) => result.status === "rejected",
   ).length;
@@ -102,12 +117,22 @@ export async function deleteBusinessData(
       `Business deletion stopped because ${failed} private object(s) could not be deleted`,
     );
   await client.business.delete({ where: { id: business.id } });
-  return { deleted: true, objectCount: objectKeys.length };
+  return {
+    deleted: true,
+    objectCount:
+      privateObjectKeys.length +
+      legacyCredentialKeys.length +
+      publicObjectKeys.length,
+  };
 }
 
 export async function deleteUserData(
   userId: string,
-  options: { client?: PrismaClient; storage?: PrivateObjectStorage } = {},
+  options: {
+    client?: PrismaClient;
+    storage?: PrivateObjectStorage;
+    publicStorage?: PrivateObjectStorage;
+  } = {},
 ) {
   const client = options.client ?? db;
   const storage = options.storage ?? privateStorage;
@@ -130,6 +155,7 @@ export async function deleteUserData(
       const result = await deleteBusinessData(membership.businessId, {
         client,
         storage,
+        publicStorage: options.publicStorage,
       });
       if (result.deleted) businessesDeleted += 1;
     }

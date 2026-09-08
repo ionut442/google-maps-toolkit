@@ -77,13 +77,14 @@ model TrustEvidence {
   originalFilename String
   mediaType        String
   sizeBytes        Int
+  storageScope     String   @default("PRIVATE")
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   businessId       String
   business         Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
-  @@unique([businessId, entryId])
   @@index([businessId])
+  @@index([businessId, entryId])
 }
 
 model Membership {
@@ -105,6 +106,7 @@ model BusinessModule {
   enabled    Boolean  @default(true)
   sortOrder  Int
   config     String   @default("{}")
+  customizedAt DateTime?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   businessId String

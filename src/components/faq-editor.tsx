@@ -5,6 +5,7 @@ import {
   updateFaqAction,
 } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { EditorActionForm } from "@/components/editor-action-form";
 import { ArrowUp, ArrowDown, Pencil, Plus, CircleHelp } from "lucide-react";
 import { MAX_FAQS, type ModuleConfigByType } from "@/lib/domain";
 
@@ -51,7 +52,7 @@ export function FaqEditor({
                 </span>
               </summary>
               <div className="focused-form">
-                <form action={updateFaqAction} className="stack-form">
+                <EditorActionForm action={updateFaqAction}>
                   <input type="hidden" name="businessId" value={businessId} />
                   <input type="hidden" name="index" value={index} />
                   <label>
@@ -76,7 +77,7 @@ export function FaqEditor({
                   <SubmitButton pendingLabel="Saving…">
                     Save question
                   </SubmitButton>
-                </form>
+                </EditorActionForm>
                 <div className="row-actions">
                   <form action={moveFaqAction}>
                     <input type="hidden" name="businessId" value={businessId} />
@@ -122,7 +123,11 @@ export function FaqEditor({
             <summary>
               <Plus size={18} aria-hidden="true" /> Add question
             </summary>
-            <form action={addFaqAction} className="focused-form stack-form">
+            <EditorActionForm
+              action={addFaqAction}
+              className="focused-form stack-form"
+              savedMessage="Question added"
+            >
               <input type="hidden" name="businessId" value={businessId} />
               <label>
                 Question
@@ -133,7 +138,7 @@ export function FaqEditor({
                 <textarea name="answer" required maxLength={500} rows={4} />
               </label>
               <SubmitButton pendingLabel="Adding…">Add question</SubmitButton>
-            </form>
+            </EditorActionForm>
           </details>
         )}
         <small>

@@ -4,6 +4,7 @@ import {
 } from "@/lib/quote-validation";
 import { submitPublicQuote } from "@/lib/quotes";
 import { applicationBaseUrl, clientNetworkIdentifier } from "@/lib/environment";
+import { currentUser } from "@/lib/auth";
 
 export const runtime = "nodejs";
 
@@ -80,6 +81,7 @@ export async function POST(
     slug,
     formData,
     clientIdentifier: identifier,
+    previewUserId: (await currentUser())?.id,
   });
   if (result.ok) return Response.json({ ok: true }, { status: 201 });
   return Response.json(

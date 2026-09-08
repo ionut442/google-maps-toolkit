@@ -18,6 +18,7 @@ export interface PrivateObjectStorage {
 
 const SAFE_OBJECT_KEY = /^[a-z0-9][a-z0-9/_-]*\.(jpg|png|webp|pdf)$/;
 const NEON_UPLOADS_BUCKET = "uploads";
+const NEON_PUBLIC_CREDENTIALS_BUCKET = "public-credentials";
 
 function validateObjectKey(objectKey: string) {
   if (!SAFE_OBJECT_KEY.test(objectKey) || objectKey.includes(".."))
@@ -120,6 +121,12 @@ export class NeonPrivateStorage implements PrivateObjectStorage {
   }
 }
 
+export class NeonPublicStorage extends NeonPrivateStorage {
+  constructor(client = new S3Client({ forcePathStyle: true })) {
+    super(client, NEON_PUBLIC_CREDENTIALS_BUCKET);
+  }
+}
+
 export function configuredPrivateStorage(
   env: Record<string, string | undefined> = process.env,
 ): PrivateObjectStorage {
@@ -133,3 +140,22 @@ export function configuredPrivateStorage(
 }
 
 export const privateStorage = configuredPrivateStorage();
+
+export function configuredPublicStorage(
+  env: Record<string, string | undefined> = process.env,
+): PrivateObjectStorage {
+  const production = env.NODE_ENV === "production";
+  const provider =
+    env.PUBLIC_STORAGE_PROVIDER ??
+    env.PRIVATE_STORAGE_PROVIDER ??
+    (production ? "neon" : "local");
+  if (provider === "local" && !production)
+    return new LocalPrivateStorage(
+      env.PUBLIC_STORAGE_DIR ??
+        path.join(process.cwd(), ".local-data", "public-credentials"),
+    );
+  if (provider === "neon") return new NeonPublicStorage();
+  throw new Error("Public storage provider is unavailable");
+}
+
+export const publicStorage = configuredPublicStorage();

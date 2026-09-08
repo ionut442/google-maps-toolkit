@@ -51,6 +51,7 @@ import {
   stageBusinessLogo,
 } from "@/lib/business-logo";
 import { privateStorage } from "@/lib/storage";
+import { allEnabledToolsReady } from "@/lib/onboarding-readiness";
 
 export type FormState = {
   error?: string;
@@ -293,7 +294,11 @@ export async function updateModuleLabelAction(formData: FormData) {
   const validated = parseModuleConfig(item.type as ModuleType, config);
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(validated), enabled: true },
+    data: {
+      config: JSON.stringify(validated),
+      enabled: true,
+      customizedAt: new Date(),
+    },
   });
   revalidatePath("/dashboard");
   revalidatePath("/onboarding/tools");
@@ -319,7 +324,11 @@ export async function updateContactActionConfigAction(formData: FormData) {
   });
   await db.businessModule.update({
     where: { id: item.id },
-    data: { config: JSON.stringify(config), enabled: true },
+    data: {
+      config: JSON.stringify(config),
+      enabled: true,
+      customizedAt: new Date(),
+    },
   });
   revalidatePath("/dashboard");
   revalidatePath(`/${business.slug}`);
@@ -510,13 +519,14 @@ export async function saveTrustAction(formData: FormData) {
 
 export async function uploadTrustEvidenceAction(formData: FormData) {
   const user = await requireUser();
-  const file = formData.get("evidence");
-  if (!(file instanceof File)) throw new Error("Choose an evidence file");
+  const files = formData
+    .getAll("evidence")
+    .filter((file): file is File => file instanceof File && file.size > 0);
   const slug = await uploadTrustEvidence(
     user.id,
     String(formData.get("businessId")),
     String(formData.get("entryId")),
-    file,
+    files,
   );
   revalidatePath("/dashboard");
   revalidatePath(`/${slug}`);
@@ -527,8 +537,26 @@ export async function removeTrustEvidenceAction(formData: FormData) {
     user.id,
     String(formData.get("businessId")),
     String(formData.get("entryId")),
+    String(formData.get("evidenceId")),
   );
   revalidatePath("/dashboard");
+}
+
+export async function saveQuoteAction(formData: FormData) {
+  const user = await requireUser();
+  let input: unknown;
+  try {
+    input = JSON.parse(String(formData.get("config") ?? ""));
+  } catch {
+    throw new Error("Invalid quote form configuration");
+  }
+  const { slug } = await saveOwnedModuleConfig(
+    user.id,
+    String(formData.get("businessId")),
+    "QUOTE_REQUEST",
+    input,
+  );
+  revalidateQuoteConfig(slug);
 }
 
 export async function finishToolsAction() {
@@ -572,9 +600,13 @@ export async function setPublishedAction(formData: FormData) {
     String(formData.get("businessId")) || undefined,
   );
   const publish = String(formData.get("published")) === "true";
-  if (publish && !canPublishBusiness(business, business.modules)) {
+  if (
+    publish &&
+    (!canPublishBusiness(business, business.modules) ||
+      !allEnabledToolsReady(business.modules, business))
+  ) {
     throw new Error(
-      "Complete the required business details and enable at least one customer tool before publishing",
+      "Complete the business details and save every enabled tool before publishing",
     );
   }
   await db.business.update({

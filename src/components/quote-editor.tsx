@@ -20,6 +20,7 @@ import {
   addQuoteFieldAction,
   deleteQuoteFieldAction,
   moveQuoteFieldAction,
+  saveQuoteAction,
   updateQuoteFieldAction,
   updateQuoteFormMetaAction,
 } from "@/app/actions";
@@ -401,6 +402,14 @@ export function QuoteEditor({
             <p>Your form has 16 questions. Remove one before adding another.</p>
           )}
         </section>
+        <EditorActionForm action={saveQuoteAction} className="quote-save-form">
+          <input type="hidden" name="businessId" value={businessId} />
+          <input type="hidden" name="config" value={JSON.stringify(config)} />
+          <div className="editor-save-bar">
+            <SubmitButton>Save quote form</SubmitButton>
+            <small>Saves the introduction and every question.</small>
+          </div>
+        </EditorActionForm>
       </div>
       <aside className="tool-editor-aside">
         <section
