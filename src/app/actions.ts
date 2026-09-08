@@ -53,7 +53,9 @@ import {
 import { privateStorage } from "@/lib/storage";
 import { allEnabledToolsReady } from "@/lib/onboarding-readiness";
 import {
+  directGoogleReviewUrlSchema,
   extractGoogleReviewLink,
+  googleMapsUrlSchema,
   type ExtractReviewLinkResult,
 } from "@/lib/google-review-link";
 import { resolvedGoogleReviewUrl } from "@/lib/profile-behavior";
@@ -321,6 +323,61 @@ export async function updateModuleLabelAction(formData: FormData) {
   });
   revalidatePath("/dashboard");
   revalidatePath("/onboarding/tools");
+}
+
+export async function saveReviewToolAction(formData: FormData) {
+  const user = await requireUser();
+  const business = await requireOwnedBusiness(
+    user.id,
+    String(formData.get("businessId")),
+  );
+  const item = business.modules.find(
+    (module) =>
+      module.id === String(formData.get("moduleId")) &&
+      module.type === "REVIEW",
+  );
+  if (!item) throw new Error("Review tool not found or access denied");
+
+  const rawMapsUrl = String(formData.get("googleMapsUrl") ?? "");
+  const rawReviewUrl = String(formData.get("googleReviewUrl") ?? "");
+  const resolvedForMapsUrl = String(
+    formData.get("resolvedGoogleMapsUrl") ?? "",
+  );
+  const mapsUrl = googleMapsUrlSchema.safeParse(rawMapsUrl);
+  const reviewUrl = directGoogleReviewUrlSchema.safeParse(rawReviewUrl);
+  if (
+    !mapsUrl.success ||
+    !reviewUrl.success ||
+    rawMapsUrl !== resolvedForMapsUrl
+  )
+    throw new Error("Get a valid Google review link before saving");
+
+  const config = parseModuleConfig("REVIEW", {
+    ...JSON.parse(item.config),
+    label: String(formData.get("label") ?? "").trim(),
+  });
+  await db.$transaction([
+    db.business.update({
+      where: { id: business.id },
+      data: {
+        googleMapsUrl: mapsUrl.data,
+        googleReviewUrl: reviewUrl.data,
+      },
+    }),
+    db.businessModule.update({
+      where: { id: item.id },
+      data: {
+        config: JSON.stringify(config),
+        enabled: true,
+        customizedAt: new Date(),
+      },
+    }),
+  ]);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/page");
+  revalidatePath("/dashboard/review-kit");
+  revalidatePath(`/preview/${business.slug}`);
+  revalidatePath(`/${business.slug}`);
 }
 
 export async function updateContactActionConfigAction(formData: FormData) {

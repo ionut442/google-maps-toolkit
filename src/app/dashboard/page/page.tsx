@@ -12,10 +12,12 @@ import { PageOrderList } from "@/components/page-order-list";
 import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
 import { publicBusinessUrl } from "@/lib/public-url";
+import { listOwnedTrustEvidence } from "@/lib/trust-evidence";
 
 export default async function MyPagePage() {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
+  const trustEvidence = await listOwnedTrustEvidence(user.id, business.id);
   const url = publicBusinessUrl(business.slug);
   return (
     <main className="dashboard-page">
@@ -75,12 +77,16 @@ export default async function MyPagePage() {
               Move enabled tools into the order that makes sense for your
               customers.
             </p>
-            <PageOrderList businessId={business.id} tools={business.modules} />
+            <PageOrderList
+              businessId={business.id}
+              tools={business.modules}
+              business={business}
+            />
           </SectionCard>
         </div>
         <aside className="sticky-preview">
           <span className="section-kicker">Customer preview</span>
-          <CustomerPreview business={business} />
+          <CustomerPreview business={{ ...business, trustEvidence }} />
         </aside>
       </div>
     </main>

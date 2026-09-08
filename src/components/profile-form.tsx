@@ -1,12 +1,8 @@
 "use client";
 
-import {
-  useActionState,
-  useState,
-  useTransition,
-  type CSSProperties,
-} from "react";
-import { extractReviewLinkAction, saveProfileAction } from "@/app/actions";
+import { useActionState, useState } from "react";
+import { saveProfileAction } from "@/app/actions";
+import { GoogleReviewConnectionField } from "@/components/google-review-connection-field";
 import { synchronizedWhatsapp } from "@/lib/profile-behavior";
 
 type Profile = {
@@ -49,18 +45,6 @@ export function ProfileForm({
   const [brandColor, setBrandColor] = useState(
     business.brandColor.toUpperCase(),
   );
-  const initialGoogleMapsUrl =
-    business.googleMapsUrl ?? business.googleReviewUrl ?? "";
-  const initialGoogleReviewUrl = business.googleReviewUrl ?? "";
-  const [googleMapsUrl, setGoogleMapsUrl] = useState(initialGoogleMapsUrl);
-  const [googleReviewUrl, setGoogleReviewUrl] = useState(
-    initialGoogleReviewUrl,
-  );
-  const [resolvedGoogleMapsUrl, setResolvedGoogleMapsUrl] = useState(
-    initialGoogleReviewUrl ? initialGoogleMapsUrl : "",
-  );
-  const [reviewLinkError, setReviewLinkError] = useState("");
-  const [reviewLinkPending, startReviewLinkTransition] = useTransition();
   const error = (name: string) => state.fields?.[name]?.[0];
 
   function updatePhone(value: string) {
@@ -74,35 +58,6 @@ export function ProfileForm({
   function updateHex(value: string) {
     const normalized = value.trim().toUpperCase();
     setBrandColor(normalized.startsWith("#") ? normalized : `#${normalized}`);
-  }
-
-  function updateGoogleMapsUrl(value: string) {
-    setGoogleMapsUrl(value);
-    setReviewLinkError("");
-    if (value === initialGoogleMapsUrl) {
-      setGoogleReviewUrl(initialGoogleReviewUrl);
-      setResolvedGoogleMapsUrl(
-        initialGoogleReviewUrl ? initialGoogleMapsUrl : "",
-      );
-    } else if (value !== resolvedGoogleMapsUrl) {
-      setGoogleReviewUrl("");
-      setResolvedGoogleMapsUrl("");
-    }
-  }
-
-  function resolveReviewLink() {
-    setReviewLinkError("");
-    startReviewLinkTransition(async () => {
-      const result = await extractReviewLinkAction(googleMapsUrl);
-      if (!result.success) {
-        setGoogleReviewUrl("");
-        setResolvedGoogleMapsUrl("");
-        setReviewLinkError(result.error);
-        return;
-      }
-      setGoogleReviewUrl(result.reviewUrl);
-      setResolvedGoogleMapsUrl(googleMapsUrl);
-    });
   }
 
   return (
@@ -267,15 +222,15 @@ export function ProfileForm({
         </div>
       </fieldset>
 
-      <details className="profile-disclosure" open={!onboarding}>
+      <details className="profile-disclosure" open>
         <summary>
           <span>Page personalisation</span>
           <small>Colour and branding</small>
         </summary>
         <fieldset className="form-section">
-          <legend>Action Page colour</legend>
+          <legend>Brand colour</legend>
           <p className="field-intro">
-            Choose one accent for your public buttons and highlights.
+            Used on your printable review sign and social review graphic.
           </p>
           <div className="color-row">
             <label className="color-swatch" title="Open colour picker">
@@ -299,19 +254,6 @@ export function ProfileForm({
                 aria-invalid={Boolean(error("brandColor"))}
               />
             </label>
-            <div
-              className="brand-preview"
-              style={
-                {
-                  "--preview-brand": validHex(brandColor)
-                    ? brandColor
-                    : "#2F6FED",
-                } as CSSProperties
-              }
-            >
-              <span>Customer preview</span>
-              <strong>Get a quote</strong>
-            </div>
           </div>
           {error("brandColor") && (
             <small className="error">{error("brandColor")}</small>
@@ -319,66 +261,23 @@ export function ProfileForm({
         </fieldset>
       </details>
 
-      <details className="profile-disclosure" open={!onboarding}>
+      <details className="profile-disclosure" open>
         <summary>
           <span>Google Business Profile</span>
           <small>Optional connection</small>
         </summary>
-        <fieldset className="form-section google-profile-setup">
+        <fieldset className="form-section">
           <legend>Google Business Profile</legend>
-          <p className="field-intro">
-            Open your business in Google Maps, choose Share → Copy link, then
-            paste it here.
-          </p>
-          <label>
-            Google Maps share link
-            <input
-              name="googleMapsUrl"
-              type="url"
-              value={googleMapsUrl}
-              onChange={(e) => updateGoogleMapsUrl(e.currentTarget.value)}
-              placeholder="https://maps.app.goo.gl/..."
-            />
-            {error("googleMapsUrl") && (
-              <small className="error">{error("googleMapsUrl")}</small>
-            )}
-          </label>
-          <button
-            className="button secondary google-review-resolve"
-            type="button"
-            disabled={reviewLinkPending || !googleMapsUrl.trim()}
-            onClick={resolveReviewLink}
-          >
-            {reviewLinkPending ? "Getting review link…" : "Get review link"}
-          </button>
-          <input type="hidden" name="googleReviewUrl" value={googleReviewUrl} />
-          <input
-            type="hidden"
-            name="resolvedGoogleMapsUrl"
-            value={resolvedGoogleMapsUrl}
+          <GoogleReviewConnectionField
+            initialMapsUrl={business.googleMapsUrl}
+            initialReviewUrl={business.googleReviewUrl}
+            fieldError={error("googleMapsUrl")}
           />
           <input
             type="hidden"
             name="googleBusinessName"
             value={business.googleBusinessName ?? business.name}
           />
-          {googleReviewUrl && resolvedGoogleMapsUrl === googleMapsUrl && (
-            <div className="google-review-ready" role="status">
-              <strong>Review link ready</strong>
-              <a
-                href={googleReviewUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Test review link ↗
-              </a>
-            </div>
-          )}
-          {reviewLinkError && (
-            <p className="error callout" role="alert">
-              {reviewLinkError}
-            </p>
-          )}
         </fieldset>
       </details>
 

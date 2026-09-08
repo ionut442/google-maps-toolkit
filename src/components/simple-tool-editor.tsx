@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { ContactRound, ExternalLink, Star } from "lucide-react";
-import { updateModuleLabelAction } from "@/app/actions";
+import { ContactRound, Star } from "lucide-react";
+import { saveReviewToolAction, updateModuleLabelAction } from "@/app/actions";
 import { EditorActionForm } from "@/components/editor-action-form";
+import { GoogleReviewConnectionField } from "@/components/google-review-connection-field";
 import { SubmitButton } from "@/components/submit-button";
 import type { ModuleType } from "@/lib/domain";
 
@@ -18,7 +19,12 @@ export function SimpleToolEditor({
   type: ModuleType;
   label: string;
   googleUrl?: string | null;
-  business: { name: string; phone: string; email: string };
+  business: {
+    name: string;
+    phone: string;
+    email: string;
+    googleMapsUrl: string | null;
+  };
 }) {
   const review = type === "REVIEW";
   return (
@@ -40,43 +46,27 @@ export function SimpleToolEditor({
           </p>
         </div>
       </div>
-      <EditorActionForm action={updateModuleLabelAction}>
+      <EditorActionForm
+        action={review ? saveReviewToolAction : updateModuleLabelAction}
+      >
         <input type="hidden" name="businessId" value={businessId} />
         <input type="hidden" name="moduleId" value={moduleId} />
+        {review && (
+          <>
+            <h3>Google Maps share link</h3>
+            <GoogleReviewConnectionField
+              initialMapsUrl={business.googleMapsUrl}
+              initialReviewUrl={googleUrl ?? null}
+            />
+          </>
+        )}
         <label>
           Button text
           <input name="label" defaultValue={label} maxLength={60} required />
         </label>
         <SubmitButton>Save changes</SubmitButton>
       </EditorActionForm>
-      {review ? (
-        <div className="simple-tool-preview">
-          <span>Google connection</span>
-          {googleUrl ? (
-            <>
-              <strong>Google listing connected</strong>
-              <a
-                className="button secondary"
-                href={googleUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Test review link <ExternalLink size={16} aria-hidden="true" />
-              </a>
-            </>
-          ) : (
-            <>
-              <strong>Google listing not connected</strong>
-              <p>
-                Add a confirmed Google Maps or review link in Business Details.
-              </p>
-              <Link className="button secondary" href="/dashboard/business">
-                Connect Google
-              </Link>
-            </>
-          )}
-        </div>
-      ) : (
+      {!review && (
         <div className="simple-tool-preview">
           <span>Information customers save</span>
           <strong>{business.name}</strong>

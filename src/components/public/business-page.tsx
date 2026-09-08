@@ -1,8 +1,6 @@
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import { AnalyticsPageView } from "@/components/public/analytics-client";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
-import { accessibleBrandColor } from "@/lib/brand";
 import { businessTypeLabel } from "@/lib/domain";
 import { safeHttpUrl } from "@/lib/public-actions";
 import type { PublicBusiness } from "@/lib/public-business";
@@ -18,17 +16,10 @@ export function BusinessPage({
   pricingContext?: { addOnIds: string[]; quantity?: number };
   pricingSummary?: string;
 }) {
-  const brand = accessibleBrandColor(business.brandColor);
   const logoUrl = safeHttpUrl(business.logoUrl);
-  const style = {
-    "--action-brand": brand.background,
-    "--action-brand-foreground": brand.foreground,
-    "--action-brand-border": brand.border,
-    "--action-brand-soft": brand.soft,
-  } as CSSProperties;
 
   return (
-    <main className="public-action-page" style={style}>
+    <main className="public-action-page">
       {!preview && <AnalyticsPageView slug={business.slug} />}
       {preview && (
         <div className="draft-preview-banner">
@@ -48,8 +39,7 @@ export function BusinessPage({
               className="action-logo"
               src={logoUrl}
               alt={`${business.name} logo`}
-              width={80}
-              height={80}
+              decoding="async"
               referrerPolicy="no-referrer"
             />
           ) : (

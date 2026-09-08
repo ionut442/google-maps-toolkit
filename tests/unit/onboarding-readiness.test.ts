@@ -38,4 +38,27 @@ describe("onboarding tool readiness", () => {
       }),
     ).toBe(false);
   });
+
+  it("requires a saved Review tool and a direct review destination", () => {
+    const direct =
+      "https://search.google.com/local/writereview?placeid=ChIJExamplePlaceIdentifier12345";
+    expect(
+      onboardingToolReady(makeModule("REVIEW", new Date()), {
+        phone: "+401234",
+        googleReviewUrl: null,
+      }),
+    ).toBe(false);
+    expect(
+      onboardingToolReady(makeModule("REVIEW"), {
+        phone: "+401234",
+        googleReviewUrl: direct,
+      }),
+    ).toBe(false);
+    expect(
+      onboardingToolReady(makeModule("REVIEW", new Date()), {
+        phone: "+401234",
+        googleReviewUrl: direct,
+      }),
+    ).toBe(true);
+  });
 });

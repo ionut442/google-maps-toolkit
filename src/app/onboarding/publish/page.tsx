@@ -21,10 +21,12 @@ import {
 } from "@/lib/onboarding-readiness";
 import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
 import { toolEditorHref } from "@/lib/tool-presentation";
+import { listOwnedTrustEvidence } from "@/lib/trust-evidence";
 
 export default async function PublishPage() {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
+  const trustEvidence = await listOwnedTrustEvidence(user.id, business.id);
   const url = publicBusinessUrl(business.slug);
   const detailsReady = Boolean(business.phone && business.description);
   const enabledTools = business.modules.filter(
@@ -141,7 +143,7 @@ export default async function PublishPage() {
             </>
           )}
         </div>
-        <CustomerPreview business={business} />
+        <CustomerPreview business={{ ...business, trustEvidence }} />
       </div>
     </StepShell>
   );

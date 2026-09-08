@@ -2,11 +2,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   extractGoogleReviewLink,
   generateGoogleReviewUrl,
+  googleMapsHexPairToPlaceId,
   GoogleReviewLinkError,
   resolveGooglePlaceId,
 } from "@/lib/google-review-link";
 
 const placeId = "ChIJN1t_tDeuEmsRUsoyG83frY4";
+const penangPlaceId = "ChIJqc9AwPLpSjAREsHn965EcRA";
 
 describe("Google review link resolution", () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -50,6 +52,50 @@ describe("Google review link resolution", () => {
     await expect(
       resolveGooglePlaceId("https://maps.app.goo.gl/example"),
     ).resolves.toBe(placeId);
+  });
+
+  it("resolves the supplied real share-link redirect to Penang Island", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(null, {
+        status: 302,
+        headers: {
+          location:
+            "https://www.google.com/maps/place/Penang+Island/@5.369907,100.2606831,12z/data=!3m1!4b1!4m6!3m5!1s0x304ae9f2c040cfa9:0x107144aef7e7c112!8m2!3d5.3673161!4d100.2486493",
+        },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      extractGoogleReviewLink("https://maps.app.goo.gl/hdACQxBqiUgWvufV9"),
+    ).resolves.toEqual({
+      success: true,
+      placeId: penangPlaceId,
+      reviewUrl: generateGoogleReviewUrl(penangPlaceId),
+    });
+  });
+
+  it("converts ftid and !1s hex pairs deterministically", async () => {
+    expect(
+      googleMapsHexPairToPlaceId("0x304ae9f2c040cfa9", "0x107144aef7e7c112"),
+    ).toBe(penangPlaceId);
+
+    for (const location of [
+      "https://www.google.com/maps?ftid=0x304ae9f2c040cfa9:0x107144aef7e7c112",
+      "https://www.google.com/maps/place/Penang/data=!1s0x304ae9f2c040cfa9:0x107144aef7e7c112!8m2",
+    ]) {
+      vi.stubGlobal(
+        "fetch",
+        vi
+          .fn()
+          .mockResolvedValue(
+            new Response(null, { status: 302, headers: { location } }),
+          ),
+      );
+      await expect(
+        resolveGooglePlaceId("https://maps.app.goo.gl/example"),
+      ).resolves.toBe(penangPlaceId);
+    }
   });
 
   it("normalizes a direct write-review URL without fetching", async () => {
@@ -103,7 +149,7 @@ describe("Google review link resolution", () => {
     ).rejects.toMatchObject({ code: "TIMEOUT" });
   });
 
-  it("rejects too many redirects, missing IDs, and hex-only feature IDs", async () => {
+  it("rejects too many redirects and missing IDs", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -117,17 +163,51 @@ describe("Google review link resolution", () => {
       resolveGooglePlaceId("https://maps.app.goo.gl/example"),
     ).rejects.toMatchObject({ code: "TOO_MANY_REDIRECTS" });
 
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("<html />")));
+    await expect(
+      resolveGooglePlaceId("https://maps.app.goo.gl/example"),
+    ).rejects.toMatchObject({ code: "PLACE_ID_NOT_FOUND" });
+  });
+
+  it("extracts a safely encoded hex pair from returned HTML", async () => {
     vi.stubGlobal(
       "fetch",
       vi
         .fn()
         .mockResolvedValue(
-          new Response("<html>0x487604b900d26973:0x2d93df740cb42a1f</html>"),
+          new Response(
+            '<script>const next="https:\\/\\/www.google.com\\/maps\\/data=!1s0x304ae9f2c040cfa9:0x107144aef7e7c112!8m2"</script>',
+          ),
         ),
     );
     await expect(
       resolveGooglePlaceId("https://maps.app.goo.gl/example"),
-    ).rejects.toMatchObject({ code: "PLACE_ID_NOT_FOUND" });
+    ).resolves.toBe(penangPlaceId);
+  });
+
+  it("rejects oversized responses and malformed or out-of-range hex", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          new Response("small", { headers: { "content-length": "2097153" } }),
+        ),
+    );
+    await expect(
+      resolveGooglePlaceId("https://maps.app.goo.gl/example"),
+    ).rejects.toMatchObject({ code: "GOOGLE_FETCH_FAILED" });
+
+    for (const pair of [
+      ["0x", "0x1"],
+      ["0x10000000000000000", "0x1"],
+      ["0x1", "0x10000000000000000"],
+      ["0xnothex", "0x1"],
+    ]) {
+      expect(() => googleMapsHexPairToPlaceId(pair[0], pair[1])).toThrow(
+        GoogleReviewLinkError,
+      );
+    }
   });
 
   it("validates and encodes generated URLs", () => {

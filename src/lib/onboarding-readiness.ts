@@ -1,3 +1,5 @@
+import { isDirectGoogleReviewUrl } from "./google-review-link";
+
 export type ToolReadinessModule = {
   type: string;
   enabled: boolean;
@@ -6,17 +8,22 @@ export type ToolReadinessModule = {
 
 export function onboardingToolReady(
   module: ToolReadinessModule,
-  business: { phone: string },
+  business: { phone: string; googleReviewUrl?: string | null },
 ) {
   if (!module.enabled) return true;
   if (module.type === "CALL_WHATSAPP" || module.type === "SAVE_CONTACT")
     return Boolean(business.phone.trim());
+  if (module.type === "REVIEW")
+    return (
+      Boolean(module.customizedAt) &&
+      isDirectGoogleReviewUrl(business.googleReviewUrl)
+    );
   return Boolean(module.customizedAt);
 }
 
 export function allEnabledToolsReady(
   modules: ToolReadinessModule[],
-  business: { phone: string },
+  business: { phone: string; googleReviewUrl?: string | null },
 ) {
   const enabled = modules.filter((module) => module.enabled);
   return (

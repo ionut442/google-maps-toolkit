@@ -289,6 +289,11 @@ function TrustPresentation({
                 {item.referenceNumber && (
                   <small>Reference: {item.referenceNumber}</small>
                 )}
+                {item.expiresOn && (
+                  <small>
+                    Valid until {formatCredentialExpiry(item.expiresOn)}
+                  </small>
+                )}
                 {evidence.length > 0 && (
                   <span className="public-credential-files">
                     {evidence.map((file) => (
@@ -322,6 +327,15 @@ function TrustPresentation({
       <p className="trust-disclaimer">Information provided by this business.</p>
     </section>
   );
+}
+
+export function formatCredentialExpiry(value: string) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
 }
 
 export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {

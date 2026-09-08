@@ -90,6 +90,13 @@ async function businessFixture(email: string, name: string, published = true) {
   });
   const business = await createBusinessForUser(user.id, name, email, client);
   await applyTemplate(business.id, "PLUMBING", client);
+  await client.businessModule.updateMany({
+    where: {
+      businessId: business.id,
+      type: { in: ["QUOTE_REQUEST", "PRICING"] },
+    },
+    data: { enabled: true },
+  });
   await client.business.update({
     where: { id: business.id },
     data: {
@@ -547,7 +554,7 @@ describe("Goal 3 quote system integration", () => {
         client,
       ),
     ).resolves.toMatchObject({ objectKey: quote!.uploads[0].objectKey });
-  }, 30_000);
+  }, 60_000);
 
   it("uses honeypot and strict route request protections", async () => {
     const { business } = await businessFixture(

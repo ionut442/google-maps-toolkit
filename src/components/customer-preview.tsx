@@ -1,7 +1,5 @@
-import type { CSSProperties } from "react";
 import Link from "next/link";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
-import { accessibleBrandColor } from "@/lib/brand";
 import { businessTypeLabel } from "@/lib/domain";
 import { safeHttpUrl } from "@/lib/public-actions";
 import { toPublicBusiness } from "@/lib/public-business";
@@ -26,21 +24,20 @@ type PreviewBusiness = {
     sortOrder: number;
     config: string;
   }>;
+  trustEvidence?: Array<{
+    id: string;
+    entryId: string;
+    mediaType: string;
+    originalFilename: string;
+  }>;
 };
 
 export function CustomerPreview({ business }: { business: PreviewBusiness }) {
   const safeBusiness = toPublicBusiness(business);
-  const brand = accessibleBrandColor(safeBusiness.brandColor);
   const logoUrl = safeHttpUrl(safeBusiness.logoUrl);
-  const style = {
-    "--action-brand": brand.background,
-    "--action-brand-foreground": brand.foreground,
-    "--action-brand-border": brand.border,
-    "--action-brand-soft": brand.soft,
-  } as CSSProperties;
 
   return (
-    <div className="customer-preview-frame" style={style}>
+    <div className="customer-preview-frame">
       <div className="preview-browser-bar" aria-hidden="true">
         <span />
         <span />
@@ -63,8 +60,7 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
                 className="action-logo"
                 src={logoUrl}
                 alt=""
-                width={80}
-                height={80}
+                decoding="async"
                 referrerPolicy="no-referrer"
               />
             ) : (

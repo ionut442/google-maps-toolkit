@@ -1,4 +1,4 @@
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { PrismaClient } from "@prisma/client";
 import {
   applyTemplate,
@@ -20,6 +20,10 @@ import {
   listOwnedTrustEvidence,
   uploadTrustEvidence,
 } from "@/lib/trust-evidence";
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(async () => ({ get: () => undefined })),
+}));
 import {
   saveOwnedModuleConfig,
   saveOwnedTrustConfig,
@@ -434,6 +438,7 @@ describe("database ownership and toolkit integration", () => {
         "phone",
         "primaryAction",
         "slug",
+        "trustEvidence",
         "website",
         "whatsapp",
       ].sort(),
@@ -454,7 +459,9 @@ describe("database ownership and toolkit integration", () => {
     );
     expect(publicBusiness).not.toHaveProperty("id");
     expect(publicBusiness).not.toHaveProperty("published");
-    expect(JSON.stringify(publicBusiness)).not.toContain("private-proof");
+    expect(publicBusiness!.trustEvidence).toEqual([
+      expect.objectContaining({ originalFilename: "private-proof.pdf" }),
+    ]);
     expect(JSON.stringify(publicBusiness)).not.toContain("objectKey");
 
     await client.business.update({

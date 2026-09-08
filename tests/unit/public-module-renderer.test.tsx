@@ -57,4 +57,62 @@ describe("public tool cards", () => {
     expect(html).toContain('href="tel:+40700111222"');
     expect(html).toContain("wa.me/40700333444");
   });
+
+  it("shows credential expiry and image evidence without inventing expiry text", () => {
+    const business: PublicBusiness = {
+      name: "Example Heating",
+      slug: "example-heating",
+      logoUrl: null,
+      description: "Qualified local heating services for nearby homes.",
+      phone: "+40700111222",
+      whatsapp: "+40700111222",
+      email: "hello@example.test",
+      website: null,
+      brandColor: "#AA00AA",
+      industry: "HEATING",
+      customIndustryLabel: null,
+      googleReviewUrl: null,
+      primaryAction: null,
+      modules: [
+        {
+          type: "TRUST",
+          sortOrder: 1,
+          config: {
+            label: "Credentials",
+            entries: [
+              {
+                id: "gas_safe",
+                name: "Gas Safe registered",
+                referenceNumber: "123456",
+                expiresOn: "2099-10-15",
+              },
+              { id: "insured", name: "Fully insured" },
+            ],
+          },
+        },
+      ],
+      trustEvidence: [
+        {
+          id: "evidence-image",
+          entryId: "gas_safe",
+          mediaType: "image/png",
+          originalFilename: "certificate.png",
+        },
+        {
+          id: "evidence-pdf",
+          entryId: "gas_safe",
+          mediaType: "application/pdf",
+          originalFilename: "certificate.pdf",
+        },
+      ],
+    };
+    const html = renderToStaticMarkup(
+      <PublicModuleRenderer business={business} primary={null} />,
+    );
+    expect(html).toContain("Valid until 15 October 2099");
+    expect(html.match(/Valid until/g)).toHaveLength(1);
+    expect(html).toContain('src="/trust-evidence/evidence-image"');
+    expect(html).toContain('class="public-credential-image"');
+    expect(html).toContain("View certificate.pdf");
+  });
 });

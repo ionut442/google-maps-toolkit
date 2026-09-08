@@ -116,6 +116,39 @@ function validPlaceId(value: string | null | undefined) {
   return candidate;
 }
 
+const MAX_UINT64 = (1n << 64n) - 1n;
+
+function validHexPart(value: string) {
+  if (!/^0x[0-9a-f]{1,16}$/i.test(value)) return null;
+  try {
+    const parsed = BigInt(value);
+    return parsed <= MAX_UINT64 ? parsed : null;
+  } catch {
+    return null;
+  }
+}
+
+export function googleMapsHexPairToPlaceId(hex1: string, hex2: string) {
+  const part1 = validHexPart(hex1);
+  const part2 = validHexPart(hex2);
+  if (part1 === null || part2 === null)
+    throw new GoogleReviewLinkError("PLACE_ID_NOT_FOUND");
+
+  const first = Buffer.alloc(8);
+  first.writeBigUInt64LE(part1);
+  const second = Buffer.alloc(8);
+  second.writeBigUInt64LE(part2);
+  const payload = Buffer.concat([
+    Buffer.from([0x09]),
+    first,
+    Buffer.from([0x11]),
+    second,
+  ]);
+  return Buffer.concat([Buffer.from([0x0a, 0x12]), payload]).toString(
+    "base64url",
+  );
+}
+
 function decodedVariants(value: string) {
   const variants = new Set([value, value.replace(/&amp;/g, "&")]);
   let current = value;
@@ -175,6 +208,25 @@ function placeIdFromHtml(html: string) {
   return validPlaceId(commonBusinessId);
 }
 
+function hexPairFromText(value: string) {
+  for (const variant of decodedVariants(value)) {
+    const patterns = [
+      /(?:[?&]|["']|\b)ftid["']?\s*(?:=|:|%3D)\s*["']?(0x[0-9a-f]+):(0x[0-9a-f]+)(?=[^0-9a-f]|$)/i,
+      /!1s(0x[0-9a-f]+):(0x[0-9a-f]+)(?=[^0-9a-f]|$)/i,
+    ];
+    for (const pattern of patterns) {
+      const match = variant.match(pattern);
+      if (!match) continue;
+      try {
+        return googleMapsHexPairToPlaceId(match[1], match[2]);
+      } catch {
+        // A malformed or out-of-range pair is not a usable identifier.
+      }
+    }
+  }
+  return null;
+}
+
 async function readBoundedText(response: Response) {
   const declared = Number(response.headers.get("content-length") ?? 0);
   if (declared > MAX_RESPONSE_BYTES)
@@ -212,6 +264,8 @@ export async function resolveGooglePlaceId(
   let url = parseGoogleUrl(input);
   const direct = placeIdFromUrl(url);
   if (direct) return direct;
+  const directHexPair = hexPairFromText(url.toString());
+  if (directHexPair) return directHexPair;
 
   const controller = new AbortController();
   const timeout = setTimeout(
@@ -250,14 +304,21 @@ export async function resolveGooglePlaceId(
         url = parseGoogleUrl(new URL(location, url).toString(), true);
         const redirected = placeIdFromUrl(url);
         if (redirected) return redirected;
+        const redirectedHexPair = hexPairFromText(url.toString());
+        if (redirectedHexPair) return redirectedHexPair;
         continue;
       }
       if (!response.ok) throw new GoogleReviewLinkError("GOOGLE_FETCH_FAILED");
       const finalUrl = parseGoogleUrl(response.url || url.toString(), true);
       const fromFinalUrl = placeIdFromUrl(finalUrl);
       if (fromFinalUrl) return fromFinalUrl;
-      const fromHtml = placeIdFromHtml(await readBoundedText(response));
+      const html = await readBoundedText(response);
+      const fromHtml = placeIdFromHtml(html);
       if (fromHtml) return fromHtml;
+      const fromFinalHexPair = hexPairFromText(finalUrl.toString());
+      if (fromFinalHexPair) return fromFinalHexPair;
+      const fromHtmlHexPair = hexPairFromText(html);
+      if (fromHtmlHexPair) return fromHtmlHexPair;
       throw new GoogleReviewLinkError("PLACE_ID_NOT_FOUND");
     }
     throw new GoogleReviewLinkError("TOO_MANY_REDIRECTS");
