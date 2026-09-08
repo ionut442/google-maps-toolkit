@@ -52,12 +52,24 @@ import {
 } from "@/lib/business-logo";
 import { privateStorage } from "@/lib/storage";
 import { allEnabledToolsReady } from "@/lib/onboarding-readiness";
+import {
+  extractGoogleReviewLink,
+  type ExtractReviewLinkResult,
+} from "@/lib/google-review-link";
+import { resolvedGoogleReviewUrl } from "@/lib/profile-behavior";
 
 export type FormState = {
   error?: string;
   success?: string;
   fields?: Record<string, string[]>;
 };
+
+export async function extractReviewLinkAction(
+  input: string,
+): Promise<ExtractReviewLinkResult> {
+  await requireUser();
+  return extractGoogleReviewLink(input);
+}
 const values = (formData: FormData) => Object.fromEntries(formData.entries());
 const invalid = (error: {
   flatten(): { fieldErrors: Record<string, string[]> };
@@ -179,14 +191,21 @@ export async function saveProfileAction(
     }
   }
   const nextLogoUrl = stagedLogo?.url ?? parsed.data.logoUrl;
+  const googleReviewUrl = resolvedGoogleReviewUrl({
+    previousMapsUrl: business.googleMapsUrl,
+    previousReviewUrl: business.googleReviewUrl,
+    submittedMapsUrl: parsed.data.googleMapsUrl,
+    submittedReviewUrl: parsed.data.googleReviewUrl,
+    resolvedForMapsUrl:
+      String(formData.get("resolvedGoogleMapsUrl") ?? "") || null,
+  });
   try {
     await db.business.update({
       where: { id: business.id },
       data: {
         ...parsed.data,
         logoUrl: nextLogoUrl,
-        googleReviewUrl:
-          parsed.data.googleReviewUrl ?? parsed.data.googleMapsUrl,
+        googleReviewUrl,
         phone: normalizePhone(parsed.data.phone),
         whatsapp: normalizePhone(parsed.data.whatsapp),
         onboardingStep: Math.max(business.onboardingStep, 4),

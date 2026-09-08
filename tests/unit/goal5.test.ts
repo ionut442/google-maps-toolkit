@@ -77,7 +77,8 @@ describe("Goal 5 QR, assets, and analytics", () => {
     expect(
       profileSchema.safeParse({
         ...base,
-        googleReviewUrl: "https://g.page/r/example/review",
+        googleReviewUrl:
+          "https://search.google.com/local/writereview?placeid=ChIJExamplePlaceIdentifier12345",
       }).success,
     ).toBe(true);
   });
@@ -201,7 +202,8 @@ describe("Goal 5 QR, assets, and analytics", () => {
     const business = {
       name: "Élite International Plumbing Cleaning and Emergency Services București",
       brandColor: "#ffff00",
-      googleReviewUrl: "https://g.page/r/example/review",
+      googleReviewUrl:
+        "https://search.google.com/local/writereview?placeid=ChIJExamplePlaceIdentifier12345",
     };
     expect(wrapBusinessName(business.name).length).toBeLessThanOrEqual(3);
     const [print, social] = await Promise.all([
@@ -221,10 +223,18 @@ describe("Goal 5 QR, assets, and analytics", () => {
     expect(print.byteLength).toBeGreaterThan(50_000);
     expect(social.byteLength).toBeGreaterThan(20_000);
     const embedded = await sharp(print)
-      .extract({ left: 700, top: 1510, width: 1080, height: 1080 })
+      .extract({ left: 354, top: 2508, width: 562, height: 562 })
       .png()
       .toBuffer();
     expect(decodeQr(embedded)).toBe(business.googleReviewUrl);
+    const socialQr = await sharp(social)
+      .extract({ left: 817, top: 757, width: 272, height: 272 })
+      .png()
+      .toBuffer();
+    expect(decodeQr(socialQr)).toBe(business.googleReviewUrl);
+    await expect(
+      generateSocialReviewGraphic({ ...business, name: "A1 Plumbing" }),
+    ).resolves.toBeInstanceOf(Buffer);
   }, 15_000);
 
   it("contains square and wide logos without distortion", async () => {

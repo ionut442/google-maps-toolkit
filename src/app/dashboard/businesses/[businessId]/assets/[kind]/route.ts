@@ -7,6 +7,7 @@ import {
 } from "@/lib/review-assets";
 import { publicBusinessUrl, safeDownloadSlug } from "@/lib/public-url";
 import { safeHttpUrl } from "@/lib/public-actions";
+import { isDirectGoogleReviewUrl } from "@/lib/google-review-link";
 
 const kinds = [
   "business-page-qr",
@@ -31,7 +32,10 @@ export async function GET(
   const reviewUrl = safeHttpUrl(business.googleReviewUrl);
   if (kind === "business-page-qr" && !business.published)
     return new Response("Publish business first", { status: 409 });
-  if (kind !== "business-page-qr" && !reviewUrl)
+  if (
+    kind !== "business-page-qr" &&
+    (!reviewUrl || !isDirectGoogleReviewUrl(reviewUrl))
+  )
     return new Response("Configure a valid review URL first", { status: 409 });
   let bytes: Buffer;
   if (kind === "business-page-qr")
@@ -42,14 +46,12 @@ export async function GET(
       name: business.name,
       brandColor: business.brandColor,
       googleReviewUrl: reviewUrl!,
-      logoUrl: business.logoUrl,
     });
   else
     bytes = await generateSocialReviewGraphic({
       name: business.name,
       brandColor: business.brandColor,
       googleReviewUrl: reviewUrl!,
-      logoUrl: business.logoUrl,
     });
   const base = safeDownloadSlug(business.name);
   const suffix: Record<Kind, string> = {

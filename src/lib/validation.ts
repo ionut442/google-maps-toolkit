@@ -1,5 +1,9 @@
 import { z } from "zod";
 import { industries, primaryActions } from "./domain";
+import {
+  directGoogleReviewUrlSchema,
+  googleMapsUrlSchema,
+} from "./google-review-link";
 
 const httpUrl = z
   .string()
@@ -18,6 +22,12 @@ const httpUrl = z
 const optionalUrl = z
   .union([z.literal(""), httpUrl])
   .transform((v) => v || null);
+const optionalGoogleMapsUrl = z
+  .union([z.literal(""), googleMapsUrlSchema])
+  .transform((value) => value || null);
+const optionalDirectReviewUrl = z
+  .union([z.literal(""), directGoogleReviewUrlSchema])
+  .transform((value) => value || null);
 export const signupSchema = z.object({
   email: z.string().trim().toLowerCase().pipe(z.email()),
   password: z.string().min(10, "Use at least 10 characters").max(128),
@@ -64,14 +74,16 @@ export const profileSchema = z.object({
   brandColor: z
     .string()
     .regex(/^#[0-9a-fA-F]{6}$/, "Use a six-digit hex colour"),
-  googleReviewUrl: optionalUrl,
+  googleReviewUrl: optionalDirectReviewUrl,
   googleBusinessName: z
     .string()
     .trim()
     .max(120)
     .optional()
     .transform((v) => v || null),
-  googleMapsUrl: optionalUrl.optional().transform((value) => value ?? null),
+  googleMapsUrl: optionalGoogleMapsUrl
+    .optional()
+    .transform((value) => value ?? null),
 });
 export const primaryActionSchema = z.object({
   primaryAction: z.enum(primaryActions),

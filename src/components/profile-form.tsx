@@ -1,7 +1,12 @@
 "use client";
 
-import { useActionState, useMemo, useState, type CSSProperties } from "react";
-import { saveProfileAction } from "@/app/actions";
+import {
+  useActionState,
+  useState,
+  useTransition,
+  type CSSProperties,
+} from "react";
+import { extractReviewLinkAction, saveProfileAction } from "@/app/actions";
 import { synchronizedWhatsapp } from "@/lib/profile-behavior";
 
 type Profile = {
@@ -44,15 +49,19 @@ export function ProfileForm({
   const [brandColor, setBrandColor] = useState(
     business.brandColor.toUpperCase(),
   );
-  const [googleBusinessName, setGoogleBusinessName] = useState(
-    business.googleBusinessName ?? business.name,
+  const initialGoogleMapsUrl =
+    business.googleMapsUrl ?? business.googleReviewUrl ?? "";
+  const initialGoogleReviewUrl = business.googleReviewUrl ?? "";
+  const [googleMapsUrl, setGoogleMapsUrl] = useState(initialGoogleMapsUrl);
+  const [googleReviewUrl, setGoogleReviewUrl] = useState(
+    initialGoogleReviewUrl,
   );
+  const [resolvedGoogleMapsUrl, setResolvedGoogleMapsUrl] = useState(
+    initialGoogleReviewUrl ? initialGoogleMapsUrl : "",
+  );
+  const [reviewLinkError, setReviewLinkError] = useState("");
+  const [reviewLinkPending, startReviewLinkTransition] = useTransition();
   const error = (name: string) => state.fields?.[name]?.[0];
-  const searchUrl = useMemo(
-    () =>
-      `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(googleBusinessName)}`,
-    [googleBusinessName],
-  );
 
   function updatePhone(value: string) {
     const normalized = sanitizePhoneInput(value);
@@ -65,6 +74,35 @@ export function ProfileForm({
   function updateHex(value: string) {
     const normalized = value.trim().toUpperCase();
     setBrandColor(normalized.startsWith("#") ? normalized : `#${normalized}`);
+  }
+
+  function updateGoogleMapsUrl(value: string) {
+    setGoogleMapsUrl(value);
+    setReviewLinkError("");
+    if (value === initialGoogleMapsUrl) {
+      setGoogleReviewUrl(initialGoogleReviewUrl);
+      setResolvedGoogleMapsUrl(
+        initialGoogleReviewUrl ? initialGoogleMapsUrl : "",
+      );
+    } else if (value !== resolvedGoogleMapsUrl) {
+      setGoogleReviewUrl("");
+      setResolvedGoogleMapsUrl("");
+    }
+  }
+
+  function resolveReviewLink() {
+    setReviewLinkError("");
+    startReviewLinkTransition(async () => {
+      const result = await extractReviewLinkAction(googleMapsUrl);
+      if (!result.success) {
+        setGoogleReviewUrl("");
+        setResolvedGoogleMapsUrl("");
+        setReviewLinkError(result.error);
+        return;
+      }
+      setGoogleReviewUrl(result.reviewUrl);
+      setResolvedGoogleMapsUrl(googleMapsUrl);
+    });
   }
 
   return (
@@ -289,46 +327,58 @@ export function ProfileForm({
         <fieldset className="form-section google-profile-setup">
           <legend>Google Business Profile</legend>
           <p className="field-intro">
-            Find your business, confirm the correct listing, then paste its
-            Google Maps or review link.
+            Open your business in Google Maps, choose Share → Copy link, then
+            paste it here.
           </p>
           <label>
-            Business name
-            <input
-              name="googleBusinessName"
-              value={googleBusinessName}
-              onChange={(e) => setGoogleBusinessName(e.currentTarget.value)}
-              placeholder="Your business name and town"
-            />
-          </label>
-          <a
-            className="button secondary"
-            href={searchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Find on Google Maps{" "}
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
-          <label>
-            Google Maps or review link
+            Google Maps share link
             <input
               name="googleMapsUrl"
               type="url"
-              defaultValue={
-                business.googleMapsUrl ?? business.googleReviewUrl ?? ""
-              }
-              placeholder="Paste the confirmed link"
+              value={googleMapsUrl}
+              onChange={(e) => updateGoogleMapsUrl(e.currentTarget.value)}
+              placeholder="https://maps.app.goo.gl/..."
             />
             {error("googleMapsUrl") && (
               <small className="error">{error("googleMapsUrl")}</small>
             )}
           </label>
-          <input type="hidden" name="googleReviewUrl" value="" />
-          <small>
-            We never guess which business is yours. A Maps link opens the
-            confirmed listing; a direct review link opens the review form.
-          </small>
+          <button
+            className="button secondary google-review-resolve"
+            type="button"
+            disabled={reviewLinkPending || !googleMapsUrl.trim()}
+            onClick={resolveReviewLink}
+          >
+            {reviewLinkPending ? "Getting review link…" : "Get review link"}
+          </button>
+          <input type="hidden" name="googleReviewUrl" value={googleReviewUrl} />
+          <input
+            type="hidden"
+            name="resolvedGoogleMapsUrl"
+            value={resolvedGoogleMapsUrl}
+          />
+          <input
+            type="hidden"
+            name="googleBusinessName"
+            value={business.googleBusinessName ?? business.name}
+          />
+          {googleReviewUrl && resolvedGoogleMapsUrl === googleMapsUrl && (
+            <div className="google-review-ready" role="status">
+              <strong>Review link ready</strong>
+              <a
+                href={googleReviewUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Test review link ↗
+              </a>
+            </div>
+          )}
+          {reviewLinkError && (
+            <p className="error callout" role="alert">
+              {reviewLinkError}
+            </p>
+          )}
         </fieldset>
       </details>
 

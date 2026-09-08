@@ -20,7 +20,8 @@ const business = {
   slug: "route-test-plumbing",
   published: true,
   brandColor: "#2563eb",
-  googleReviewUrl: "https://g.page/r/route-test/review",
+  googleReviewUrl:
+    "https://search.google.com/local/writereview?placeid=ChIJRouteTestIdentifier12345",
   logoUrl: null,
 };
 
@@ -71,6 +72,11 @@ describe("Goal 5 owner asset routes", () => {
       googleReviewUrl: null,
     });
     expect((await request("review-qr")).status).toBe(409);
+    mocks.findOwnedBusiness.mockResolvedValueOnce({
+      ...business,
+      googleReviewUrl: "https://www.google.com/maps/place/not-a-review-link",
+    });
+    expect((await request("social-review-graphic")).status).toBe(409);
   });
 
   it("returns a decodable canonical Business Page QR with a safe filename", async () => {

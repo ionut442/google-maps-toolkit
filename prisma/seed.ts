@@ -112,7 +112,8 @@ async function main() {
       phone: item.phone,
       whatsapp: item.phone,
       website: "https://example.com",
-      googleReviewUrl: "https://www.google.com/maps",
+      googleReviewUrl:
+        "https://search.google.com/local/writereview?placeid=ChIJSeedBusinessIdentifier12345",
       description: item.description,
       brandColor: item.color,
       primaryAction: template.defaultPrimaryAction,

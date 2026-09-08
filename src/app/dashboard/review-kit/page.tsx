@@ -4,18 +4,22 @@ import { EmptyState, PageHeader } from "@/components/dashboard-ui";
 import { requireUser } from "@/lib/auth";
 import { requireOwnedBusiness } from "@/lib/business";
 import { safeHttpUrl } from "@/lib/public-actions";
+import { isDirectGoogleReviewUrl } from "@/lib/google-review-link";
 
 export default async function ReviewKitPage() {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
-  const reviewUrl = safeHttpUrl(business.googleReviewUrl);
+  const candidateReviewUrl = safeHttpUrl(business.googleReviewUrl);
+  const reviewUrl = isDirectGoogleReviewUrl(candidateReviewUrl)
+    ? candidateReviewUrl
+    : null;
   const base = `/dashboard/businesses/${business.id}/assets`;
   return (
     <main className="dashboard-page">
       <PageHeader
         eyebrow="Review Kit"
-        title="Turn happy customers into reviews"
-        intro="These assets use your confirmed Google link, separately from the business-page link you share with customers."
+        title="Review Kit"
+        intro="Finished graphics using your business colour and direct Google review link from Business Details."
         action={
           reviewUrl ? (
             <a
@@ -31,27 +35,17 @@ export default async function ReviewKitPage() {
       />
       {reviewUrl ? (
         <>
-          <p className="review-link-note">
-            A direct Google review link opens the review form. A Google Maps
-            link opens the confirmed listing, where customers can choose to
-            leave a review.
-          </p>
           <div className="review-kit-grid">
             {[
               {
-                key: "review-qr",
-                title: "Review QR",
-                copy: "A compact QR for receipts and counters.",
-              },
-              {
                 key: "printable-review-sign",
                 title: "Printable review sign",
-                copy: "An A4 graphic ready for high-resolution printing.",
+                copy: "2480 × 3508 · A4",
               },
               {
                 key: "social-review-graphic",
                 title: "Social review graphic",
-                copy: "A square branded graphic for social channels.",
+                copy: "1200 × 1200 · Square",
               },
             ].map((asset) => (
               <article className="asset-card" key={asset.key}>
@@ -79,7 +73,7 @@ export default async function ReviewKitPage() {
       ) : (
         <EmptyState
           title="Connect your Google listing first"
-          message="Add a confirmed Google Maps or direct review link to unlock your fixed review assets."
+          message="Connect your Google Maps share link in Business Details to generate these review graphics."
           action={
             <Link className="button" href="/dashboard/business">
               Add Google details
