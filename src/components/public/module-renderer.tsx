@@ -5,7 +5,6 @@ import {
   ContactRound,
   ExternalLink,
   MapPinned,
-  MessageCircle,
   Phone,
   ShieldCheck,
   Star,
@@ -43,6 +42,31 @@ function externalProps(external = false) {
   return external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 }
 
+function WhatsAppIcon({ size = 21 }: { size?: number }) {
+  return (
+    <svg
+      className="whatsapp-icon"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M20.5 11.7a8.5 8.5 0 0 1-12.58 7.45L3.5 20.5l1.4-4.28A8.5 8.5 0 1 1 20.5 11.7Z"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M8.1 7.55c.18-.4.37-.41.68-.42h.58c.18 0 .4.07.5.34l.7 1.7c.08.22.04.4-.1.58l-.55.68c-.13.16-.07.34.04.5.48.7 1.08 1.3 1.78 1.78.18.12.36.14.51.02l.83-.72c.18-.15.38-.18.6-.08l1.63.77c.22.1.34.27.3.54-.1.65-.43 1.23-.96 1.63-.46.35-1.08.52-1.7.4-1.02-.2-2.33-.76-3.75-2.02-1.17-1.04-2.04-2.31-2.33-3.35-.22-.8-.06-1.67.4-2.35.04-.06.09-.12.14-.2Z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
 function ContactPresentation({
   business,
   module,
@@ -71,7 +95,7 @@ function ContactPresentation({
           label: module.config.whatsappLabel,
           href: whatsappHref,
           external: true,
-          icon: MessageCircle,
+          icon: WhatsAppIcon,
         }
       : null,
   ].filter(Boolean);
@@ -431,7 +455,7 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             </p>
           </div>
           <TrackedLink
-            className="action-link"
+            className="action-link button compact-public-button"
             href={href}
             slug={business.slug}
             eventType="REVIEW_CLICK"
@@ -461,7 +485,7 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             <p>Add the phone number and email to your contacts.</p>
           </div>
           <a
-            className="action-link"
+            className="action-link button compact-public-button"
             href={"/" + business.slug + "/contact.vcf"}
             download
           >

@@ -118,6 +118,32 @@ describe("LocalAction real-user regressions", () => {
     );
   });
 
+  it("keeps compact preview actions readable and status feedback semantic", () => {
+    const css = readFileSync("src/app/globals.css", "utf8");
+    expect(css).toMatch(
+      /\.public-quick-actions\s*\{[^}]*padding:\s*1rem 1\.1rem 1\.15rem/s,
+    );
+    expect(css).toMatch(
+      /@container \(max-width: 520px\)[\s\S]*?\.compact-action-module \.action-link\s*\{[^}]*grid-column:\s*1 \/ -1/s,
+    );
+    expect(css).toMatch(
+      /\.compact-action-module \.compact-public-button\s*\{[^}]*background:\s*var\(--primary\)/s,
+    );
+    expect(css).toMatch(
+      /\.quote-form-preview \.public-quote-form button\s*\{[^}]*background:\s*var\(--primary\)/s,
+    );
+    expect(css).toMatch(
+      /\.publish-checklist \.is-ready small\s*\{[^}]*color:\s*var\(--success\)/s,
+    );
+    expect(css).toMatch(
+      /\.add-credential-button\s*\{[^}]*white-space:\s*nowrap/s,
+    );
+    expect(readFileSync("src/app/icon.svg", "utf8")).toContain("#ffb020");
+    expect(readFileSync("src/app/homepage.html", "utf8")).toContain(
+      '<link rel="icon" href="/icon.svg" type="image/svg+xml" />',
+    );
+  });
+
   it("puts the shared Google connection flow inside the Review editor", () => {
     const html = renderToStaticMarkup(
       <SimpleToolEditor

@@ -2264,6 +2264,7 @@ dd {
 }
 .public-tool-panel {
   border-top: 1px solid var(--soft-border);
+  container-type: inline-size;
 }
 .public-tool-panel > .action-module {
   border: 0;
@@ -2289,7 +2290,7 @@ dd {
 .public-quick-actions {
   border: 0;
   background: transparent;
-  padding: 0;
+  padding: 1rem 1.1rem 1.15rem;
 }
 .public-quick-actions > div {
   display: grid;
@@ -2308,6 +2309,9 @@ dd {
   color: var(--action-brand);
   font-weight: 650;
   text-align: center;
+}
+.public-quick-action > svg {
+  flex: 0 0 auto;
 }
 .public-pricing-module {
   border-color: color-mix(in srgb, var(--action-brand) 20%, var(--border));
@@ -2405,6 +2409,41 @@ dd {
 .compact-action-module .action-link {
   min-width: 150px;
 }
+.compact-action-module .compact-public-button {
+  min-height: 48px;
+  border: 2px solid var(--ink);
+  background: var(--primary);
+  color: var(--ink);
+  padding: 0.72rem 0.95rem;
+  box-shadow: 4px 4px 0 var(--ink);
+  font-weight: 800;
+  text-align: center;
+}
+.compact-action-module .compact-public-button:hover {
+  border-color: var(--ink);
+  background: var(--primary-hover);
+}
+
+@container (max-width: 520px) {
+  .public-quick-actions > div {
+    grid-template-columns: 1fr;
+  }
+
+  .compact-action-module {
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .compact-action-module > svg {
+    margin-top: 0.25rem;
+  }
+
+  .compact-action-module .action-link {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+  }
+}
 .action-button-grid,
 .action-inline-links {
   display: grid;
@@ -2441,9 +2480,20 @@ dd {
   gap: 0.7rem;
 }
 .public-quote-form button {
-  background: var(--action-brand);
-  border-color: var(--action-brand);
-  color: var(--action-brand-foreground);
+  background: var(--action-brand, var(--primary));
+  border-color: var(--action-brand-border, var(--ink));
+  color: var(--action-brand-foreground, var(--ink));
+}
+
+.quote-form-preview .public-quote-form button {
+  border-color: var(--ink);
+  background: var(--primary);
+  color: var(--ink);
+}
+
+.add-credential-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 .price-row {
   display: flex;
@@ -3358,8 +3408,16 @@ details[open] > summary .edit-affordance::after,
 }
 
 .publish-checklist li > span small {
-  color: var(--danger);
+  color: var(--muted);
   font-weight: 600;
+}
+
+.publish-checklist .is-ready small {
+  color: var(--success);
+}
+
+.publish-checklist .needs-attention small {
+  color: var(--danger);
 }
 
 .page-link-explanation,

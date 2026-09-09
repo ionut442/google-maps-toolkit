@@ -56,6 +56,8 @@ describe("public tool cards", () => {
     );
     expect(html).toContain('href="tel:+40700111222"');
     expect(html).toContain("wa.me/40700333444");
+    expect(html).toContain('class="whatsapp-icon"');
+    expect(html).toContain('class="action-link button compact-public-button"');
   });
 
   it("shows credential expiry and image evidence without inventing expiry text", () => {

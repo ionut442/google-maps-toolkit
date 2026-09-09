@@ -90,7 +90,7 @@ export function TrustEditor({
             </div>
             <button
               type="button"
-              className="secondary"
+              className="secondary add-credential-button"
               disabled={config.entries.length >= 12}
               onClick={() => setAdding(true)}
             >
