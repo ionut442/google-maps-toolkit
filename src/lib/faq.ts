@@ -89,6 +89,16 @@ export async function updateFaqItem(
   );
 }
 
+export async function replaceFaqItems(
+  userId: string,
+  businessId: string,
+  items: FaqItem[],
+  client: Client = db,
+) {
+  const validated = items.map((item) => faqItemSchema.parse(item));
+  return saveFaqs(userId, businessId, () => validated, client);
+}
+
 export async function deleteFaqItem(
   userId: string,
   businessId: string,

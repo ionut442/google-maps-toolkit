@@ -685,7 +685,7 @@ body:has(.public-action-page) > .site-header {
   justify-content: space-between;
   gap: 1rem;
   border-top: 1px solid var(--soft-border);
-  padding: 0.9rem 0;
+  padding: 0.9rem 1rem;
 }
 .quote-history-row > div {
   display: grid;
@@ -876,8 +876,10 @@ body:has(.public-action-page) > .site-header {
 }
 .tool-icon {
   display: grid;
+  flex: 0 0 46px;
   width: 46px;
   height: 46px;
+  aspect-ratio: 1;
   place-items: center;
   border-radius: 12px;
   background: var(--tool-tint, var(--primary-soft));
@@ -2400,7 +2402,11 @@ dd {
   gap: 0.9rem;
 }
 .compact-action-module > svg {
+  flex: 0 0 auto;
   color: var(--action-brand);
+}
+.compact-action-module .action-kicker {
+  padding-bottom: 0.56rem;
 }
 .compact-action-module h2,
 .compact-action-module p {
@@ -2775,6 +2781,7 @@ dd {
     display: none;
   }
   .page-order-row .tool-icon {
+    flex-basis: 38px;
     width: 38px;
     height: 38px;
   }

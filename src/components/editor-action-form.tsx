@@ -9,11 +9,13 @@ export function EditorActionForm({
   action,
   children,
   className = "stack-form",
+  id,
   savedMessage = "Saved",
 }: {
   action: (data: FormData) => Promise<void>;
   children: ReactNode;
   className?: string;
+  id?: string;
   savedMessage?: string;
 }) {
   const [pending, setPending] = useState(false);
@@ -49,6 +51,7 @@ export function EditorActionForm({
       onSubmit={submit}
       aria-busy={pending}
       className="editor-action-form"
+      id={id}
     >
       <fieldset disabled={pending} className={className}>
         {children}

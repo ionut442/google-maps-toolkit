@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
 import { businessTypeLabel } from "@/lib/domain";
 import { safeHttpUrl } from "@/lib/public-actions";
@@ -32,7 +33,13 @@ type PreviewBusiness = {
   }>;
 };
 
-export function CustomerPreview({ business }: { business: PreviewBusiness }) {
+export function CustomerPreview({
+  business,
+  publishAction,
+}: {
+  business: PreviewBusiness;
+  publishAction?: ReactNode;
+}) {
   const safeBusiness = toPublicBusiness(business);
   const logoUrl = safeHttpUrl(safeBusiness.logoUrl);
 
@@ -77,15 +84,16 @@ export function CustomerPreview({ business }: { business: PreviewBusiness }) {
           <PublicModuleRenderer business={safeBusiness} primary={null} />
         </div>
       </div>
-      <p className="preview-interaction-note">
-        Links and forms work in this draft.
+      <div className="preview-interaction-note">
         <Link
+          className="button secondary"
           href={`/preview/${encodeURIComponent(safeBusiness.slug)}`}
           target="_blank"
         >
-          Open full interactive preview
+          Open draft preview
         </Link>
-      </p>
+        {publishAction}
+      </div>
     </div>
   );
 }

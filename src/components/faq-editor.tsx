@@ -2,7 +2,7 @@ import {
   addFaqAction,
   deleteFaqAction,
   moveFaqAction,
-  updateFaqAction,
+  saveFaqListAction,
 } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { EditorActionForm } from "@/components/editor-action-form";
@@ -16,6 +16,7 @@ export function FaqEditor({
   businessId: string;
   config: ModuleConfigByType["FAQ"];
 }) {
+  const formId = `faq-list-${businessId}`;
   return (
     <div className="tool-editor-layout">
       <div className="editor-sheet stack-form">
@@ -52,32 +53,27 @@ export function FaqEditor({
                 </span>
               </summary>
               <div className="focused-form">
-                <EditorActionForm action={updateFaqAction}>
-                  <input type="hidden" name="businessId" value={businessId} />
-                  <input type="hidden" name="index" value={index} />
-                  <label>
-                    Question
-                    <input
-                      name="question"
-                      defaultValue={faq.question}
-                      required
-                      maxLength={160}
-                    />
-                  </label>
-                  <label>
-                    Answer
-                    <textarea
-                      name="answer"
-                      defaultValue={faq.answer}
-                      required
-                      maxLength={500}
-                      rows={4}
-                    />
-                  </label>
-                  <SubmitButton pendingLabel="Saving…">
-                    Save question
-                  </SubmitButton>
-                </EditorActionForm>
+                <label>
+                  Question
+                  <input
+                    form={formId}
+                    name="question"
+                    defaultValue={faq.question}
+                    required
+                    maxLength={160}
+                  />
+                </label>
+                <label>
+                  Answer
+                  <textarea
+                    form={formId}
+                    name="answer"
+                    defaultValue={faq.answer}
+                    required
+                    maxLength={500}
+                    rows={4}
+                  />
+                </label>
                 <div className="row-actions">
                   <form action={moveFaqAction}>
                     <input type="hidden" name="businessId" value={businessId} />
@@ -144,6 +140,14 @@ export function FaqEditor({
         <small>
           {config.suggestedFaqs.length} of {MAX_FAQS} questions
         </small>
+        <EditorActionForm
+          action={saveFaqListAction}
+          id={formId}
+          savedMessage="FAQ saved"
+        >
+          <input type="hidden" name="businessId" value={businessId} />
+          <SubmitButton>Save changes</SubmitButton>
+        </EditorActionForm>
       </div>
       <aside className="tool-editor-aside">
         <section className="tool-customer-preview faq-customer-preview">

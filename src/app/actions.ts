@@ -9,6 +9,7 @@ import {
   addFaqItem,
   deleteFaqItem,
   moveFaqItem,
+  replaceFaqItems,
   updateFaqItem,
 } from "@/lib/faq";
 import {
@@ -441,6 +442,24 @@ export async function updateFaqAction(formData: FormData) {
     String(formData.get("businessId")),
     Number(formData.get("index")),
     faqItemFrom(formData),
+  );
+  revalidateFaq(slug);
+}
+
+export async function saveFaqListAction(formData: FormData) {
+  const user = await requireUser();
+  const questions = formData.getAll("question").map(String);
+  const answers = formData.getAll("answer").map(String);
+  if (questions.length !== answers.length) {
+    throw new Error("FAQ questions and answers do not match");
+  }
+  const slug = await replaceFaqItems(
+    user.id,
+    String(formData.get("businessId")),
+    questions.map((question, index) => ({
+      question,
+      answer: answers[index],
+    })),
   );
   revalidateFaq(slug);
 }

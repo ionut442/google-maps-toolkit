@@ -13,6 +13,7 @@ import {
   addFaqItem,
   deleteFaqItem,
   moveFaqItem,
+  replaceFaqItems,
   updateFaqItem,
 } from "@/lib/faq";
 import { findPublicBusinessBySlug } from "@/lib/public-business";
@@ -573,6 +574,22 @@ describe("database ownership and toolkit integration", () => {
     expect(
       config.suggestedFaqs.some((item) => item.question === "Updated first?"),
     ).toBe(false);
+
+    await replaceFaqItems(
+      owner.id,
+      created.id,
+      [
+        { question: "First saved question?", answer: "First saved answer." },
+        { question: "Second saved question?", answer: "Second saved answer." },
+      ],
+      client,
+    );
+    const replaced = await requireOwnedBusiness(owner.id, created.id, client);
+    const replacedFaq = replaced.modules.find((item) => item.type === "FAQ")!;
+    expect(JSON.parse(replacedFaq.config).suggestedFaqs).toEqual([
+      { question: "First saved question?", answer: "First saved answer." },
+      { question: "Second saved question?", answer: "Second saved answer." },
+    ]);
   });
 
   it("serves a vCard only for a published business", async () => {

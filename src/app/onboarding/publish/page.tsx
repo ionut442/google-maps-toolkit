@@ -126,13 +126,6 @@ export default async function PublishPage() {
               <div className="publish-actions">
                 <form action={setPublishedAction}>
                   <input type="hidden" name="businessId" value={business.id} />
-                  <input type="hidden" name="published" value="true" />
-                  <SubmitButton disabled={!publishable}>
-                    Publish my page
-                  </SubmitButton>
-                </form>
-                <form action={setPublishedAction}>
-                  <input type="hidden" name="businessId" value={business.id} />
                   <input type="hidden" name="published" value="false" />
                   <input type="hidden" name="intent" value="onboarding" />
                   <SubmitButton className="secondary">
@@ -143,7 +136,20 @@ export default async function PublishPage() {
             </>
           )}
         </div>
-        <CustomerPreview business={{ ...business, trustEvidence }} />
+        <CustomerPreview
+          business={{ ...business, trustEvidence }}
+          publishAction={
+            business.published ? undefined : (
+              <form action={setPublishedAction}>
+                <input type="hidden" name="businessId" value={business.id} />
+                <input type="hidden" name="published" value="true" />
+                <SubmitButton disabled={!publishable}>
+                  Publish page
+                </SubmitButton>
+              </form>
+            )
+          }
+        />
       </div>
     </StepShell>
   );
