@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { selectIndustryAction } from "@/app/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type Choice = { industry: string; name: string; toolCount: number };
 
@@ -53,7 +54,13 @@ export function BusinessTypeChooser({
           <small>Use the name your customers would recognize.</small>
         </label>
       )}
-      <button className="sticky-submit">Continue</button>
+      <SubmitButton
+        type="submit"
+        className="sticky-submit"
+        pendingLabel="Saving choice…"
+      >
+        Continue
+      </SubmitButton>
     </form>
   );
 }

@@ -5,6 +5,8 @@ import {
   createBusinessForUser,
   findOwnedBusiness,
   requireOwnedBusiness,
+  requireOwnedBusinessId,
+  requireOwnedBusinessRecord,
 } from "@/lib/business";
 import { canPublishBusiness, resolvePrimaryAction } from "@/lib/domain";
 import {
@@ -263,6 +265,54 @@ describe("database ownership and toolkit integration", () => {
     await expect(
       requireOwnedBusiness(stranger.id, business.id, client),
     ).rejects.toThrow("access denied");
+    await expect(
+      requireOwnedBusinessId(owner.id, business.id, client),
+    ).resolves.toBe(business.id);
+    await expect(
+      requireOwnedBusinessId(stranger.id, business.id, client),
+    ).rejects.toThrow("access denied");
+    await expect(
+      requireOwnedBusinessRecord(owner.id, business.id, client),
+    ).resolves.toMatchObject({ id: business.id, name: "ABC Plumbing" });
+    await expect(
+      requireOwnedBusinessRecord(stranger.id, business.id, client),
+    ).rejects.toThrow("access denied");
+  });
+  it("bulk-applies Other template data without changing onboarding behavior", async () => {
+    const owner = await client.user.create({
+      data: { email: "other-owner@example.test", passwordHash: "test-only" },
+    });
+    const business = await createBusinessForUser(
+      owner.id,
+      "Other Services",
+      owner.email,
+      client,
+    );
+
+    const template = await client.$transaction((tx) =>
+      applyTemplate(business.id, "OTHER", tx, "Dog groomer"),
+    );
+    const applied = await requireOwnedBusiness(owner.id, business.id, client);
+
+    expect(applied.industry).toBe("OTHER");
+    expect(applied.customIndustryLabel).toBe("Dog groomer");
+    expect(applied.primaryAction).toBe(template.defaultPrimaryAction);
+    expect(applied.onboardingStep).toBe(3);
+    expect(
+      applied.modules.map(({ type, enabled, sortOrder, config }) => ({
+        type,
+        enabled,
+        sortOrder,
+        config: JSON.parse(config),
+      })),
+    ).toEqual(
+      template.modules.map((module, sortOrder) => ({
+        type: module.type,
+        enabled: module.enabled,
+        sortOrder,
+        config: module.config,
+      })),
+    );
   });
   it("enforces unique account emails, slugs, memberships, and module types per business", async () => {
     const user = await client.user.create({

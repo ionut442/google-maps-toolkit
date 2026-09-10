@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth";
-import { requireOwnedBusiness } from "@/lib/business";
+import { requireOwnedBusinessRecord } from "@/lib/business";
 import { StepShell } from "@/components/step-shell";
 import { ProfileForm } from "@/components/profile-form";
 export default async function DetailsPage({
@@ -8,7 +8,7 @@ export default async function DetailsPage({
   searchParams: Promise<{ from?: string }>;
 }) {
   const user = await requireUser();
-  const business = await requireOwnedBusiness(user.id);
+  const business = await requireOwnedBusinessRecord(user.id);
   const { from } = await searchParams;
   const publishMissing =
     from === "publish"

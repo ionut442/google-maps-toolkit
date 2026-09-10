@@ -24,7 +24,7 @@ List and inspect the archive before transfer, calculate its SHA-256 hash, then c
 6. Restore `googlemaps:googlemaps` ownership, directory mode `0750`, ordinary source mode `0640`, and environment mode `0600`.
 7. As `googlemaps`, run `npm ci` with the lockfile and all build dependencies, then `npm run db:generate` and `npx prisma validate`.
 8. Export the protected environment, run `npm run config:check`, `npx prisma migrate status`, and `npm run db:migrate`. Never reset or seed production.
-9. Build on Oracle with `NEXT_TELEMETRY_DISABLED=1 npm run build`.
+9. Set `NEXT_DEPLOYMENT_ID` in the staged release environment to the exact commit SHA, then build on Oracle with `NEXT_TELEMETRY_DISABLED=1 npm run build`. The same value must be available to `next start`; this lets Next.js detect tabs from an older release and reload them before they invoke stale Server Actions.
 10. Restart only `google-maps-toolbox.service` and verify `systemctl status`, `journalctl`, `127.0.0.1:3040`, a static asset, and `npm run ops -- health`.
 11. Verify `google-maps-toolbox-email-retry.timer` and `google-maps-toolbox-retention.timer` remain enabled and successful.
 12. Remove the uploaded archive after successful validation. Retain the previous recovery point until the deployment is accepted.

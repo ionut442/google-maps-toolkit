@@ -29,6 +29,34 @@ export async function requireOwnedBusiness(
   return business;
 }
 
+export async function requireOwnedBusinessId(
+  userId: string,
+  businessId?: string,
+  client: Client = db,
+) {
+  const membership = await client.membership.findFirst({
+    where: { userId, ...(businessId ? { businessId } : {}) },
+    select: { businessId: true },
+  });
+  if (!membership) throw new Error("Business not found or access denied");
+  return membership.businessId;
+}
+
+export async function requireOwnedBusinessRecord(
+  userId: string,
+  businessId?: string,
+  client: Client = db,
+) {
+  const business = await client.business.findFirst({
+    where: {
+      ...(businessId ? { id: businessId } : {}),
+      memberships: { some: { userId } },
+    },
+  });
+  if (!business) throw new Error("Business not found or access denied");
+  return business;
+}
+
 export async function createBusinessForUser(
   userId: string,
   name: string,
@@ -69,15 +97,16 @@ export async function applyTemplate(
       customIndustryLabel: industry === "OTHER" ? customIndustryLabel : null,
       primaryAction: template.defaultPrimaryAction,
       onboardingStep: 3,
-      modules: {
-        create: template.modules.map((m, sortOrder) => ({
-          type: m.type,
-          enabled: m.enabled,
-          sortOrder,
-          config: JSON.stringify(m.config),
-        })),
-      },
     },
+  });
+  await client.businessModule.createMany({
+    data: template.modules.map((module, sortOrder) => ({
+      businessId,
+      type: module.type,
+      enabled: module.enabled,
+      sortOrder,
+      config: JSON.stringify(module.config),
+    })),
   });
   return template;
 }

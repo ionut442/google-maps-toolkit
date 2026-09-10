@@ -15,6 +15,8 @@ import {
   applyTemplate,
   createBusinessForUser,
   requireOwnedBusiness,
+  requireOwnedBusinessId,
+  requireOwnedBusinessRecord,
 } from "@/lib/business";
 import {
   industrySchema,
@@ -123,7 +125,7 @@ export async function loginAction(
   if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash)))
     return { error: "Email or password is incorrect." };
   await createSession(user.id);
-  const business = await requireOwnedBusiness(user.id);
+  const business = await requireOwnedBusinessRecord(user.id);
   redirect(
     business.onboardingStep < 7
       ? stepPath(business.onboardingStep)
@@ -152,12 +154,12 @@ function stepPath(step: number) {
 
 export async function selectIndustryAction(formData: FormData) {
   const user = await requireUser();
-  const business = await requireOwnedBusiness(user.id);
   const parsed = industrySchema.safeParse(values(formData));
   if (!parsed.success) throw new Error("Choose a supported business type");
+  const businessId = await requireOwnedBusinessId(user.id);
   await db.$transaction((tx) =>
     applyTemplate(
-      business.id,
+      businessId,
       parsed.data.industry,
       tx,
       parsed.data.customIndustryLabel ?? null,
@@ -171,7 +173,7 @@ export async function saveProfileAction(
   formData: FormData,
 ): Promise<FormState> {
   const user = await requireUser();
-  const business = await requireOwnedBusiness(user.id);
+  const business = await requireOwnedBusinessRecord(user.id);
   const logoFile = formData.get("logoFile");
   const hasLogoUpload = logoFile instanceof File && logoFile.size > 0;
   const submitted = values(formData);
@@ -637,7 +639,7 @@ export async function saveQuoteAction(formData: FormData) {
 
 export async function finishToolsAction() {
   const user = await requireUser();
-  const business = await requireOwnedBusiness(user.id);
+  const business = await requireOwnedBusinessRecord(user.id);
   await db.business.update({
     where: { id: business.id },
     data: { onboardingStep: Math.max(business.onboardingStep, 5) },

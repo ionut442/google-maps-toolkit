@@ -1,12 +1,12 @@
 import { requireUser } from "@/lib/auth";
-import { requireOwnedBusiness } from "@/lib/business";
+import { requireOwnedBusinessRecord } from "@/lib/business";
 import { templates } from "@/lib/templates";
 import { StepShell } from "@/components/step-shell";
 import { BusinessTypeChooser } from "@/components/business-type-chooser";
 
 export default async function IndustryPage() {
   const user = await requireUser();
-  const business = await requireOwnedBusiness(user.id);
+  const business = await requireOwnedBusinessRecord(user.id);
   return (
     <StepShell
       step={2}
