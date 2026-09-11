@@ -92,7 +92,8 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
       callLabel: emergency ? "Call now" : "Call us",
       whatsappLabel: "Message on WhatsApp",
       whatsappMessage: "Hi, I’d like to request a quote.",
-      ...(emergency ? { emergencyLabel: "Emergency call" } : {}),
+      emergencyEnabled: emergency,
+      ...(emergency ? { emergencyLabel: "24/7 emergency" } : {}),
     },
   },
   {
@@ -159,6 +160,32 @@ const base = (specialty: string, emergency = false): TemplateModule[] => [
     type: "SAVE_CONTACT",
     enabled: true,
     config: { label: "Save our contact" },
+  },
+  {
+    type: "SERVICES",
+    enabled: false,
+    config: { label: "Services", categories: [] },
+  },
+  {
+    type: "WORK_HOURS",
+    enabled: false,
+    config: {
+      label: "Work days & hours",
+      days: [
+        "MONDAY",
+        "TUESDAY",
+        "WEDNESDAY",
+        "THURSDAY",
+        "FRIDAY",
+        "SATURDAY",
+        "SUNDAY",
+      ].map((day) => ({ day, status: "CLOSED" })),
+    },
+  },
+  {
+    type: "PROMOTIONS",
+    enabled: false,
+    config: { label: "Special Offers", offers: [] },
   },
 ];
 

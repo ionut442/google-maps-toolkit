@@ -255,7 +255,7 @@ describe("database ownership and toolkit integration", () => {
     );
     await applyTemplate(business.id, "PLUMBING", client);
     const owned = await requireOwnedBusiness(owner.id, business.id, client);
-    expect(owned.modules).toHaveLength(8);
+    expect(owned.modules).toHaveLength(11);
     expect(owned.primaryAction).toBe("CALL");
     expect(
       owned.modules.filter((module) => module.enabled).map(({ type }) => type),
@@ -471,6 +471,10 @@ describe("database ownership and toolkit integration", () => {
           config: JSON.stringify({ label: "Broken", areas: "not-an-array" }),
         },
       }),
+      client.businessModule.update({
+        where: { id: trust.id },
+        data: { enabled: true },
+      }),
     ]);
 
     const publicBusiness = await findPublicBusinessBySlug(created.slug);
@@ -480,7 +484,11 @@ describe("database ownership and toolkit integration", () => {
         "brandColor",
         "customIndustryLabel",
         "description",
+        "displayGoogleReviewCount",
+        "displayGoogleReviewScore",
         "email",
+        "googleReviewCount",
+        "googleReviewScore",
         "googleReviewUrl",
         "industry",
         "logoUrl",

@@ -6,7 +6,7 @@ export default defineConfig({
   preview: {
     buckets: {
       uploads: { access: "private" },
-      "public-credentials": { access: "public_read" },
+      "public-credentials": { access: "private" },
     },
   },
   // Branch policy: per-branch tuning

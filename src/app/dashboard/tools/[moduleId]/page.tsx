@@ -6,6 +6,11 @@ import { PricingEditor } from "@/components/pricing-editor";
 import { QuoteEditor } from "@/components/quote-editor";
 import { ServiceAreaEditor } from "@/components/service-area-editor";
 import { SimpleToolEditor } from "@/components/simple-tool-editor";
+import {
+  PromotionsEditor,
+  ServicesEditor,
+  WorkHoursEditor,
+} from "@/components/structured-tool-editors";
 import { ToolEditorShell } from "@/components/dashboard-ui";
 import { ToolStatusSwitch } from "@/components/tool-status-switch";
 import { TrustEditor } from "@/components/trust-editor";
@@ -46,6 +51,9 @@ export default async function ToolPage({
     "SERVICE_AREA",
     "TRUST",
     "FAQ",
+    "SERVICES",
+    "WORK_HOURS",
+    "PROMOTIONS",
   ].includes(type);
   return (
     <ToolEditorShell
@@ -106,6 +114,24 @@ export default async function ToolPage({
         <FaqEditor
           businessId={business.id}
           config={config as ModuleConfigByType["FAQ"]}
+        />
+      )}
+      {type === "SERVICES" && (
+        <ServicesEditor
+          businessId={business.id}
+          config={config as ModuleConfigByType["SERVICES"]}
+        />
+      )}
+      {type === "WORK_HOURS" && (
+        <WorkHoursEditor
+          businessId={business.id}
+          config={config as ModuleConfigByType["WORK_HOURS"]}
+        />
+      )}
+      {type === "PROMOTIONS" && (
+        <PromotionsEditor
+          businessId={business.id}
+          config={config as ModuleConfigByType["PROMOTIONS"]}
         />
       )}
       {(type === "REVIEW" || type === "SAVE_CONTACT") && (

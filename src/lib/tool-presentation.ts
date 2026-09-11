@@ -5,6 +5,8 @@ import {
   type ModuleType,
 } from "./domain";
 import { formatMoney } from "./pricing";
+import { promotionIsExpired } from "./promotions";
+import { serviceCount } from "./services";
 import { trustEntryState } from "./trust";
 
 export const toolDescriptions: Record<ModuleType, string> = {
@@ -16,6 +18,9 @@ export const toolDescriptions: Record<ModuleType, string> = {
   FAQ: "Answer common questions before customers need to ask.",
   REVIEW: "Send happy customers to your Google listing.",
   SAVE_CONTACT: "Let customers save your details to their phone.",
+  SERVICES: "Show customers the services you provide.",
+  WORK_HOURS: "Share your normal work days and hours.",
+  PROMOTIONS: "Highlight current offers without a coupon system.",
 };
 
 export const toolEditorTitles: Record<ModuleType, string> = {
@@ -27,6 +32,9 @@ export const toolEditorTitles: Record<ModuleType, string> = {
   FAQ: "Questions customers often ask",
   REVIEW: "Google Reviews",
   SAVE_CONTACT: "Save Contact",
+  SERVICES: "Your services",
+  WORK_HOURS: "Work days & hours",
+  PROMOTIONS: "Special offers",
 };
 
 export function toolSummary(
@@ -75,6 +83,23 @@ export function toolSummary(
     return options.googleConnected
       ? "Google listing connected"
       : "Finish Google setup";
+  if (type === "SERVICES") {
+    const services = config as ModuleConfigByType["SERVICES"];
+    const count = serviceCount(services);
+    return `${count} ${count === 1 ? "service" : "services"} in ${services.categories.length} ${services.categories.length === 1 ? "category" : "categories"}`;
+  }
+  if (type === "WORK_HOURS") {
+    const hours = config as ModuleConfigByType["WORK_HOURS"];
+    const openDays = hours.days.filter((day) => day.status !== "CLOSED").length;
+    return `${openDays} ${openDays === 1 ? "open day" : "open days"}`;
+  }
+  if (type === "PROMOTIONS") {
+    const promotions = config as ModuleConfigByType["PROMOTIONS"];
+    const active = promotions.offers.filter(
+      (offer) => !promotionIsExpired(offer.validUntil),
+    ).length;
+    return `${active} active ${active === 1 ? "offer" : "offers"}`;
+  }
   return "Ready";
 }
 

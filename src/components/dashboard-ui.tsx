@@ -2,10 +2,13 @@ import Link from "next/link";
 import {
   ArrowLeft,
   BadgeDollarSign,
+  BadgePercent,
   CheckCircle2,
   CircleHelp,
   ClipboardList,
   ContactRound,
+  Clock3,
+  ListChecks,
   MapPinned,
   Phone,
   ShieldCheck,
@@ -23,6 +26,9 @@ const toolIcons: Record<ModuleType, LucideIcon> = {
   FAQ: CircleHelp,
   REVIEW: Star,
   SAVE_CONTACT: ContactRound,
+  SERVICES: ListChecks,
+  WORK_HOURS: Clock3,
+  PROMOTIONS: BadgePercent,
 };
 
 export function ToolIcon({ type }: { type: ModuleType }) {

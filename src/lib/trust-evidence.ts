@@ -124,7 +124,7 @@ export async function uploadTrustEvidence(
   businessId: string,
   entryId: string,
   filesInput: File | File[],
-  storage: PrivateObjectStorage = publicStorage,
+  storage: PrivateObjectStorage = privateStorage,
 ) {
   const files = Array.isArray(filesInput) ? filesInput : [filesInput];
   const business = await requireOwnedBusiness(userId, businessId);
@@ -175,7 +175,7 @@ export async function uploadTrustEvidence(
         originalFilename: item.originalFilename,
         mediaType: item.mediaType,
         sizeBytes: item.sizeBytes,
-        storageScope: "PUBLIC",
+        storageScope: "PRIVATE",
         businessId,
         entryId,
       })),
@@ -194,8 +194,8 @@ export async function removeTrustEvidence(
   businessId: string,
   entryId: string,
   evidenceId: string,
-  storage: PrivateObjectStorage = publicStorage,
-  legacyStorage: PrivateObjectStorage = privateStorage,
+  storage: PrivateObjectStorage = privateStorage,
+  legacyStorage: PrivateObjectStorage = publicStorage,
 ) {
   await requireOwnedBusiness(userId, businessId);
   const evidence = await db.trustEvidence.findFirst({
@@ -203,7 +203,7 @@ export async function removeTrustEvidence(
   });
   if (!evidence) return;
   await db.trustEvidence.delete({ where: { id: evidence.id } });
-  await (evidence.storageScope === "PUBLIC" ? storage : legacyStorage).delete(
+  await (evidence.storageScope === "PRIVATE" ? storage : legacyStorage).delete(
     evidence.objectKey,
   );
 }

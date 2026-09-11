@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
+import { GoogleReviewSummary } from "@/components/google-review-summary";
 import { businessTypeLabel } from "@/lib/domain";
 import { safeHttpUrl } from "@/lib/public-actions";
 import { toPublicBusiness } from "@/lib/public-business";
@@ -18,6 +19,10 @@ type PreviewBusiness = {
   industry: string;
   customIndustryLabel: string | null;
   googleReviewUrl: string | null;
+  googleReviewScore: number | null;
+  googleReviewCount: number | null;
+  displayGoogleReviewScore: boolean;
+  displayGoogleReviewCount: boolean;
   primaryAction: string | null;
   modules: Array<{
     type: string;
@@ -76,6 +81,7 @@ export function CustomerPreview({
               </div>
             )}
             <h1>{safeBusiness.name}</h1>
+            <GoogleReviewSummary business={safeBusiness} />
             <p className="action-description">
               {safeBusiness.description ||
                 "Your business description appears here."}

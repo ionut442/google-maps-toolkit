@@ -442,6 +442,28 @@ export function TrustEditor({
                     {entry.referenceNumber && (
                       <small>Reference: {entry.referenceNumber}</small>
                     )}
+                    {evidence
+                      .filter(
+                        (file) =>
+                          file.entryId === entry.id &&
+                          file.mediaType.startsWith("image/"),
+                      )
+                      .map((file) => (
+                        <a
+                          href={`/trust-evidence/${file.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          key={file.id}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            className="public-credential-image"
+                            src={`/trust-evidence/${file.id}`}
+                            alt={`${entry.name}: ${file.originalFilename}`}
+                            loading="lazy"
+                          />
+                        </a>
+                      ))}
                   </span>
                 </li>
               ))}

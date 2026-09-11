@@ -24,6 +24,10 @@ export function SimpleToolEditor({
     phone: string;
     email: string;
     googleMapsUrl: string | null;
+    googleReviewScore: number | null;
+    googleReviewCount: number | null;
+    displayGoogleReviewScore: boolean;
+    displayGoogleReviewCount: boolean;
   };
 }) {
   const review = type === "REVIEW";
@@ -57,6 +61,10 @@ export function SimpleToolEditor({
             <GoogleReviewConnectionField
               initialMapsUrl={business.googleMapsUrl}
               initialReviewUrl={googleUrl ?? null}
+              initialReviewScore={business.googleReviewScore}
+              initialReviewCount={business.googleReviewCount}
+              initialDisplayReviewScore={business.displayGoogleReviewScore}
+              initialDisplayReviewCount={business.displayGoogleReviewCount}
             />
           </>
         )}

@@ -1,9 +1,12 @@
 import type { ReactNode } from "react";
 import {
+  BadgePercent,
   BadgeDollarSign,
   ChevronDown,
+  Clock3,
   ContactRound,
   ExternalLink,
+  ListChecks,
   MapPinned,
   Phone,
   ShieldCheck,
@@ -24,6 +27,8 @@ import {
 } from "@/lib/public-actions";
 import type { PublicBusiness, PublicModule } from "@/lib/public-business";
 import { formatMoney, type PricingConfig } from "@/lib/pricing";
+import { promotionIsExpired } from "@/lib/promotions";
+import { weekDayLabels } from "@/lib/work-hours";
 import { trustEntryState } from "@/lib/trust";
 import { toolDescriptions } from "@/lib/tool-presentation";
 
@@ -87,6 +92,10 @@ function ContactPresentation({
           href: callHref,
           external: false,
           icon: Phone,
+          sublabel:
+            module.config.emergencyEnabled && module.config.emergencyLabel
+              ? module.config.emergencyLabel
+              : null,
         }
       : null,
     whatsappHref
@@ -96,6 +105,7 @@ function ContactPresentation({
           href: whatsappHref,
           external: true,
           icon: WhatsAppIcon,
+          sublabel: null,
         }
       : null,
   ].filter(Boolean);
@@ -113,7 +123,7 @@ function ContactPresentation({
           (action) =>
             action && (
               <TrackedLink
-                className="public-quick-action"
+                className={`public-quick-action public-quick-action-${action.type.toLowerCase()}`}
                 href={action.href}
                 key={action.type}
                 slug={business.slug}
@@ -123,7 +133,10 @@ function ContactPresentation({
                 {...externalProps(action.external)}
               >
                 <action.icon size={21} aria-hidden="true" />
-                <span>{action.label}</span>
+                <span className="public-quick-action-label">
+                  <span>{action.label}</span>
+                  {action.sublabel && <small>{action.sublabel}</small>}
+                </span>
                 {action.external && (
                   <span className="sr-only"> (opens in a new tab)</span>
                 )}
@@ -215,6 +228,115 @@ function PublicPriceList({
         </section>
       ))}
     </div>
+  );
+}
+
+function ServicesPresentation({
+  module,
+}: {
+  module: Extract<PublicModule, { type: "SERVICES" }>;
+}) {
+  const categories = module.config.categories.filter(
+    (category) => category.items.length > 0,
+  );
+  if (!categories.length) return null;
+  return (
+    <section
+      className="action-module public-services"
+      aria-labelledby="services-heading"
+    >
+      <div className="public-module-heading">
+        <ListChecks size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Services</p>
+          <h2 id="services-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      <div className="public-service-categories">
+        {categories.map((category) => (
+          <section key={category.id}>
+            <h3>{category.name}</h3>
+            {category.items.map((item) => (
+              <div className="public-service-row" key={item.id}>
+                <strong>{item.name}</strong>
+                {item.description && <p>{item.description}</p>}
+              </div>
+            ))}
+          </section>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function WorkHoursPresentation({
+  module,
+}: {
+  module: Extract<PublicModule, { type: "WORK_HOURS" }>;
+}) {
+  if (!module.config.days.some((entry) => entry.status !== "CLOSED"))
+    return null;
+  return (
+    <section
+      className="action-module public-work-hours"
+      aria-labelledby="hours-heading"
+    >
+      <div className="public-module-heading">
+        <Clock3 size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Availability</p>
+          <h2 id="hours-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      <dl>
+        {module.config.days.map((entry) => (
+          <div key={entry.day}>
+            <dt>{weekDayLabels[entry.day]}</dt>
+            <dd>
+              {entry.status === "CLOSED"
+                ? "Closed"
+                : entry.status === "OPEN_24_HOURS"
+                  ? "Open 24 hours"
+                  : `${entry.opensAt}–${entry.closesAt}`}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
+function PromotionsPresentation({
+  module,
+}: {
+  module: Extract<PublicModule, { type: "PROMOTIONS" }>;
+}) {
+  const offers = module.config.offers.filter(
+    (offer) => !promotionIsExpired(offer.validUntil),
+  );
+  if (!offers.length) return null;
+  return (
+    <section
+      className="action-module public-promotions"
+      aria-labelledby="promotions-heading"
+    >
+      <div className="public-module-heading">
+        <BadgePercent size={25} aria-hidden="true" />
+        <div>
+          <p className="action-kicker">Special offers</p>
+          <h2 id="promotions-heading">{module.config.label}</h2>
+        </div>
+      </div>
+      <div className="public-promotion-list">
+        {offers.map((offer) => (
+          <article key={offer.id}>
+            <strong>{offer.title}</strong>
+            {offer.description && <p>{offer.description}</p>}
+            {offer.validUntil && <small>Valid until {offer.validUntil}</small>}
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -492,6 +614,32 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             {module.config.label}
           </a>
         </section>
+      ) : null,
+  },
+  SERVICES: {
+    analyticsEvent: "services_viewed",
+    render: ({ module }) =>
+      module.type === "SERVICES" &&
+      module.config.categories.some((category) => category.items.length > 0) ? (
+        <ServicesPresentation module={module} />
+      ) : null,
+  },
+  WORK_HOURS: {
+    analyticsEvent: "work_hours_viewed",
+    render: ({ module }) =>
+      module.type === "WORK_HOURS" &&
+      module.config.days.some((entry) => entry.status !== "CLOSED") ? (
+        <WorkHoursPresentation module={module} />
+      ) : null,
+  },
+  PROMOTIONS: {
+    analyticsEvent: "promotions_viewed",
+    render: ({ module }) =>
+      module.type === "PROMOTIONS" &&
+      module.config.offers.some(
+        (offer) => !promotionIsExpired(offer.validUntil),
+      ) ? (
+        <PromotionsPresentation module={module} />
       ) : null,
   },
 };

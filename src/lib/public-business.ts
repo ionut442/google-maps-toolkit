@@ -6,6 +6,7 @@ import {
   type ModuleConfigByType,
   type ModuleType,
 } from "./domain";
+import { trustEntryState } from "./trust";
 
 export type PublicModule = {
   [K in ModuleType]: {
@@ -28,6 +29,10 @@ export type PublicBusiness = {
   industry: string;
   customIndustryLabel: string | null;
   googleReviewUrl: string | null;
+  googleReviewScore: number | null;
+  googleReviewCount: number | null;
+  displayGoogleReviewScore: boolean;
+  displayGoogleReviewCount: boolean;
   primaryAction: string | null;
   modules: PublicModule[];
   trustEvidence?: Array<{
@@ -81,6 +86,10 @@ export function toPublicBusiness(
     industry: business.industry,
     customIndustryLabel: business.customIndustryLabel,
     googleReviewUrl: business.googleReviewUrl,
+    googleReviewScore: business.googleReviewScore,
+    googleReviewCount: business.googleReviewCount,
+    displayGoogleReviewScore: business.displayGoogleReviewScore,
+    displayGoogleReviewCount: business.displayGoogleReviewCount,
     primaryAction: business.primaryAction,
     trustEvidence: business.trustEvidence ?? [],
     modules: business.modules
@@ -109,6 +118,10 @@ export async function findPublicBusinessBySlug(
       industry: true,
       customIndustryLabel: true,
       googleReviewUrl: true,
+      googleReviewScore: true,
+      googleReviewCount: true,
+      displayGoogleReviewScore: true,
+      displayGoogleReviewCount: true,
       primaryAction: true,
       modules: {
         where: { enabled: true },
@@ -127,7 +140,21 @@ export async function findPublicBusinessBySlug(
     },
   });
   if (!business) return null;
-  return toPublicBusiness(business);
+  const publicBusiness = toPublicBusiness(business);
+  const trust = publicBusiness.modules.find(
+    (module) => module.type === "TRUST",
+  );
+  const visibleEntryIds = new Set(
+    trust?.type === "TRUST"
+      ? trust.config.entries
+          .filter((entry) => trustEntryState(entry.expiresOn) !== "EXPIRED")
+          .map((entry) => entry.id)
+      : [],
+  );
+  publicBusiness.trustEvidence = (publicBusiness.trustEvidence ?? []).filter(
+    (evidence) => visibleEntryIds.has(evidence.entryId),
+  );
+  return publicBusiness;
 }
 
 export const getPublicBusiness = cache(findPublicBusinessBySlug);

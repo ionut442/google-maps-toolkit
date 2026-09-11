@@ -1,8 +1,11 @@
 import { z } from "zod";
 import { quoteModuleConfigSchema } from "./quote-config";
 import { pricingConfigSchema } from "./pricing";
+import { promotionsConfigSchema } from "./promotions";
 import { serviceAreaConfigSchema } from "./service-area";
+import { servicesConfigSchema } from "./services";
 import { trustConfigSchema } from "./trust";
+import { workHoursConfigSchema } from "./work-hours";
 
 export const industries = [
   "PLUMBING",
@@ -44,6 +47,9 @@ export const moduleTypes = [
   "FAQ",
   "REVIEW",
   "SAVE_CONTACT",
+  "SERVICES",
+  "WORK_HOURS",
+  "PROMOTIONS",
 ] as const;
 export type ModuleType = (typeof moduleTypes)[number];
 
@@ -64,6 +70,9 @@ export const labels: Record<ModuleType, string> = {
   FAQ: "FAQs",
   REVIEW: "Google Reviews",
   SAVE_CONTACT: "Save Contact",
+  SERVICES: "Services",
+  WORK_HOURS: "Working Hours",
+  PROMOTIONS: "Special Offers",
 };
 
 export const MAX_FAQS = 12;
@@ -81,9 +90,15 @@ export const moduleConfigSchemas = {
       callLabel: z.string().min(1).max(60),
       whatsappLabel: z.string().min(1).max(60),
       emergencyLabel: z.string().max(60).optional(),
+      emergencyEnabled: z.boolean().optional(),
       whatsappMessage: z.string().trim().max(300).optional(),
     })
-    .strict(),
+    .strict()
+    .transform((config) => ({
+      ...config,
+      emergencyEnabled:
+        config.emergencyEnabled ?? Boolean(config.emergencyLabel?.trim()),
+    })),
   QUOTE_REQUEST: quoteModuleConfigSchema,
   PRICING: pricingConfigSchema,
   SERVICE_AREA: serviceAreaConfigSchema,
@@ -96,6 +111,9 @@ export const moduleConfigSchemas = {
     .strict(),
   REVIEW: z.object({ label: z.string().min(1).max(60) }).strict(),
   SAVE_CONTACT: z.object({ label: z.string().min(1).max(60) }).strict(),
+  SERVICES: servicesConfigSchema,
+  WORK_HOURS: workHoursConfigSchema,
+  PROMOTIONS: promotionsConfigSchema,
 } satisfies Record<ModuleType, z.ZodType>;
 
 export type ModuleConfigByType = {

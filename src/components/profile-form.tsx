@@ -17,6 +17,10 @@ type Profile = {
   googleReviewUrl: string | null;
   googleBusinessName: string | null;
   googleMapsUrl: string | null;
+  googleReviewScore?: number | null;
+  googleReviewCount?: number | null;
+  displayGoogleReviewScore?: boolean;
+  displayGoogleReviewCount?: boolean;
 };
 
 const validHex = (value: string) => /^#[0-9A-F]{6}$/.test(value);
@@ -271,6 +275,10 @@ export function ProfileForm({
           <GoogleReviewConnectionField
             initialMapsUrl={business.googleMapsUrl}
             initialReviewUrl={business.googleReviewUrl}
+            initialReviewScore={business.googleReviewScore}
+            initialReviewCount={business.googleReviewCount}
+            initialDisplayReviewScore={business.displayGoogleReviewScore}
+            initialDisplayReviewCount={business.displayGoogleReviewCount}
             fieldError={error("googleMapsUrl")}
           />
           <input

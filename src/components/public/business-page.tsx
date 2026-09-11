@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AnalyticsPageView } from "@/components/public/analytics-client";
 import { PublicModuleRenderer } from "@/components/public/module-renderer";
+import { GoogleReviewSummary } from "@/components/google-review-summary";
 import { businessTypeLabel } from "@/lib/domain";
 import { safeHttpUrl } from "@/lib/public-actions";
 import type { PublicBusiness } from "@/lib/public-business";
@@ -48,6 +49,7 @@ export function BusinessPage({
             </div>
           )}
           <h1>{business.name}</h1>
+          <GoogleReviewSummary business={business} />
           {business.description && (
             <p className="action-description">{business.description}</p>
           )}

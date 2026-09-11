@@ -18,6 +18,10 @@ describe("public tool cards", () => {
       industry: "PLUMBING",
       customIndustryLabel: null,
       googleReviewUrl: null,
+      googleReviewScore: null,
+      googleReviewCount: null,
+      displayGoogleReviewScore: false,
+      displayGoogleReviewCount: false,
       primaryAction: "CALL",
       modules: [
         {
@@ -27,6 +31,7 @@ describe("public tool cards", () => {
             callLabel: "Call now",
             whatsappLabel: "Message on WhatsApp",
             whatsappMessage: "Hello",
+            emergencyEnabled: false,
           },
         },
         {
@@ -74,6 +79,10 @@ describe("public tool cards", () => {
       industry: "HEATING",
       customIndustryLabel: null,
       googleReviewUrl: null,
+      googleReviewScore: null,
+      googleReviewCount: null,
+      displayGoogleReviewScore: false,
+      displayGoogleReviewCount: false,
       primaryAction: null,
       modules: [
         {

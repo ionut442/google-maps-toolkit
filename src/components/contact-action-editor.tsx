@@ -68,6 +68,47 @@ export function ContactActionEditor({
           <small id="whatsapp-message-help">
             Customers will see this message ready to send.
           </small>
+          <fieldset className="emergency-availability">
+            <legend>Emergency availability</legend>
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                name="emergencyEnabled"
+                checked={draft.emergencyEnabled}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    emergencyEnabled: event.currentTarget.checked,
+                  })
+                }
+              />
+              Emergency / 24-7 calls available
+            </label>
+            {draft.emergencyEnabled && (
+              <label>
+                Availability label
+                <input
+                  name="emergencyLabel"
+                  value={draft.emergencyLabel ?? ""}
+                  onChange={(event) =>
+                    setDraft({
+                      ...draft,
+                      emergencyLabel: event.currentTarget.value,
+                    })
+                  }
+                  list="emergency-label-options"
+                  maxLength={40}
+                  placeholder="24/7 emergency"
+                  required
+                />
+                <datalist id="emergency-label-options">
+                  <option value="24/7" />
+                  <option value="Emergency calls" />
+                  <option value="24/7 emergency" />
+                </datalist>
+              </label>
+            )}
+          </fieldset>
           <details className="advanced-options">
             <summary>Button text</summary>
             <div className="stack-form">
@@ -98,21 +139,6 @@ export function ContactActionEditor({
                   required
                 />
               </label>
-              <label>
-                Emergency call button
-                <input
-                  name="emergencyLabel"
-                  value={draft.emergencyLabel}
-                  onChange={(event) =>
-                    setDraft({
-                      ...draft,
-                      emergencyLabel: event.currentTarget.value,
-                    })
-                  }
-                  maxLength={40}
-                  required
-                />
-              </label>
             </div>
           </details>
           <SubmitButton>Save changes</SubmitButton>
@@ -125,7 +151,12 @@ export function ContactActionEditor({
           <div className="contact-preview-actions">
             <span>
               <Phone size={20} aria-hidden="true" />
-              {draft.callLabel}
+              <span>
+                {draft.callLabel}
+                {draft.emergencyEnabled && draft.emergencyLabel && (
+                  <small>{draft.emergencyLabel}</small>
+                )}
+              </span>
             </span>
             <span>
               <MessageCircle size={20} aria-hidden="true" />

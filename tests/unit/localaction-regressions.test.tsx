@@ -92,6 +92,10 @@ describe("LocalAction real-user regressions", () => {
       industry: "PLUMBING",
       customIndustryLabel: null,
       googleReviewUrl: null,
+      googleReviewScore: null,
+      googleReviewCount: null,
+      displayGoogleReviewScore: false,
+      displayGoogleReviewCount: false,
       primaryAction: null,
       modules: [],
     };
@@ -157,6 +161,10 @@ describe("LocalAction real-user regressions", () => {
           phone: "+40700111222",
           email: "owner@example.test",
           googleMapsUrl: "https://maps.app.goo.gl/example",
+          googleReviewScore: null,
+          googleReviewCount: null,
+          displayGoogleReviewScore: false,
+          displayGoogleReviewCount: false,
         }}
       />,
     );

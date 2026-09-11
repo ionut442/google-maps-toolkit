@@ -85,8 +85,34 @@ export class GoogleReviewLinkError extends Error {
 }
 
 export type ExtractReviewLinkResult =
-  | { success: true; placeId: string; reviewUrl: string }
+  | {
+      success: true;
+      placeId: string;
+      reviewUrl: string;
+      reviewScore: number | null;
+      reviewCount: number | null;
+    }
   | { success: false; error: string };
+
+export type GoogleReviewStats = {
+  reviewScore: number | null;
+  reviewCount: number | null;
+};
+
+const storedReviewScoreSchema = z
+  .union([z.literal(""), z.coerce.number().min(0).max(5).multipleOf(0.01)])
+  .transform((value) => (value === "" ? null : value));
+const storedReviewCountSchema = z
+  .union([z.literal(""), z.coerce.number().int().min(0).max(2_147_483_647)])
+  .transform((value) => (value === "" ? null : value));
+
+export const googleReviewSnapshotSchema = z.object({
+  googleReviewScore: storedReviewScoreSchema,
+  googleReviewCount: storedReviewCountSchema,
+  displayGoogleReviewScore: z.boolean(),
+  displayGoogleReviewCount: z.boolean(),
+  googleReviewStatsRefreshed: z.boolean(),
+});
 
 function parseGoogleUrl(input: string, redirect = false) {
   const result = googleUrlSchema.safeParse(input);
@@ -208,6 +234,95 @@ function placeIdFromHtml(html: string) {
   return validPlaceId(commonBusinessId);
 }
 
+function parseRating(value: unknown) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const normalized = String(value).trim().replace(",", ".");
+  if (!/^\d(?:\.\d{1,2})?$/.test(normalized)) return null;
+  const rating = Number(normalized);
+  return rating >= 0 && rating <= 5 ? rating : null;
+}
+
+function parseExactReviewCount(value: unknown) {
+  if (typeof value !== "string" && typeof value !== "number") return null;
+  const normalized = String(value).trim();
+  if (/[kmb]/i.test(normalized)) return null;
+  if (
+    !/^\d+$/.test(normalized) &&
+    !/^\d{1,3}(?:[\s,.\u00a0\u202f]\d{3})+$/.test(normalized)
+  )
+    return null;
+  const count = Number(normalized.replace(/[\s,.\u00a0\u202f]/g, ""));
+  return Number.isSafeInteger(count) && count >= 0 && count <= 2_147_483_647
+    ? count
+    : null;
+}
+
+function structuredRating(value: unknown): GoogleReviewStats | null {
+  if (!value || typeof value !== "object") return null;
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const found = structuredRating(item);
+      if (found) return found;
+    }
+    return null;
+  }
+  const record = value as Record<string, unknown>;
+  const aggregate = record.aggregateRating;
+  if (aggregate && typeof aggregate === "object") {
+    const ratingRecord = aggregate as Record<string, unknown>;
+    const reviewScore = parseRating(ratingRecord.ratingValue);
+    const reviewCount = parseExactReviewCount(
+      ratingRecord.reviewCount ?? ratingRecord.ratingCount,
+    );
+    if (reviewScore !== null || reviewCount !== null)
+      return { reviewScore, reviewCount };
+  }
+  if (record["@graph"]) return structuredRating(record["@graph"]);
+  return null;
+}
+
+export function extractGoogleReviewStats(html: string): GoogleReviewStats {
+  for (const match of html.matchAll(
+    /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
+  )) {
+    try {
+      const found = structuredRating(JSON.parse(match[1]));
+      if (found) return found;
+    } catch {
+      // Malformed third-party structured data is ignored.
+    }
+  }
+
+  for (const variant of decodedVariants(html)) {
+    const combined = variant.match(
+      /([0-5](?:[.,]\d{1,2})?)\s*(?:stars?|out of 5)[^\d]{0,80}(\d[\d\s,.\u00a0\u202f]*?)\s+(?:Google\s+)?reviews?/i,
+    );
+    if (combined) {
+      const reviewScore = parseRating(combined[1]);
+      const reviewCount = parseExactReviewCount(combined[2]);
+      if (reviewScore !== null || reviewCount !== null)
+        return { reviewScore, reviewCount };
+    }
+
+    const aggregate = variant.match(
+      /["']aggregateRating["']\s*:\s*\{([\s\S]{0,1000}?)\}/i,
+    )?.[1];
+    if (aggregate) {
+      const score = aggregate.match(
+        /["']ratingValue["']\s*:\s*["']?([0-5](?:[.,]\d{1,2})?)/i,
+      )?.[1];
+      const count = aggregate.match(
+        /["'](?:reviewCount|ratingCount)["']\s*:\s*["']?(\d[\d\s,.\u00a0\u202f]*)/i,
+      )?.[1];
+      const reviewScore = parseRating(score);
+      const reviewCount = parseExactReviewCount(count);
+      if (reviewScore !== null || reviewCount !== null)
+        return { reviewScore, reviewCount };
+    }
+  }
+  return { reviewScore: null, reviewCount: null };
+}
+
 function hexPairFromText(value: string) {
   for (const variant of decodedVariants(value)) {
     const patterns = [
@@ -257,15 +372,18 @@ export function generateGoogleReviewUrl(placeId: string) {
   return url.toString();
 }
 
-export async function resolveGooglePlaceId(
+async function resolveGoogleListing(
   input: string,
-  options: { timeoutMs?: number } = {},
+  options: { timeoutMs?: number; includeStats?: boolean } = {},
 ) {
   let url = parseGoogleUrl(input);
   const direct = placeIdFromUrl(url);
-  if (direct) return direct;
+  if (direct) return { placeId: direct, reviewScore: null, reviewCount: null };
   const directHexPair = hexPairFromText(url.toString());
-  if (directHexPair) return directHexPair;
+  if (directHexPair)
+    return { placeId: directHexPair, reviewScore: null, reviewCount: null };
+
+  let candidatePlaceId: string | null = null;
 
   const controller = new AbortController();
   const timeout = setTimeout(
@@ -291,6 +409,12 @@ export async function resolveGooglePlaceId(
           },
         });
       } catch {
+        if (candidatePlaceId)
+          return {
+            placeId: candidatePlaceId,
+            reviewScore: null,
+            reviewCount: null,
+          };
         if (controller.signal.aborted)
           throw new GoogleReviewLinkError("TIMEOUT");
         throw new GoogleReviewLinkError("GOOGLE_FETCH_FAILED");
@@ -299,27 +423,67 @@ export async function resolveGooglePlaceId(
       if (response.status >= 300 && response.status < 400) {
         const location = response.headers.get("location");
         if (!location) throw new GoogleReviewLinkError("GOOGLE_FETCH_FAILED");
-        if (redirectCount === MAX_REDIRECTS)
+        if (redirectCount === MAX_REDIRECTS) {
+          if (candidatePlaceId)
+            return {
+              placeId: candidatePlaceId,
+              reviewScore: null,
+              reviewCount: null,
+            };
           throw new GoogleReviewLinkError("TOO_MANY_REDIRECTS");
+        }
         url = parseGoogleUrl(new URL(location, url).toString(), true);
         const redirected = placeIdFromUrl(url);
-        if (redirected) return redirected;
         const redirectedHexPair = hexPairFromText(url.toString());
-        if (redirectedHexPair) return redirectedHexPair;
+        candidatePlaceId = redirected ?? redirectedHexPair ?? candidatePlaceId;
+        if (candidatePlaceId && !options.includeStats)
+          return {
+            placeId: candidatePlaceId,
+            reviewScore: null,
+            reviewCount: null,
+          };
         continue;
       }
-      if (!response.ok) throw new GoogleReviewLinkError("GOOGLE_FETCH_FAILED");
+      if (!response.ok) {
+        if (candidatePlaceId)
+          return {
+            placeId: candidatePlaceId,
+            reviewScore: null,
+            reviewCount: null,
+          };
+        throw new GoogleReviewLinkError("GOOGLE_FETCH_FAILED");
+      }
       const finalUrl = parseGoogleUrl(response.url || url.toString(), true);
       const fromFinalUrl = placeIdFromUrl(finalUrl);
-      if (fromFinalUrl) return fromFinalUrl;
-      const html = await readBoundedText(response);
-      const fromHtml = placeIdFromHtml(html);
-      if (fromHtml) return fromHtml;
+      const genericSearch = /^\/maps\/search(?:\/|$)/i.test(finalUrl.pathname);
+      let html: string;
+      try {
+        html = await readBoundedText(response);
+      } catch (error) {
+        if (candidatePlaceId)
+          return {
+            placeId: candidatePlaceId,
+            reviewScore: null,
+            reviewCount: null,
+          };
+        throw error;
+      }
+      const fromHtml = genericSearch ? null : placeIdFromHtml(html);
       const fromFinalHexPair = hexPairFromText(finalUrl.toString());
-      if (fromFinalHexPair) return fromFinalHexPair;
-      const fromHtmlHexPair = hexPairFromText(html);
-      if (fromHtmlHexPair) return fromHtmlHexPair;
-      throw new GoogleReviewLinkError("PLACE_ID_NOT_FOUND");
+      const fromHtmlHexPair = genericSearch ? null : hexPairFromText(html);
+      const placeId =
+        fromFinalUrl ??
+        fromHtml ??
+        fromFinalHexPair ??
+        fromHtmlHexPair ??
+        candidatePlaceId;
+      if (!placeId) throw new GoogleReviewLinkError("PLACE_ID_NOT_FOUND");
+      return {
+        placeId,
+        ...(options.includeStats
+          ? extractGoogleReviewStats(html)
+          : { reviewScore: null, reviewCount: null }),
+      };
     }
     throw new GoogleReviewLinkError("TOO_MANY_REDIRECTS");
   } finally {
@@ -327,15 +491,27 @@ export async function resolveGooglePlaceId(
   }
 }
 
+export async function resolveGooglePlaceId(
+  input: string,
+  options: { timeoutMs?: number } = {},
+) {
+  return (await resolveGoogleListing(input, options)).placeId;
+}
+
 export async function extractGoogleReviewLink(
   input: string,
 ): Promise<ExtractReviewLinkResult> {
   try {
-    const placeId = await resolveGooglePlaceId(input);
+    const { placeId, reviewScore, reviewCount } = await resolveGoogleListing(
+      input,
+      { includeStats: true },
+    );
     return {
       success: true,
       placeId,
       reviewUrl: generateGoogleReviewUrl(placeId),
+      reviewScore,
+      reviewCount,
     };
   } catch {
     return { success: false, error: FRIENDLY_ERROR };

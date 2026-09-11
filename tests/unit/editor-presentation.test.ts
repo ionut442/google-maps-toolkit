@@ -81,6 +81,7 @@ describe("purpose-built editor presentation", () => {
           callLabel: "Call us",
           whatsappLabel: "Message us",
           emergencyLabel: "Emergency call",
+          emergencyEnabled: true,
           whatsappMessage: "Please send a quote.",
         },
       }),
@@ -94,6 +95,7 @@ describe("purpose-built editor presentation", () => {
       "whatsappLabel",
       "emergencyLabel",
       "whatsappMessage",
+      "emergencyEnabled",
     ])
       expect(html).toContain(`name="${name}"`);
     expect(html).toMatch(

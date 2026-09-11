@@ -22,7 +22,7 @@ export async function GET(
         "Content-Type": evidence.mediaType,
         "Content-Length": String(bytes.byteLength),
         "Content-Disposition": `inline; filename="${encodeURIComponent(evidence.originalFilename)}"`,
-        "Cache-Control": "public, max-age=3600",
+        "Cache-Control": "private, no-store",
         "X-Content-Type-Options": "nosniff",
         "Content-Security-Policy": "default-src 'none'; sandbox",
       },

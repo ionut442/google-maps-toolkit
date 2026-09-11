@@ -36,8 +36,8 @@ export async function saveOwnedTrustConfig(
   userId: string,
   businessId: string,
   input: unknown,
-  storage: PrivateObjectStorage = publicStorage,
-  legacyStorage: PrivateObjectStorage = privateStorage,
+  storage: PrivateObjectStorage = privateStorage,
+  legacyStorage: PrivateObjectStorage = publicStorage,
 ) {
   const business = await requireOwnedBusiness(userId, businessId);
   const item = business.modules.find((module) => module.type === "TRUST");
@@ -70,7 +70,7 @@ export async function saveOwnedTrustConfig(
   ]);
   await Promise.allSettled(
     removed.map((entry) =>
-      (entry.storageScope === "PUBLIC" ? storage : legacyStorage).delete(
+      (entry.storageScope === "PRIVATE" ? storage : legacyStorage).delete(
         entry.objectKey,
       ),
     ),

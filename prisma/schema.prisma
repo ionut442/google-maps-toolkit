@@ -31,32 +31,37 @@ model Session {
 }
 
 model Business {
-  id              String           @id @default(cuid())
-  name            String
-  slug            String           @unique
-  industry        String
-  customIndustryLabel String?
-  logoUrl         String?
-  description     String           @default("")
-  phone           String           @default("")
-  whatsapp        String           @default("")
-  email           String
-  website         String?
-  brandColor      String           @default("#2563eb")
-  googleReviewUrl String?
-  googleBusinessName String?
-  googleMapsUrl   String?
-  primaryAction   String?
-  published       Boolean          @default(false)
-  onboardingStep  Int              @default(2)
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  memberships     Membership[]
-  modules         BusinessModule[]
-  quoteRequests   QuoteRequest[]
-  quoteRateLimits QuoteRateLimit[]
-  trustEvidence   TrustEvidence[]
-  analyticsEvents AnalyticsEvent[]
+  id                         String           @id @default(cuid())
+  name                       String
+  slug                       String           @unique
+  industry                   String
+  customIndustryLabel        String?
+  logoUrl                    String?
+  description                String           @default("")
+  phone                      String           @default("")
+  whatsapp                   String           @default("")
+  email                      String
+  website                    String?
+  brandColor                 String           @default("#2563eb")
+  googleReviewUrl            String?
+  googleBusinessName         String?
+  googleMapsUrl              String?
+  googleReviewScore          Float?
+  googleReviewCount          Int?
+  googleReviewStatsUpdatedAt DateTime?
+  displayGoogleReviewScore   Boolean          @default(false)
+  displayGoogleReviewCount   Boolean          @default(false)
+  primaryAction              String?
+  published                  Boolean          @default(false)
+  onboardingStep             Int              @default(2)
+  createdAt                  DateTime         @default(now())
+  updatedAt                  DateTime         @updatedAt
+  memberships                Membership[]
+  modules                    BusinessModule[]
+  quoteRequests              QuoteRequest[]
+  quoteRateLimits            QuoteRateLimit[]
+  trustEvidence              TrustEvidence[]
+  analyticsEvents            AnalyticsEvent[]
 }
 
 model AnalyticsEvent {
@@ -101,16 +106,16 @@ model Membership {
 }
 
 model BusinessModule {
-  id         String   @id @default(cuid())
-  type       String
-  enabled    Boolean  @default(true)
-  sortOrder  Int
-  config     String   @default("{}")
+  id           String    @id @default(cuid())
+  type         String
+  enabled      Boolean   @default(true)
+  sortOrder    Int
+  config       String    @default("{}")
   customizedAt DateTime?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  businessId String
-  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  businessId   String
+  business     Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@unique([businessId, type])
   @@index([businessId, sortOrder])

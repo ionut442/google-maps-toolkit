@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   extractGoogleReviewLink,
+  extractGoogleReviewStats,
   generateGoogleReviewUrl,
   googleMapsHexPairToPlaceId,
   GoogleReviewLinkError,
@@ -72,6 +73,8 @@ describe("Google review link resolution", () => {
       success: true,
       placeId: penangPlaceId,
       reviewUrl: generateGoogleReviewUrl(penangPlaceId),
+      reviewScore: null,
+      reviewCount: null,
     });
   });
 
@@ -109,6 +112,8 @@ describe("Google review link resolution", () => {
       success: true,
       placeId,
       reviewUrl: generateGoogleReviewUrl(placeId),
+      reviewScore: null,
+      reviewCount: null,
     });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -217,5 +222,55 @@ describe("Google review link resolution", () => {
     expect(() => generateGoogleReviewUrl("0x123:0x456")).toThrow(
       GoogleReviewLinkError,
     );
+  });
+
+  it("extracts exact Google review details when present", () => {
+    expect(
+      extractGoogleReviewStats(`
+        <script type="application/ld+json">
+          {"@type":"LocalBusiness","aggregateRating":{"ratingValue":"4.8","reviewCount":"1,234"}}
+        </script>`),
+    ).toEqual({ reviewScore: 4.8, reviewCount: 1234 });
+    expect(
+      extractGoogleReviewStats("Rated 4.7 stars from 89 Google reviews"),
+    ).toEqual({ reviewScore: 4.7, reviewCount: 89 });
+  });
+
+  it("leaves missing or abbreviated review details unavailable", () => {
+    expect(
+      extractGoogleReviewStats("<html>No aggregate rating</html>"),
+    ).toEqual({ reviewScore: null, reviewCount: null });
+    expect(extractGoogleReviewStats("4.8 stars · 1.2K reviews")).toEqual({
+      reviewScore: null,
+      reviewCount: null,
+    });
+  });
+
+  it("rejects the supplied generic-search redirect instead of guessing a business", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(
+          new Response(null, {
+            status: 302,
+            headers: {
+              location:
+                "https://www.google.com/maps/search/plumber/@51.5068727,-0.2464961,13z",
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          new Response(
+            `<html>Results for plumber <script>window.placeId = "${placeId}"</script></html>`,
+          ),
+        ),
+    );
+    await expect(
+      extractGoogleReviewLink("https://maps.app.goo.gl/nr1vSpyzwnpSYjnT9"),
+    ).resolves.toEqual({
+      success: false,
+      error: expect.stringContaining("correct business"),
+    });
   });
 });

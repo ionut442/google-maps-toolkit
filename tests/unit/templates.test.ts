@@ -13,11 +13,24 @@ describe("industry templates", () => {
   it("covers every initial service category with controlled modules", () => {
     expect(Object.keys(templates)).toHaveLength(15);
     for (const template of Object.values(templates)) {
-      expect(template.modules.length).toBe(8);
-      expect(new Set(template.modules.map((m) => m.type)).size).toBe(8);
+      expect(template.modules.length).toBe(moduleTypes.length);
+      expect(new Set(template.modules.map((m) => m.type)).size).toBe(
+        moduleTypes.length,
+      );
       expect(template.modules.every((m) => moduleTypes.includes(m.type))).toBe(
         true,
       );
+      for (const toolModule of template.modules)
+        expect(() =>
+          parseModuleConfig(toolModule.type, toolModule.config),
+        ).not.toThrow();
+      expect(
+        template.modules
+          .filter((module) =>
+            ["SERVICES", "WORK_HOURS", "PROMOTIONS"].includes(module.type),
+          )
+          .every((module) => module.enabled === false),
+      ).toBe(true);
     }
   });
   it("provides strong plumbing defaults", () => {
@@ -28,7 +41,7 @@ describe("industry templates", () => {
         .filter((module) => module.enabled)
         .map(({ type }) => type),
     ).toEqual(["CALL_WHATSAPP", "SAVE_CONTACT"]);
-    expect(JSON.stringify(template)).toContain("Emergency call");
+    expect(JSON.stringify(template)).toContain("24/7 emergency");
   });
   it("uses industry-specific cleaning quote fields", () =>
     expect(JSON.stringify(getTemplate("CLEANING"))).toContain(

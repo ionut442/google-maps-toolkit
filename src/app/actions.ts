@@ -59,6 +59,7 @@ import {
   directGoogleReviewUrlSchema,
   extractGoogleReviewLink,
   googleMapsUrlSchema,
+  googleReviewSnapshotSchema,
   type ExtractReviewLinkResult,
 } from "@/lib/google-review-link";
 import { resolvedGoogleReviewUrl } from "@/lib/profile-behavior";
@@ -74,6 +75,31 @@ export async function extractReviewLinkAction(
 ): Promise<ExtractReviewLinkResult> {
   await requireUser();
   return extractGoogleReviewLink(input);
+}
+
+function reviewSnapshotFromForm(
+  formData: FormData,
+  previousUpdatedAt: Date | null,
+) {
+  const snapshot = googleReviewSnapshotSchema.parse({
+    googleReviewScore: String(formData.get("googleReviewScore") ?? ""),
+    googleReviewCount: String(formData.get("googleReviewCount") ?? ""),
+    displayGoogleReviewScore: formData.has("displayGoogleReviewScore"),
+    displayGoogleReviewCount: formData.has("displayGoogleReviewCount"),
+    googleReviewStatsRefreshed:
+      formData.get("googleReviewStatsRefreshed") === "true",
+  });
+  return {
+    googleReviewScore: snapshot.googleReviewScore,
+    googleReviewCount: snapshot.googleReviewCount,
+    displayGoogleReviewScore:
+      snapshot.googleReviewScore !== null && snapshot.displayGoogleReviewScore,
+    displayGoogleReviewCount:
+      snapshot.googleReviewCount !== null && snapshot.displayGoogleReviewCount,
+    googleReviewStatsUpdatedAt: snapshot.googleReviewStatsRefreshed
+      ? new Date()
+      : previousUpdatedAt,
+  };
 }
 const values = (formData: FormData) => Object.fromEntries(formData.entries());
 const invalid = (error: {
@@ -204,6 +230,10 @@ export async function saveProfileAction(
     resolvedForMapsUrl:
       String(formData.get("resolvedGoogleMapsUrl") ?? "") || null,
   });
+  const reviewSnapshot = reviewSnapshotFromForm(
+    formData,
+    business.googleReviewStatsUpdatedAt,
+  );
   try {
     await db.business.update({
       where: { id: business.id },
@@ -211,6 +241,7 @@ export async function saveProfileAction(
         ...parsed.data,
         logoUrl: nextLogoUrl,
         googleReviewUrl,
+        ...reviewSnapshot,
         phone: normalizePhone(parsed.data.phone),
         whatsapp: normalizePhone(parsed.data.whatsapp),
         onboardingStep: Math.max(business.onboardingStep, 4),
@@ -238,6 +269,9 @@ export async function saveProfileAction(
     }
   }
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/page");
+  revalidatePath(`/preview/${business.slug}`);
+  revalidatePath(`/${business.slug}`);
   if (String(formData.get("returnTo")) === "publish")
     redirect("/onboarding/publish");
   if (String(formData.get("intent")) === "onboarding")
@@ -359,12 +393,17 @@ export async function saveReviewToolAction(formData: FormData) {
     ...JSON.parse(item.config),
     label: String(formData.get("label") ?? "").trim(),
   });
+  const reviewSnapshot = reviewSnapshotFromForm(
+    formData,
+    business.googleReviewStatsUpdatedAt,
+  );
   await db.$transaction([
     db.business.update({
       where: { id: business.id },
       data: {
         googleMapsUrl: mapsUrl.data,
         googleReviewUrl: reviewUrl.data,
+        ...reviewSnapshot,
       },
     }),
     db.businessModule.update({
@@ -399,7 +438,8 @@ export async function updateContactActionConfigAction(formData: FormData) {
     callLabel: String(formData.get("callLabel") ?? ""),
     whatsappLabel: String(formData.get("whatsappLabel") ?? ""),
     whatsappMessage: String(formData.get("whatsappMessage") ?? ""),
-    emergencyLabel: String(formData.get("emergencyLabel") ?? ""),
+    emergencyEnabled: formData.has("emergencyEnabled"),
+    emergencyLabel: String(formData.get("emergencyLabel") ?? "").trim(),
   });
   await db.businessModule.update({
     where: { id: item.id },
@@ -573,7 +613,13 @@ export async function retryQuoteEmailAction(formData: FormData) {
 
 async function savePurposeConfig(
   formData: FormData,
-  type: "PRICING" | "SERVICE_AREA" | "TRUST",
+  type:
+    | "PRICING"
+    | "SERVICE_AREA"
+    | "TRUST"
+    | "SERVICES"
+    | "WORK_HOURS"
+    | "PROMOTIONS",
 ) {
   const user = await requireUser();
   let input: unknown;
@@ -596,6 +642,15 @@ export async function savePricingAction(formData: FormData) {
 }
 export async function saveServiceAreaAction(formData: FormData) {
   return savePurposeConfig(formData, "SERVICE_AREA");
+}
+export async function saveServicesAction(formData: FormData) {
+  return savePurposeConfig(formData, "SERVICES");
+}
+export async function saveWorkHoursAction(formData: FormData) {
+  return savePurposeConfig(formData, "WORK_HOURS");
+}
+export async function savePromotionsAction(formData: FormData) {
+  return savePurposeConfig(formData, "PROMOTIONS");
 }
 export async function saveTrustAction(formData: FormData) {
   const user = await requireUser();
