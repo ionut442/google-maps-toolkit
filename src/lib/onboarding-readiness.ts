@@ -22,6 +22,19 @@ export function onboardingToolReady(
   return Boolean(module.customizedAt);
 }
 
+export function onboardingToolReadinessDetail(
+  module: ToolReadinessModule,
+  business: { phone: string; googleReviewUrl?: string | null },
+) {
+  if (onboardingToolReady(module, business)) return "Saved and ready";
+  if (
+    (module.type === "CALL_WHATSAPP" || module.type === "SAVE_CONTACT") &&
+    !business.phone.trim()
+  )
+    return "Add a phone number in Business details";
+  return "Review this tool and save your changes";
+}
+
 export function allEnabledToolsReady(
   modules: ToolReadinessModule[],
   business: { phone: string; googleReviewUrl?: string | null },

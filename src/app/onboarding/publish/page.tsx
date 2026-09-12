@@ -17,6 +17,7 @@ import { canPublishBusiness } from "@/lib/domain";
 import { publicBusinessUrl } from "@/lib/public-url";
 import {
   allEnabledToolsReady,
+  onboardingToolReadinessDetail,
   onboardingToolReady,
 } from "@/lib/onboarding-readiness";
 import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
@@ -105,13 +106,7 @@ export default async function PublishPage() {
                       key={module.id}
                       ready={ready}
                       label={labels[type]}
-                      detail={
-                        ready
-                          ? "Saved and ready"
-                          : type === "CALL_WHATSAPP" || type === "SAVE_CONTACT"
-                            ? "Add a phone number in Business details"
-                            : "Review this tool and save your changes"
-                      }
+                      detail={onboardingToolReadinessDetail(module, business)}
                       href={`${toolEditorHref(module.id)}?returnTo=publish`}
                     />
                   );

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   allEnabledToolsReady,
+  onboardingToolReadinessDetail,
   onboardingToolReady,
 } from "@/lib/onboarding-readiness";
 
@@ -31,6 +32,16 @@ describe("onboarding tool readiness", () => {
         phone: "+401234",
       }),
     ).toBe(true);
+    expect(
+      onboardingToolReadinessDetail(makeModule("CALL_WHATSAPP"), {
+        phone: "+401234",
+      }),
+    ).toBe("Review this tool and save your changes");
+    expect(
+      onboardingToolReadinessDetail(makeModule("CALL_WHATSAPP"), {
+        phone: "",
+      }),
+    ).toBe("Add a phone number in Business details");
     expect(onboardingToolReady(makeModule("SAVE_CONTACT"), { phone: "" })).toBe(
       false,
     );
