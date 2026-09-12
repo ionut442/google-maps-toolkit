@@ -1,12 +1,5 @@
 import type { ReactNode } from "react";
-import {
-  ChevronDown,
-  ContactRound,
-  ExternalLink,
-  Phone,
-  ShieldCheck,
-  Star,
-} from "lucide-react";
+import { ChevronDown, ExternalLink, Phone, ShieldCheck } from "lucide-react";
 import { AreaMap } from "@/components/area-map";
 import { ToolIcon } from "@/components/dashboard-ui";
 import { TrackedLink } from "@/components/public/analytics-client";
@@ -560,7 +553,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           className="action-module compact-action-module public-review-module"
           aria-labelledby="review-heading"
         >
-          <Star size={26} aria-hidden="true" />
           <div>
             <p className="action-kicker">Customer feedback</p>
             <h2 id="review-heading">Find us on Google</h2>
@@ -592,7 +584,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           className="action-module compact-action-module public-save-contact"
           aria-labelledby="save-heading"
         >
-          <ContactRound size={26} aria-hidden="true" />
           <div>
             <p className="action-kicker">Keep the details</p>
             <h2 id="save-heading">Save this business</h2>

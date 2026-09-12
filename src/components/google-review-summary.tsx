@@ -13,7 +13,7 @@ export function GoogleReviewSummary({
 }) {
   const score =
     business.displayGoogleReviewScore && business.googleReviewScore !== null
-      ? `★ ${business.googleReviewScore.toFixed(1)}`
+      ? business.googleReviewScore.toFixed(1)
       : null;
   const count =
     business.displayGoogleReviewCount && business.googleReviewCount !== null
@@ -21,10 +21,25 @@ export function GoogleReviewSummary({
       : null;
   if (!score && !count) return null;
   return (
-    <p className="google-review-summary" aria-label="Google review summary">
-      {score}
-      {score && count && <span aria-hidden="true"> · </span>}
-      {count}
+    <p
+      className="google-review-summary"
+      aria-label={[score ? `${score} out of 5` : null, count]
+        .filter(Boolean)
+        .join(", ")}
+    >
+      {score && (
+        <>
+          <span className="google-review-stars" aria-hidden="true">
+            ★★★★★
+          </span>
+          <strong>{score}</strong>
+        </>
+      )}
+      {count && (
+        <span className="google-review-count">
+          {score ? `(${count})` : count}
+        </span>
+      )}
     </p>
   );
 }

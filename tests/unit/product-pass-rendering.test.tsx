@@ -126,7 +126,10 @@ describe("product pass public rendering", () => {
   it("renders review score and count independently without empty punctuation", () => {
     expect(
       renderToStaticMarkup(<GoogleReviewSummary business={base} />),
-    ).toContain("★ 4.8");
+    ).toContain("★★★★★");
+    expect(
+      renderToStaticMarkup(<GoogleReviewSummary business={base} />),
+    ).toContain("4.8");
     expect(
       renderToStaticMarkup(
         <GoogleReviewSummary

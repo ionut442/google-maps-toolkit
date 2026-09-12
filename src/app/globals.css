@@ -2303,10 +2303,28 @@ dd {
   font-size: clamp(1.8rem, 6vw, 2.5rem);
 }
 .google-review-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
   margin: 0.25rem 0 0;
   color: var(--pine);
   font-size: 0.92rem;
+}
+.google-review-stars {
+  color: #f5a623;
+  font-size: 1.08rem;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-shadow: 0 1px 0 rgb(23 29 26 / 18%);
+}
+.google-review-summary strong {
+  color: var(--ink);
   font-weight: 800;
+}
+.google-review-count {
+  color: var(--muted);
+  font-weight: 650;
 }
 .action-description {
   max-width: 600px;
@@ -2597,13 +2615,10 @@ dd {
 }
 .compact-action-module {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.9rem;
-}
-.compact-action-module > svg {
-  flex: 0 0 auto;
-  color: var(--action-brand);
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
 }
 .compact-action-module .action-kicker {
   padding-bottom: 0;
@@ -2617,6 +2632,7 @@ dd {
   margin-bottom: 12px;
 }
 .compact-action-module .action-link {
+  width: 100%;
   min-width: 150px;
 }
 .compact-action-module .compact-public-button {
@@ -2639,18 +2655,7 @@ dd {
     grid-template-columns: 1fr;
   }
 
-  .compact-action-module {
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-  }
-
-  .compact-action-module > svg {
-    margin-top: 0.25rem;
-  }
-
   .compact-action-module .action-link {
-    grid-column: 1 / -1;
-    width: 100%;
     min-width: 0;
   }
 }
@@ -2874,13 +2879,6 @@ dd {
     width: auto;
     margin: 1rem 0;
     box-shadow: none;
-  }
-  .compact-action-module {
-    grid-template-columns: auto minmax(0, 1fr);
-  }
-  .compact-action-module .action-link {
-    grid-column: 1 / -1;
-    min-width: 0;
   }
   .public-service-area .area-map {
     min-height: 260px;
