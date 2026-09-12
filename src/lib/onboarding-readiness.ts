@@ -11,8 +11,9 @@ export function onboardingToolReady(
   business: { phone: string; googleReviewUrl?: string | null },
 ) {
   if (!module.enabled) return true;
-  if (module.type === "CALL_WHATSAPP" || module.type === "SAVE_CONTACT")
-    return Boolean(business.phone.trim());
+  if (module.type === "CALL_WHATSAPP")
+    return Boolean(module.customizedAt) && Boolean(business.phone.trim());
+  if (module.type === "SAVE_CONTACT") return Boolean(business.phone.trim());
   if (module.type === "REVIEW")
     return (
       Boolean(module.customizedAt) &&

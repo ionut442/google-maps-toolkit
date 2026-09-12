@@ -1,13 +1,8 @@
 import type { ReactNode } from "react";
 import {
-  BadgePercent,
-  BadgeDollarSign,
   ChevronDown,
-  Clock3,
   ContactRound,
   ExternalLink,
-  ListChecks,
-  MapPinned,
   Phone,
   ShieldCheck,
   Star,
@@ -122,25 +117,28 @@ function ContactPresentation({
         {actions.map(
           (action) =>
             action && (
-              <TrackedLink
-                className={`public-quick-action public-quick-action-${action.type.toLowerCase()}`}
-                href={action.href}
-                key={action.type}
-                slug={business.slug}
-                eventType={
-                  action.type === "CALL" ? "CALL_CLICK" : "WHATSAPP_CLICK"
-                }
-                {...externalProps(action.external)}
-              >
-                <action.icon size={21} aria-hidden="true" />
-                <span className="public-quick-action-label">
+              <div className="public-quick-action-item" key={action.type}>
+                <TrackedLink
+                  className={`public-quick-action public-quick-action-${action.type.toLowerCase()}`}
+                  href={action.href}
+                  slug={business.slug}
+                  eventType={
+                    action.type === "CALL" ? "CALL_CLICK" : "WHATSAPP_CLICK"
+                  }
+                  {...externalProps(action.external)}
+                >
+                  <action.icon size={21} aria-hidden="true" />
                   <span>{action.label}</span>
-                  {action.sublabel && <small>{action.sublabel}</small>}
-                </span>
-                {action.external && (
-                  <span className="sr-only"> (opens in a new tab)</span>
+                  {action.external && (
+                    <span className="sr-only"> (opens in a new tab)</span>
+                  )}
+                </TrackedLink>
+                {action.sublabel && (
+                  <small className="public-quick-action-note">
+                    {action.sublabel}
+                  </small>
                 )}
-              </TrackedLink>
+              </div>
             ),
         )}
       </div>
@@ -161,7 +159,6 @@ function PricingPresentation({
       aria-labelledby="pricing-heading"
     >
       <div className="public-module-heading">
-        <BadgeDollarSign size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Pricing</p>
           <h2 id="pricing-heading">{module.config.label}</h2>
@@ -246,7 +243,6 @@ function ServicesPresentation({
       aria-labelledby="services-heading"
     >
       <div className="public-module-heading">
-        <ListChecks size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Services</p>
           <h2 id="services-heading">{module.config.label}</h2>
@@ -282,7 +278,6 @@ function WorkHoursPresentation({
       aria-labelledby="hours-heading"
     >
       <div className="public-module-heading">
-        <Clock3 size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Availability</p>
           <h2 id="hours-heading">{module.config.label}</h2>
@@ -321,7 +316,6 @@ function PromotionsPresentation({
       aria-labelledby="promotions-heading"
     >
       <div className="public-module-heading">
-        <BadgePercent size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Special offers</p>
           <h2 id="promotions-heading">{module.config.label}</h2>
@@ -366,7 +360,6 @@ function ServiceAreaPresentation({
       aria-labelledby="area-heading"
     >
       <div className="public-module-heading">
-        <MapPinned size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Service area</p>
           <h2 id="area-heading">{module.config.label}</h2>
@@ -415,7 +408,6 @@ function TrustPresentation({
       aria-labelledby="trust-heading"
     >
       <div className="public-module-heading">
-        <ShieldCheck size={25} aria-hidden="true" />
         <div>
           <p className="action-kicker">Credentials & reassurance</p>
           <h2 id="trust-heading">{module.config.label}</h2>

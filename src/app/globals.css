@@ -1603,7 +1603,11 @@ body:has(.public-action-page) > .site-header {
   display: grid;
   gap: 0.7rem;
 }
-.contact-preview-actions > span {
+.contact-preview-action {
+  display: grid;
+  gap: 0.45rem;
+}
+.contact-preview-action > span {
   display: flex;
   min-height: 52px;
   align-items: center;
@@ -1613,6 +1617,45 @@ body:has(.public-action-page) > .site-header {
   border-radius: 11px;
   color: var(--primary);
   padding: 0.7rem;
+}
+.contact-preview-emergency,
+.public-quick-action-note {
+  margin: 0;
+  color: var(--pine);
+  font-family: var(--font-mono-stack);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.emergency-availability {
+  display: grid;
+  gap: 0.85rem;
+  border: 2px solid var(--ink);
+  border-radius: 11px;
+  background: var(--paper-2);
+  padding: 1rem;
+}
+.emergency-availability legend {
+  padding: 0 0.4rem;
+  font-weight: 800;
+}
+.emergency-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: fit-content;
+  cursor: pointer;
+  font-weight: 750;
+}
+.emergency-toggle input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-height: 22px;
+  margin: 0;
+  accent-color: var(--pine);
+  box-shadow: none;
 }
 .message-preview {
   margin-top: 1.3rem;
@@ -2361,10 +2404,6 @@ dd {
   align-items: flex-start;
   gap: 0.75rem;
 }
-.public-module-heading > svg {
-  flex: 0 0 auto;
-  color: var(--action-brand);
-}
 .public-module-heading h2,
 .public-module-heading p {
   margin: 0;
@@ -2378,6 +2417,11 @@ dd {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.65rem;
+}
+.public-quick-action-item {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
 }
 .public-quick-action {
   display: flex;
@@ -2418,18 +2462,6 @@ dd {
 .public-quick-action:focus-visible {
   outline: 3px solid var(--primary-hover);
   outline-offset: 3px;
-}
-.public-quick-action-label {
-  display: grid;
-  gap: 0.12rem;
-}
-.public-quick-action-label small {
-  color: inherit;
-  font-family: var(--font-mono-stack);
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
 }
 .public-quick-action > svg {
   flex: 0 0 auto;

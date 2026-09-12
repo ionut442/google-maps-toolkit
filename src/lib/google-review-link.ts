@@ -323,6 +323,40 @@ export function extractGoogleReviewStats(html: string): GoogleReviewStats {
   return { reviewScore: null, reviewCount: null };
 }
 
+async function fetchSerpApiReviewStats(
+  placeId: string,
+  apiKey = process.env.SERPAPI_API_KEY?.trim(),
+): Promise<GoogleReviewStats | null> {
+  if (!apiKey) return null;
+  const url = new URL("https://serpapi.com/search.json");
+  url.searchParams.set("engine", "google_maps");
+  url.searchParams.set("type", "place");
+  url.searchParams.set("place_id", placeId);
+  url.searchParams.set("api_key", apiKey);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEFAULT_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: { accept: "application/json" },
+    });
+    if (!response.ok) return null;
+    const payload = JSON.parse(await readBoundedText(response)) as {
+      place_results?: Record<string, unknown>;
+    };
+    const place = payload.place_results;
+    if (!place || place.place_id !== placeId) return null;
+    const reviewScore = parseRating(place.rating);
+    const reviewCount = parseExactReviewCount(place.reviews);
+    if (reviewScore === null && reviewCount === null) return null;
+    return { reviewScore, reviewCount };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 function hexPairFromText(value: string) {
   for (const variant of decodedVariants(value)) {
     const patterns = [
@@ -502,16 +536,17 @@ export async function extractGoogleReviewLink(
   input: string,
 ): Promise<ExtractReviewLinkResult> {
   try {
-    const { placeId, reviewScore, reviewCount } = await resolveGoogleListing(
-      input,
-      { includeStats: true },
-    );
+    const listing = await resolveGoogleListing(input, { includeStats: true });
+    const serpApiStats =
+      listing.reviewScore === null || listing.reviewCount === null
+        ? await fetchSerpApiReviewStats(listing.placeId)
+        : null;
     return {
       success: true,
-      placeId,
-      reviewUrl: generateGoogleReviewUrl(placeId),
-      reviewScore,
-      reviewCount,
+      placeId: listing.placeId,
+      reviewUrl: generateGoogleReviewUrl(listing.placeId),
+      reviewScore: listing.reviewScore ?? serpApiStats?.reviewScore ?? null,
+      reviewCount: listing.reviewCount ?? serpApiStats?.reviewCount ?? null,
     };
   } catch {
     return { success: false, error: FRIENDLY_ERROR };

@@ -22,9 +22,14 @@ describe("onboarding tool readiness", () => {
     ).toBe(true);
   });
 
-  it("makes contact and save-contact ready from a saved phone number", () => {
+  it("keeps contact pending until explicitly saved and derives save-contact from the phone", () => {
     expect(
       onboardingToolReady(makeModule("CALL_WHATSAPP"), { phone: "+401234" }),
+    ).toBe(false);
+    expect(
+      onboardingToolReady(makeModule("CALL_WHATSAPP", new Date()), {
+        phone: "+401234",
+      }),
     ).toBe(true);
     expect(onboardingToolReady(makeModule("SAVE_CONTACT"), { phone: "" })).toBe(
       false,

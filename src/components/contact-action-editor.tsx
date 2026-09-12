@@ -70,7 +70,7 @@ export function ContactActionEditor({
           </small>
           <fieldset className="emergency-availability">
             <legend>Emergency availability</legend>
-            <label className="checkbox-row">
+            <label className="emergency-toggle">
               <input
                 type="checkbox"
                 name="emergencyEnabled"
@@ -149,19 +149,23 @@ export function ContactActionEditor({
           <h2>What customers see</h2>
           <p>Two simple ways to get in touch.</p>
           <div className="contact-preview-actions">
-            <span>
-              <Phone size={20} aria-hidden="true" />
+            <div className="contact-preview-action">
               <span>
+                <Phone size={20} aria-hidden="true" />
                 {draft.callLabel}
-                {draft.emergencyEnabled && draft.emergencyLabel && (
-                  <small>{draft.emergencyLabel}</small>
-                )}
               </span>
-            </span>
-            <span>
-              <MessageCircle size={20} aria-hidden="true" />
-              {draft.whatsappLabel}
-            </span>
+              {draft.emergencyEnabled && draft.emergencyLabel && (
+                <small className="contact-preview-emergency">
+                  {draft.emergencyLabel}
+                </small>
+              )}
+            </div>
+            <div className="contact-preview-action">
+              <span>
+                <MessageCircle size={20} aria-hidden="true" />
+                {draft.whatsappLabel}
+              </span>
+            </div>
           </div>
           {draft.whatsappMessage && (
             <div className="message-preview">

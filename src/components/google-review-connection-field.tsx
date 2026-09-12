@@ -45,10 +45,19 @@ export function GoogleReviewConnectionField({
     if (value === startingMapsUrl) {
       setGoogleReviewUrl(startingReviewUrl);
       setResolvedGoogleMapsUrl(startingReviewUrl ? startingMapsUrl : "");
+      setReviewScore(initialReviewScore);
+      setReviewCount(initialReviewCount);
+      setDisplayReviewScore(initialDisplayReviewScore);
+      setDisplayReviewCount(initialDisplayReviewCount);
     } else if (value !== resolvedGoogleMapsUrl) {
       setGoogleReviewUrl("");
       setResolvedGoogleMapsUrl("");
+      setReviewScore(null);
+      setReviewCount(null);
+      setDisplayReviewScore(false);
+      setDisplayReviewCount(false);
     }
+    setStatsRefreshed(false);
   }
 
   function resolveReviewLink() {
@@ -63,10 +72,15 @@ export function GoogleReviewConnectionField({
       }
       setGoogleReviewUrl(result.reviewUrl);
       setResolvedGoogleMapsUrl(googleMapsUrl);
-      setReviewScore(result.reviewScore);
-      setReviewCount(result.reviewCount);
-      if (result.reviewScore === null) setDisplayReviewScore(false);
-      if (result.reviewCount === null) setDisplayReviewCount(false);
+      const refreshingCurrentListing = resolvedGoogleMapsUrl === googleMapsUrl;
+      const nextReviewScore =
+        result.reviewScore ?? (refreshingCurrentListing ? reviewScore : null);
+      const nextReviewCount =
+        result.reviewCount ?? (refreshingCurrentListing ? reviewCount : null);
+      setReviewScore(nextReviewScore);
+      setReviewCount(nextReviewCount);
+      if (nextReviewScore === null) setDisplayReviewScore(false);
+      if (nextReviewCount === null) setDisplayReviewCount(false);
       setStatsRefreshed(
         result.reviewScore !== null || result.reviewCount !== null,
       );

@@ -12,7 +12,10 @@ const placeId = "ChIJN1t_tDeuEmsRUsoyG83frY4";
 const penangPlaceId = "ChIJqc9AwPLpSjAREsHn965EcRA";
 
 describe("Google review link resolution", () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.unstubAllEnvs();
+  });
 
   it("follows an allowed short-link redirect and extracts a Place ID from HTML", async () => {
     const fetchMock = vi
@@ -241,6 +244,68 @@ describe("Google review link resolution", () => {
       extractGoogleReviewStats("<html>No aggregate rating</html>"),
     ).toEqual({ reviewScore: null, reviewCount: null });
     expect(extractGoogleReviewStats("4.8 stars · 1.2K reviews")).toEqual({
+      reviewScore: null,
+      reviewCount: null,
+    });
+  });
+
+  it("uses matching SerpApi place results as a server-side stats fallback", async () => {
+    vi.stubEnv("SERPAPI_API_KEY", "test-serpapi-key");
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          place_results: {
+            place_id: placeId,
+            title: "Test business",
+            rating: 4.9,
+            reviews: 321,
+          },
+        }),
+        { headers: { "content-type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(
+      extractGoogleReviewLink(
+        `https://search.google.com/local/writereview?placeid=${placeId}`,
+      ),
+    ).resolves.toMatchObject({
+      success: true,
+      placeId,
+      reviewScore: 4.9,
+      reviewCount: 321,
+    });
+    const requested = new URL(String(fetchMock.mock.calls[0][0]));
+    expect(requested.origin).toBe("https://serpapi.com");
+    expect(requested.searchParams.get("place_id")).toBe(placeId);
+  });
+
+  it("ignores mismatched or unavailable SerpApi results without breaking the review link", async () => {
+    vi.stubEnv("SERPAPI_API_KEY", "test-serpapi-key");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            place_results: {
+              place_id: penangPlaceId,
+              rating: 5,
+              reviews: 999,
+            },
+          }),
+        ),
+      ),
+    );
+
+    await expect(
+      extractGoogleReviewLink(
+        `https://search.google.com/local/writereview?placeid=${placeId}`,
+      ),
+    ).resolves.toEqual({
+      success: true,
+      placeId,
+      reviewUrl: generateGoogleReviewUrl(placeId),
       reviewScore: null,
       reviewCount: null,
     });

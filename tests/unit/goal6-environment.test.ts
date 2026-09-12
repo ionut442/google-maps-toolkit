@@ -76,6 +76,7 @@ describe("Goal 6 production environment", () => {
         expect.stringContaining("EMAIL_TRANSPORT"),
         expect.stringContaining("RESEND_API_KEY"),
         expect.stringContaining("EMAIL_FROM"),
+        expect.stringContaining("SERPAPI_API_KEY"),
       ]),
     );
 
@@ -95,6 +96,7 @@ describe("Goal 6 production environment", () => {
         EMAIL_TRANSPORT: "resend",
         RESEND_API_KEY: "test-resend-key",
         EMAIL_FROM: "quotes@toolkit.example",
+        SERPAPI_API_KEY: "a-secure-serpapi-key-with-32-characters",
       }),
     ).toEqual([]);
   });

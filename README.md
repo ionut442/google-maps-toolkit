@@ -59,6 +59,7 @@ Migration `20260827090000_goal_5_analytics` adds `AnalyticsEvent` and indexed bu
 - `EMAIL_TRANSPORT`: `development` outside production or `resend` in production.
 - `EMAIL_FROM`: verified sender used by the Resend adapter.
 - `RESEND_API_KEY`: required only for production Resend delivery.
+- `SERPAPI_API_KEY`: server-only key used to refresh Google rating and review-count details when Google Maps HTML does not expose them. A missing or failed lookup never blocks review-link generation.
 
 Production must supply the pooled/direct Neon URLs, Object Storage credentials, rate-limit salt, trusted-ingress settings, and Resend values. `EMAIL_FROM` must be a sender accepted by Resend; use a verified domain sender for deployment. Development can use local private storage and the capture email transport.
 

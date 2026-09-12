@@ -132,5 +132,14 @@ export function productionEnvironmentIssues(env: Environment = process.env) {
   if (!env.RESEND_API_KEY?.trim()) issues.push("RESEND_API_KEY is required");
   if (!env.EMAIL_FROM?.includes("@"))
     issues.push("EMAIL_FROM must be a valid sender");
+  const serpApiKey = env.SERPAPI_API_KEY?.trim();
+  if (
+    !serpApiKey ||
+    serpApiKey.length < 32 ||
+    /replace|example/i.test(serpApiKey)
+  )
+    issues.push(
+      "SERPAPI_API_KEY must be a non-placeholder 32+ character secret",
+    );
   return issues;
 }
