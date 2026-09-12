@@ -49,7 +49,14 @@ export function BusinessPage({
             </div>
           )}
           <h1>{business.name}</h1>
-          <GoogleReviewSummary business={business} />
+          <GoogleReviewSummary
+            business={business}
+            href={
+              business.modules.some((module) => module.type === "REVIEW")
+                ? "#module-review"
+                : undefined
+            }
+          />
           {business.description && (
             <p className="action-description">{business.description}</p>
           )}

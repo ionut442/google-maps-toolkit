@@ -359,9 +359,11 @@ export function WorkHoursEditor({
 export function PromotionsEditor({
   businessId,
   config: initial,
+  contacts,
 }: {
   businessId: string;
   config: PromotionsConfig;
+  contacts: { phone: string; whatsapp: string; email: string };
 }) {
   const [config, setConfig] = useState(initial);
   return (
@@ -468,6 +470,37 @@ export function PromotionsEditor({
                   }}
                 />
               </label>
+              <label>
+                How should customers request this offer?
+                <select
+                  value={offer.requestMethod}
+                  onChange={(event) => {
+                    const offers = [...config.offers];
+                    offers[index] = {
+                      ...offer,
+                      requestMethod: event.currentTarget.value as
+                        | "PHONE"
+                        | "WHATSAPP"
+                        | "EMAIL",
+                    };
+                    setConfig({ ...config, offers });
+                  }}
+                >
+                  <option value="PHONE">Phone</option>
+                  <option value="WHATSAPP">WhatsApp</option>
+                  <option value="EMAIL">Email</option>
+                </select>
+              </label>
+              {((offer.requestMethod === "PHONE" && !contacts.phone.trim()) ||
+                (offer.requestMethod === "WHATSAPP" &&
+                  !(contacts.whatsapp.trim() || contacts.phone.trim())) ||
+                (offer.requestMethod === "EMAIL" &&
+                  !contacts.email.trim())) && (
+                <p className="field-warning" role="status">
+                  Add this contact method in Business Details before publishing
+                  the offer.
+                </p>
+              )}
             </section>
           ))}
         </div>
@@ -480,7 +513,12 @@ export function PromotionsEditor({
                 ...config,
                 offers: [
                   ...config.offers,
-                  { id: newId("offer"), title: "", description: "" },
+                  {
+                    id: newId("offer"),
+                    title: "",
+                    description: "",
+                    requestMethod: "PHONE",
+                  },
                 ],
               })
             }

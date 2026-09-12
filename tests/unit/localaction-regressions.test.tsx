@@ -5,6 +5,7 @@ import { PageOrderList } from "@/components/page-order-list";
 import { ProfileForm } from "@/components/profile-form";
 import { BusinessPage } from "@/components/public/business-page";
 import { SimpleToolEditor } from "@/components/simple-tool-editor";
+import { PromotionsEditor } from "@/components/structured-tool-editors";
 import type { PublicBusiness } from "@/lib/public-business";
 
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh: vi.fn() }) }));
@@ -12,7 +13,9 @@ vi.mock("@/app/actions", () => ({
   extractReviewLinkAction: vi.fn(),
   moveModuleAction: vi.fn(),
   saveProfileAction: vi.fn(),
+  savePromotionsAction: vi.fn(),
   saveReviewToolAction: vi.fn(),
+  setModuleOpenByDefaultAction: vi.fn(),
   updateModuleLabelAction: vi.fn(),
 }));
 
@@ -60,6 +63,7 @@ describe("LocalAction real-user regressions", () => {
             id: "pricing-id",
             type: "PRICING",
             enabled: true,
+            openByDefault: true,
             customizedAt: new Date(),
           },
           {
@@ -76,6 +80,9 @@ describe("LocalAction real-user regressions", () => {
     expect(html).toContain("1 enabled tool still needs setup");
     expect(html).toContain('href="/dashboard/tools/quote-id"');
     expect(html).toContain("Finish setup");
+    expect(html).toContain('name="openByDefault"');
+    expect(html).toContain('checked=""');
+    expect(html).toContain("Open by default");
   });
 
   it("uses LocalAction styling and preserves a logo's intrinsic shape", () => {
@@ -128,7 +135,7 @@ describe("LocalAction real-user regressions", () => {
       /\.public-quick-actions\s*\{[^}]*padding:\s*1rem 1\.1rem 1\.15rem/s,
     );
     expect(css).toMatch(
-      /@container \(max-width: 520px\)[\s\S]*?\.compact-action-module \.action-link\s*\{[^}]*grid-column:\s*1 \/ -1/s,
+      /@container \(max-width: 520px\)[\s\S]*?\.compact-action-module \.action-link\s*\{[^}]*min-width:\s*0/s,
     );
     expect(css).toMatch(
       /\.compact-action-module \.compact-public-button\s*\{[^}]*background:\s*var\(--primary\)/s,
@@ -174,5 +181,28 @@ describe("LocalAction real-user regressions", () => {
     expect(html).toContain("Button text");
     expect(html).not.toContain("Connect Google");
     expect(html).not.toContain("Business Details");
+  });
+
+  it("warns when an offer's selected request channel has no business contact", () => {
+    const html = renderToStaticMarkup(
+      <PromotionsEditor
+        businessId="business"
+        contacts={{ phone: "+40700111222", whatsapp: "", email: "" }}
+        config={{
+          label: "Special Offers",
+          offers: [
+            {
+              id: "email_offer",
+              title: "Email offer",
+              requestMethod: "EMAIL",
+            },
+          ],
+        }}
+      />,
+    );
+    expect(html).toContain("How should customers request this offer?");
+    expect(html).toContain(
+      "Add this contact method in Business Details before publishing the offer.",
+    );
   });
 });

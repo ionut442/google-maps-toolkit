@@ -27,6 +27,7 @@ type PreviewBusiness = {
   modules: Array<{
     type: string;
     enabled: boolean;
+    openByDefault?: boolean;
     sortOrder: number;
     config: string;
   }>;
@@ -81,7 +82,14 @@ export function CustomerPreview({
               </div>
             )}
             <h1>{safeBusiness.name}</h1>
-            <GoogleReviewSummary business={safeBusiness} />
+            <GoogleReviewSummary
+              business={safeBusiness}
+              href={
+                safeBusiness.modules.some((module) => module.type === "REVIEW")
+                  ? "#module-review"
+                  : undefined
+              }
+            />
             <p className="action-description">
               {safeBusiness.description ||
                 "Your business description appears here."}

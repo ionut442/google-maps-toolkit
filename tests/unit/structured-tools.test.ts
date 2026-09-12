@@ -57,17 +57,29 @@ describe("structured customer tools", () => {
   it("uses date-only expiry so an offer remains visible through its valid-until date", () => {
     expect(promotionIsExpired("2026-09-10", "2026-09-10")).toBe(false);
     expect(promotionIsExpired("2026-09-09", "2026-09-10")).toBe(true);
-    expect(
-      promotionsConfigSchema.parse({
+    const parsed = promotionsConfigSchema.parse({
+      label: "Offers",
+      offers: [
+        {
+          id: "autumn_offer",
+          title: "Autumn offer",
+          validUntil: "2026-09-30",
+        },
+      ],
+    });
+    expect(parsed.offers).toHaveLength(1);
+    expect(parsed.offers[0].requestMethod).toBe("PHONE");
+  });
+
+  it("preserves each supported promotion request method", () => {
+    for (const requestMethod of ["PHONE", "WHATSAPP", "EMAIL"] as const) {
+      const parsed = promotionsConfigSchema.parse({
         label: "Offers",
         offers: [
-          {
-            id: "autumn_offer",
-            title: "Autumn offer",
-            validUntil: "2026-09-30",
-          },
+          { id: requestMethod.toLowerCase(), title: "Offer", requestMethod },
         ],
-      }).offers,
-    ).toHaveLength(1);
+      });
+      expect(parsed.offers[0].requestMethod).toBe(requestMethod);
+    }
   });
 });

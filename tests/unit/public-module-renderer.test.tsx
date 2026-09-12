@@ -126,4 +126,74 @@ describe("public tool cards", () => {
     expect(html).toContain('class="public-credential-image"');
     expect(html).toContain("View certificate.pdf");
   });
+
+  it("opens every opted-in card and routes each offer through its saved request method", () => {
+    const business: PublicBusiness = {
+      name: "Example Offers",
+      slug: "example-offers",
+      logoUrl: null,
+      description: "Current offers from a local business.",
+      phone: "+40700111222",
+      whatsapp: "+40700333444",
+      email: "offers@example.test",
+      website: null,
+      brandColor: "#FFB020",
+      industry: "PLUMBING",
+      customIndustryLabel: null,
+      googleReviewUrl: null,
+      googleReviewScore: null,
+      googleReviewCount: null,
+      displayGoogleReviewScore: false,
+      displayGoogleReviewCount: false,
+      primaryAction: null,
+      modules: [
+        {
+          type: "PROMOTIONS",
+          sortOrder: 1,
+          openByDefault: true,
+          config: {
+            label: "Offers",
+            offers: [
+              { id: "phone", title: "Phone offer", requestMethod: "PHONE" },
+              {
+                id: "whatsapp",
+                title: "WhatsApp offer",
+                requestMethod: "WHATSAPP",
+              },
+              { id: "email", title: "Email offer", requestMethod: "EMAIL" },
+            ],
+          },
+        },
+        {
+          type: "SAVE_CONTACT",
+          sortOrder: 2,
+          openByDefault: true,
+          config: { label: "Save contact" },
+        },
+        {
+          type: "FAQ",
+          sortOrder: 3,
+          openByDefault: false,
+          config: {
+            label: "FAQs",
+            suggestedFaqs: [{ question: "Question?", answer: "Answer." }],
+          },
+        },
+      ],
+    };
+
+    const html = renderToStaticMarkup(
+      <PublicModuleRenderer business={business} primary={null} />,
+    );
+
+    expect(html.match(/open=""/g)).toHaveLength(2);
+    expect(html.match(/class="public-tool-card"/g)).toHaveLength(3);
+    expect(html).toContain('href="tel:+40700111222"');
+    expect(html).toContain("wa.me/40700333444");
+    expect(html).toContain("WhatsApp+offer");
+    expect(html).toContain(
+      'href="mailto:offers@example.test?subject=Offer%20enquiry%3A%20Email%20offer',
+    );
+    expect(html.match(/Request this offer/g)).toHaveLength(3);
+  });
 });

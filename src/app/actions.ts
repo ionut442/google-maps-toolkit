@@ -336,6 +336,25 @@ export async function moveModuleAction(formData: FormData) {
   revalidatePath("/onboarding/tools");
 }
 
+export async function setModuleOpenByDefaultAction(formData: FormData) {
+  const user = await requireUser();
+  const business = await requireOwnedBusiness(
+    user.id,
+    String(formData.get("businessId")),
+  );
+  const moduleId = String(formData.get("moduleId"));
+  const item = business.modules.find((module) => module.id === moduleId);
+  if (!item || !item.enabled)
+    throw new Error("Tool not found, disabled, or access denied");
+  await db.businessModule.update({
+    where: { id: item.id },
+    data: { openByDefault: formData.get("openByDefault") === "true" },
+  });
+  revalidatePath("/dashboard/page");
+  revalidatePath(`/preview/${business.slug}`);
+  revalidatePath(`/${business.slug}`);
+}
+
 export async function updateModuleLabelAction(formData: FormData) {
   const user = await requireUser();
   const business = await requireOwnedBusiness(

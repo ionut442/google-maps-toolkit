@@ -132,6 +132,11 @@ export default async function ToolPage({
         <PromotionsEditor
           businessId={business.id}
           config={config as ModuleConfigByType["PROMOTIONS"]}
+          contacts={{
+            phone: business.phone,
+            whatsapp: business.whatsapp,
+            email: business.email,
+          }}
         />
       )}
       {(type === "REVIEW" || type === "SAVE_CONTACT") && (

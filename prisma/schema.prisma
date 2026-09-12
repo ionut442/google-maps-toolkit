@@ -109,6 +109,7 @@ model BusinessModule {
   id           String    @id @default(cuid())
   type         String
   enabled      Boolean   @default(true)
+  openByDefault Boolean  @default(false)
   sortOrder    Int
   config       String    @default("{}")
   customizedAt DateTime?

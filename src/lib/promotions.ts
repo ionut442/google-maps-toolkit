@@ -1,6 +1,8 @@
 import { z } from "zod";
 
 const promotionIdSchema = z.string().regex(/^[a-z][a-z0-9_]{1,39}$/);
+export const promotionRequestMethods = ["PHONE", "WHATSAPP", "EMAIL"] as const;
+export type PromotionRequestMethod = (typeof promotionRequestMethods)[number];
 const dateSchema = z
   .string()
   .regex(/^\d{4}-\d{2}-\d{2}$/)
@@ -17,6 +19,7 @@ const promotionSchema = z
     title: z.string().trim().min(1).max(120),
     description: z.string().trim().max(400).optional(),
     validUntil: dateSchema.optional(),
+    requestMethod: z.enum(promotionRequestMethods).default("PHONE"),
   })
   .strict();
 

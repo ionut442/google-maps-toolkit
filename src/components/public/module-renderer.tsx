@@ -1,5 +1,12 @@
 import type { ReactNode } from "react";
-import { ChevronDown, ExternalLink, Phone, ShieldCheck } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Star,
+} from "lucide-react";
 import { AreaMap } from "@/components/area-map";
 import { ToolIcon } from "@/components/dashboard-ui";
 import { TrackedLink } from "@/components/public/analytics-client";
@@ -18,7 +25,6 @@ import { formatMoney, type PricingConfig } from "@/lib/pricing";
 import { promotionIsExpired } from "@/lib/promotions";
 import { weekDayLabels } from "@/lib/work-hours";
 import { trustEntryState } from "@/lib/trust";
-import { toolDescriptions } from "@/lib/tool-presentation";
 
 type RendererContext = {
   business: PublicBusiness;
@@ -33,6 +39,124 @@ type RegistryEntry = {
 };
 function externalProps(external = false) {
   return external ? { target: "_blank", rel: "noopener noreferrer" } : {};
+}
+
+const moduleKickers: Record<ModuleType, string> = {
+  CALL_WHATSAPP: "Contact",
+  QUOTE_REQUEST: "Get a quote",
+  PROMOTIONS: "Special offers",
+  PRICING: "Pricing",
+  SERVICES: "Services",
+  SERVICE_AREA: "Service area",
+  WORK_HOURS: "Availability",
+  TRUST: "Trust & credentials",
+  FAQ: "FAQs",
+  REVIEW: "Customer feedback",
+  SAVE_CONTACT: "Keep the details",
+};
+
+function modulePreview(module: PublicModule, business: PublicBusiness) {
+  switch (module.type) {
+    case "CALL_WHATSAPP":
+      return (
+        <>
+          <strong>{business.phone}</strong>
+          {module.config.emergencyEnabled && module.config.emergencyLabel
+            ? ` Â· ${module.config.emergencyLabel}`
+            : " Â· Call or message in one tap"}
+        </>
+      );
+    case "QUOTE_REQUEST":
+      return module.config.intro || "A few quick questions Â· quick to send";
+    case "PROMOTIONS": {
+      const active = module.config.offers.filter(
+        (offer) => !promotionIsExpired(offer.validUntil),
+      );
+      return `${active.length} active ${active.length === 1 ? "offer" : "offers"}`;
+    }
+    case "PRICING":
+      if (module.config.mode === "HOURLY")
+        return `From ${formatMoney(module.config.amountMinor, module.config.currency)} per hour`;
+      if (module.config.mode === "PRICE_LIST") {
+        const first = module.config.categories.flatMap(
+          (category) => category.items,
+        )[0];
+        return first
+          ? `${first.name} Â· ${first.pricePrefix === "FROM" ? "from " : ""}${formatMoney(first.amountMinor, module.config.currency)}`
+          : "Clear starting prices";
+      }
+      return "Build a quick starting estimate";
+    case "SERVICES":
+      return (
+        module.config.categories
+          .flatMap((category) => category.items)
+          .slice(0, 3)
+          .map((item) => item.name)
+          .join(", ") || "See what this business offers"
+      );
+    case "SERVICE_AREA": {
+      const shown = module.config.areas.slice(0, 3);
+      return shown.length ? (
+        <span className="public-preview-chips">
+          {shown.map((area) => (
+            <span key={area.id}>{area.name}</span>
+          ))}
+          {module.config.areas.length > shown.length && (
+            <small>+{module.config.areas.length - shown.length} more</small>
+          )}
+        </span>
+      ) : (
+        `${module.config.postalCodes.length} covered postcodes`
+      );
+    }
+    case "WORK_HOURS":
+      return "See this weekâ€™s availability";
+    case "TRUST":
+      return `${module.config.entries.length} business-provided ${module.config.entries.length === 1 ? "credential" : "credentials"}`;
+    case "FAQ":
+      return `${module.config.suggestedFaqs.length} common ${module.config.suggestedFaqs.length === 1 ? "question" : "questions"}`;
+    case "REVIEW":
+      return business.googleReviewScore !== null
+        ? `${business.googleReviewScore.toFixed(1)} Â· ${business.googleReviewCount ?? "Google"} reviews`
+        : "Read or leave a Google review";
+    case "SAVE_CONTACT":
+      return "Add phone & email to your contacts";
+  }
+}
+
+function promotionRequestAction(
+  business: PublicBusiness,
+  offer: Extract<
+    PublicModule,
+    { type: "PROMOTIONS" }
+  >["config"]["offers"][number],
+) {
+  if (offer.requestMethod === "WHATSAPP") {
+    const href = createWhatsAppUrl(
+      business.whatsapp || business.phone,
+      `Hi, I'm interested in the offer: ${offer.title}.`,
+    );
+    return href
+      ? { href, external: true, eventType: "WHATSAPP_CLICK" as const }
+      : null;
+  }
+  if (offer.requestMethod === "EMAIL") {
+    const email = business.email.trim();
+    if (!email) return null;
+    const subject = encodeURIComponent(`Offer enquiry: ${offer.title}`);
+    const body = encodeURIComponent(
+      `Hi, I'm interested in the offer: ${offer.title}.`,
+    );
+    return {
+      href: `mailto:${email}?subject=${subject}&body=${body}`,
+      external: false,
+      eventType: undefined,
+    };
+  }
+  const href = createTelHref(business.phone);
+  return href
+    ? { href, external: false, eventType: "CALL_CLICK" as const }
+    : null;
 }
 
 function WhatsAppIcon({ size = 21 }: { size?: number }) {
@@ -295,8 +419,10 @@ function WorkHoursPresentation({
 }
 
 function PromotionsPresentation({
+  business,
   module,
 }: {
+  business: PublicBusiness;
   module: Extract<PublicModule, { type: "PROMOTIONS" }>;
 }) {
   const offers = module.config.offers.filter(
@@ -315,13 +441,30 @@ function PromotionsPresentation({
         </div>
       </div>
       <div className="public-promotion-list">
-        {offers.map((offer) => (
-          <article key={offer.id}>
-            <strong>{offer.title}</strong>
-            {offer.description && <p>{offer.description}</p>}
-            {offer.validUntil && <small>Valid until {offer.validUntil}</small>}
-          </article>
-        ))}
+        {offers.map((offer) => {
+          const action = promotionRequestAction(business, offer);
+          return (
+            <article key={offer.id}>
+              <strong>{offer.title}</strong>
+              {offer.description && <p>{offer.description}</p>}
+              {offer.validUntil && (
+                <small>Valid until {offer.validUntil}</small>
+              )}
+              {action && (
+                <TrackedLink
+                  className="public-offer-action"
+                  href={action.href}
+                  slug={business.slug}
+                  eventType={action.eventType}
+                  {...externalProps(action.external)}
+                >
+                  Request this offer{" "}
+                  <ExternalLink size={16} aria-hidden="true" />
+                </TrackedLink>
+              )}
+            </article>
+          );
+        })}
       </div>
     </section>
   );
@@ -369,7 +512,9 @@ function ServiceAreaPresentation({
       {module.config.areas.length > 0 && (
         <ul className="chip-list">
           {module.config.areas.map((area) => (
-            <li key={area.id}>{area.name}</li>
+            <li key={area.id}>
+              <MapPin size={14} aria-hidden="true" /> {area.name}
+            </li>
           ))}
         </ul>
       )}
@@ -569,7 +714,7 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
             rel="noopener noreferrer"
           >
             {module.config.label || "Leave Us a Review"}{" "}
-            <ExternalLink size={17} aria-hidden="true" />
+            <Star size={17} aria-hidden="true" />
             <span className="sr-only"> (opens in a new tab)</span>
           </TrackedLink>
         </section>
@@ -617,12 +762,12 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
   },
   PROMOTIONS: {
     analyticsEvent: "promotions_viewed",
-    render: ({ module }) =>
+    render: ({ business, module }) =>
       module.type === "PROMOTIONS" &&
       module.config.offers.some(
         (offer) => !promotionIsExpired(offer.validUntil),
       ) ? (
-        <PromotionsPresentation module={module} />
+        <PromotionsPresentation business={business} module={module} />
       ) : null,
   },
 };
@@ -654,13 +799,18 @@ export function PublicModuleRenderer({
             className="public-tool-card"
             key={module.type}
             data-module={module.type.toLowerCase()}
+            id={`module-${module.type.toLowerCase().replaceAll("_", "-")}`}
+            open={module.openByDefault}
           >
             <summary>
               <span className="public-tool-summary">
                 <ToolIcon type={module.type} />
                 <span>
+                  <span className="public-tool-kicker">
+                    {moduleKickers[module.type]}
+                  </span>
                   <strong>{labels[module.type]}</strong>
-                  <small>{toolDescriptions[module.type]}</small>
+                  <small>{modulePreview(module, business)}</small>
                 </span>
               </span>
               <ChevronDown

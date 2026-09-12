@@ -12,6 +12,7 @@ export type PublicModule = {
   [K in ModuleType]: {
     type: K;
     sortOrder: number;
+    openByDefault?: boolean;
     config: ModuleConfigByType[K];
   };
 }[ModuleType];
@@ -47,6 +48,7 @@ type PreviewableBusiness = Omit<PublicBusiness, "modules" | "trustEvidence"> & {
   modules: Array<{
     type: string;
     enabled?: boolean;
+    openByDefault?: boolean;
     sortOrder: number;
     config: string;
   }>;
@@ -56,6 +58,7 @@ type PreviewableBusiness = Omit<PublicBusiness, "modules" | "trustEvidence"> & {
 function parsePublicModule(module: {
   type: string;
   sortOrder: number;
+  openByDefault?: boolean;
   config: string;
 }): PublicModule | null {
   if (!moduleTypes.includes(module.type as ModuleType)) return null;
@@ -63,7 +66,12 @@ function parsePublicModule(module: {
   try {
     const config = safeParseModuleConfig(type, JSON.parse(module.config));
     return config
-      ? ({ type, sortOrder: module.sortOrder, config } as PublicModule)
+      ? ({
+          type,
+          sortOrder: module.sortOrder,
+          openByDefault: module.openByDefault ?? false,
+          config,
+        } as PublicModule)
       : null;
   } catch {
     return null;
@@ -126,7 +134,12 @@ export async function findPublicBusinessBySlug(
       modules: {
         where: { enabled: true },
         orderBy: { sortOrder: "asc" },
-        select: { type: true, sortOrder: true, config: true },
+        select: {
+          type: true,
+          sortOrder: true,
+          openByDefault: true,
+          config: true,
+        },
       },
       trustEvidence: {
         orderBy: { createdAt: "asc" },

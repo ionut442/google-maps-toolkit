@@ -2,6 +2,7 @@ import type { PublicBusiness } from "@/lib/public-business";
 
 export function GoogleReviewSummary({
   business,
+  href,
 }: {
   business: Pick<
     PublicBusiness,
@@ -10,6 +11,7 @@ export function GoogleReviewSummary({
     | "displayGoogleReviewScore"
     | "displayGoogleReviewCount"
   >;
+  href?: string;
 }) {
   const score =
     business.displayGoogleReviewScore && business.googleReviewScore !== null
@@ -20,13 +22,11 @@ export function GoogleReviewSummary({
       ? `${business.googleReviewCount.toLocaleString("en-GB")} Google ${business.googleReviewCount === 1 ? "review" : "reviews"}`
       : null;
   if (!score && !count) return null;
-  return (
-    <p
-      className="google-review-summary"
-      aria-label={[score ? `${score} out of 5` : null, count]
-        .filter(Boolean)
-        .join(", ")}
-    >
+  const label = [score ? `${score} out of 5` : null, count]
+    .filter(Boolean)
+    .join(", ");
+  const content = (
+    <>
       {score && (
         <>
           <span className="google-review-stars" aria-hidden="true">
@@ -40,6 +40,15 @@ export function GoogleReviewSummary({
           {score ? `(${count})` : count}
         </span>
       )}
+    </>
+  );
+  return href ? (
+    <a className="google-review-summary" href={href} aria-label={label}>
+      {content}
+    </a>
+  ) : (
+    <p className="google-review-summary" aria-label={label}>
+      {content}
     </p>
   );
 }

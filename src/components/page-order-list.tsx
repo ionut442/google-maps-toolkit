@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ChevronDown, ChevronUp, GripVertical } from "lucide-react";
-import { moveModuleAction } from "@/app/actions";
+import { moveModuleAction, setModuleOpenByDefaultAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
 import { ToolIcon } from "@/components/dashboard-ui";
@@ -17,6 +17,7 @@ export function PageOrderList({
     id: string;
     type: string;
     enabled: boolean;
+    openByDefault?: boolean;
     customizedAt: Date | null;
   }>;
   business: { phone: string; googleReviewUrl: string | null };
@@ -58,6 +59,28 @@ export function PageOrderList({
                 Finish setup
               </Link>
             )}
+            <form
+              action={setModuleOpenByDefaultAction}
+              className="open-by-default-form"
+            >
+              <input type="hidden" name="businessId" value={businessId} />
+              <input type="hidden" name="moduleId" value={tool.id} />
+              <label className="open-by-default-control">
+                <input
+                  type="checkbox"
+                  name="openByDefault"
+                  value="true"
+                  defaultChecked={tool.openByDefault}
+                />
+                <span>Open by default</span>
+              </label>
+              <SubmitButton
+                className="secondary compact-save"
+                pendingLabel="Savingâ€¦"
+              >
+                Save
+              </SubmitButton>
+            </form>
             <form action={moveModuleAction}>
               <input type="hidden" name="businessId" value={businessId} />
               <input type="hidden" name="moduleId" value={tool.id} />

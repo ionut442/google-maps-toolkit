@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Anton, IBM_Plex_Mono, Public_Sans } from "next/font/google";
 import "./globals.css";
+import "./glm.css";
 
 const anton = Anton({
   weight: "400",

@@ -80,11 +80,13 @@ describe("product pass public rendering", () => {
                 id: "active_offer",
                 title: "Active offer",
                 validUntil: "2099-01-01",
+                requestMethod: "PHONE",
               },
               {
                 id: "expired_offer",
                 title: "Expired offer",
                 validUntil: "2020-01-01",
+                requestMethod: "PHONE",
               },
             ],
           },
