@@ -940,6 +940,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 }
 
 .public-promotion-list article > strong {
+  display: block;
   font-size: 1.35rem;
 }
 
@@ -957,6 +958,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   min-height: 44px;
   align-items: center;
   gap: 8px;
+  margin-top: 10px;
   color: var(--glm-ink);
   font-weight: 700;
   text-decoration: underline;
