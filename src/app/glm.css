@@ -1258,3 +1258,229 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Mobile-first editor and customer-card corrections. */
+.public-tool-card > summary,
+.public-tool-summary {
+  align-items: flex-start;
+}
+
+.public-tool-chevron {
+  margin-top: 12px;
+}
+
+.public-trust-module .trust-list li,
+.credential-preview li {
+  align-items: center;
+}
+
+.public-trust-module .trust-list li > span,
+.credential-preview li > span {
+  align-content: center;
+}
+
+.tool-switch {
+  min-width: 88px;
+  min-height: 40px;
+  justify-content: flex-start;
+  gap: 0.55rem;
+  border: 1.5px solid var(--glm-border);
+  border-radius: 999px;
+  background: var(--glm-white);
+  color: var(--glm-ink-2);
+  padding: 0.28rem 0.55rem;
+  box-shadow: none;
+}
+
+.tool-switch:hover {
+  background: #f0f1ed;
+  box-shadow: none;
+  transform: none;
+}
+
+.tool-switch > span {
+  flex: 0 0 23px;
+  width: 23px;
+  height: 23px;
+  border: 1px solid rgb(23 29 26 / 18%);
+}
+
+.tool-switch.is-on,
+.tool-switch.is-on:hover {
+  justify-content: flex-end;
+  border-color: #1d6b48;
+  background: #2f8b61;
+  color: #fff;
+}
+
+.setup-shell .tool-switch,
+.app-shell .tool-switch {
+  background: var(--glm-white);
+  border-color: var(--glm-ink);
+  color: var(--glm-ink);
+}
+
+.setup-shell .tool-switch.is-on,
+.setup-shell .tool-switch.is-on:hover,
+.app-shell .tool-switch.is-on,
+.app-shell .tool-switch.is-on:hover {
+  background: #2f8b61;
+  border-color: #1d6b48;
+  color: #fff;
+}
+
+.tool-card-top {
+  align-items: flex-start;
+}
+
+.tool-card-actions {
+  justify-content: flex-end;
+}
+
+.tool-summary-card {
+  min-height: 0;
+}
+
+.search-input {
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding-right: 0.9rem;
+  padding-left: 0;
+}
+
+.search-input input {
+  min-width: 0;
+}
+
+.text-button,
+.input-action .text-button {
+  justify-content: center;
+  text-align: center;
+}
+
+.editor-save-bar {
+  display: grid;
+  width: 100%;
+  border-top: 0;
+  background: transparent;
+  padding-top: 0;
+  text-align: center;
+}
+
+.editor-save-bar > button {
+  width: 100%;
+  min-width: 0;
+  justify-content: center;
+}
+
+.editor-save-bar > small {
+  text-align: center;
+}
+
+.section-heading:has(.add-credential-button) {
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.section-heading:has(.add-credential-button) .add-credential-button {
+  align-self: stretch;
+  justify-content: center;
+}
+
+@media (max-width: 700px) {
+  .tool-editor-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: start;
+  }
+
+  .tool-editor-header > .tool-icon {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .tool-editor-header > .tool-status-control {
+    grid-column: 3;
+    grid-row: 1;
+    margin-left: 0;
+  }
+
+  .tool-editor-header > div {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .tool-editor-header h1 {
+    margin-top: 0.8rem;
+  }
+
+  .page-order-row {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    grid-template-rows: auto auto auto auto;
+    align-items: start;
+    gap: 7px 10px;
+  }
+
+  .page-order-row > .tool-icon {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+
+  .page-order-row > strong,
+  .page-order-row > .tool-readiness,
+  .page-order-row > .finish-tool-setup {
+    grid-column: 2;
+  }
+
+  .page-order-row > strong {
+    grid-row: 1;
+  }
+
+  .page-order-row > .tool-readiness {
+    grid-row: 2;
+  }
+
+  .page-order-row > .finish-tool-setup {
+    grid-row: 3;
+    justify-self: start;
+  }
+
+  .page-order-row > .open-by-default-form {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-row: 4;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+    border-top: 1px solid var(--glm-soft-border);
+    padding-top: 10px;
+  }
+
+  .page-order-row > form:last-child {
+    display: grid;
+    grid-column: 3;
+    grid-row: 1 / span 3;
+    grid-template-columns: repeat(2, 36px);
+    gap: 6px;
+  }
+
+  .page-order-row > form:last-child button {
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    min-height: 36px;
+    padding: 0;
+    box-shadow: 2px 2px 0 var(--glm-ink);
+  }
+
+  .metrics > div,
+  .metrics > div:first-child {
+    padding: 0.9rem 1rem;
+  }
+
+  .tool-summary-card {
+    min-height: 0;
+    gap: 0.9rem;
+  }
+}

@@ -85,11 +85,11 @@ export function AreaMap({
     >
       <div className="area-map-canvas" aria-hidden="true">
         {layout.tiles.map((tile) => (
-          // OpenStreetMap tiles use dynamic paths and cannot use next/image.
+          // Tile requests stay same-origin so privacy shields do not block them.
           // eslint-disable-next-line @next/next/no-img-element
           <img
             key={`${tile.x}-${tile.y}`}
-            src={`https://tile.openstreetmap.org/${layout.zoom}/${tile.x}/${tile.y}.png`}
+            src={`/api/map-tiles/${layout.zoom}/${tile.x}/${tile.y}`}
             alt=""
             draggable={false}
             style={{ left: tile.left, top: tile.top }}

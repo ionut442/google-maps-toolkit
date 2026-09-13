@@ -29,10 +29,10 @@ export function GoogleReviewSummary({
     <>
       {score && (
         <>
+          <strong>{score}</strong>
           <span className="google-review-stars" aria-hidden="true">
             ★★★★★
           </span>
-          <strong>{score}</strong>
         </>
       )}
       {count && (

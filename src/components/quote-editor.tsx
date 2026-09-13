@@ -22,7 +22,6 @@ import {
   moveQuoteFieldAction,
   saveQuoteAction,
   updateQuoteFieldAction,
-  updateQuoteFormMetaAction,
 } from "@/app/actions";
 import { EditorActionForm } from "@/components/editor-action-form";
 import { QuoteFieldControl } from "@/components/public/quote-request-form";
@@ -112,12 +111,10 @@ export function QuoteEditor({
           <p>
             Choose what customers should tell you before you call them back.
           </p>
-          <EditorActionForm action={updateQuoteFormMetaAction}>
-            <input type="hidden" name="businessId" value={businessId} />
+          <div className="stack-form quote-introduction-fields">
             <label>
               Heading customers see
               <input
-                name="label"
                 value={config.label}
                 onChange={(event) =>
                   setConfig({ ...config, label: event.currentTarget.value })
@@ -129,7 +126,6 @@ export function QuoteEditor({
             <label>
               Short introduction <span className="optional">Optional</span>
               <textarea
-                name="intro"
                 value={config.intro ?? ""}
                 onChange={(event) =>
                   setConfig({ ...config, intro: event.currentTarget.value })
@@ -138,8 +134,7 @@ export function QuoteEditor({
                 rows={2}
               />
             </label>
-            <SubmitButton>Save introduction</SubmitButton>
-          </EditorActionForm>
+          </div>
         </section>
         <section className="stack-form" aria-labelledby="questions-title">
           <div className="section-heading">

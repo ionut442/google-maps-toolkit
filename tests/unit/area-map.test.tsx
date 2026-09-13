@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { AreaMap } from "@/components/area-map";
 
 describe("service area map", () => {
-  it("renders an accessible OpenStreetMap tile preview around a saved area", () => {
+  it("renders accessible, same-origin OpenStreetMap tiles around a saved area", () => {
     const html = renderToStaticMarkup(
       <AreaMap
         points={[
@@ -15,9 +15,10 @@ describe("service area map", () => {
         ]}
       />,
     );
-    expect(html).toContain("https://tile.openstreetmap.org/");
     expect(html).toContain('aria-label="Map showing Cluj-Napoca, Romania"');
-    expect(html).toContain('title="Cluj-Napoca, Romania"');
-    expect(html).not.toContain("<iframe");
+    expect(html).toContain('role="img"');
+    expect(html).toContain('src="/api/map-tiles/13/');
+    expect(html).toContain("© OpenStreetMap contributors");
+    expect(html).not.toContain("tile.openstreetmap.org");
   });
 });

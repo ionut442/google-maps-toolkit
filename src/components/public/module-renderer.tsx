@@ -26,6 +26,10 @@ import { promotionIsExpired } from "@/lib/promotions";
 import { weekDayLabels } from "@/lib/work-hours";
 import { trustEntryState } from "@/lib/trust";
 
+function cityName(value: string) {
+  return value.split(",", 1)[0]?.trim() || value;
+}
+
 type RendererContext = {
   business: PublicBusiness;
   module: PublicModule;
@@ -62,12 +66,12 @@ function modulePreview(module: PublicModule, business: PublicBusiness) {
         <>
           <strong>{business.phone}</strong>
           {module.config.emergencyEnabled && module.config.emergencyLabel
-            ? ` Â· ${module.config.emergencyLabel}`
-            : " Â· Call or message in one tap"}
+            ? ` · ${module.config.emergencyLabel}`
+            : " · Call or message in one tap"}
         </>
       );
     case "QUOTE_REQUEST":
-      return module.config.intro || "A few quick questions Â· quick to send";
+      return module.config.intro || "A few quick questions · quick to send";
     case "PROMOTIONS": {
       const active = module.config.offers.filter(
         (offer) => !promotionIsExpired(offer.validUntil),
@@ -82,7 +86,7 @@ function modulePreview(module: PublicModule, business: PublicBusiness) {
           (category) => category.items,
         )[0];
         return first
-          ? `${first.name} Â· ${first.pricePrefix === "FROM" ? "from " : ""}${formatMoney(first.amountMinor, module.config.currency)}`
+          ? `${first.name} · ${first.pricePrefix === "FROM" ? "from " : ""}${formatMoney(first.amountMinor, module.config.currency)}`
           : "Clear starting prices";
       }
       return "Build a quick starting estimate";
@@ -95,29 +99,19 @@ function modulePreview(module: PublicModule, business: PublicBusiness) {
           .join(", ") || "See what this business offers"
       );
     case "SERVICE_AREA": {
-      const shown = module.config.areas.slice(0, 3);
-      return shown.length ? (
-        <span className="public-preview-chips">
-          {shown.map((area) => (
-            <span key={area.id}>{area.name}</span>
-          ))}
-          {module.config.areas.length > shown.length && (
-            <small>+{module.config.areas.length - shown.length} more</small>
-          )}
-        </span>
-      ) : (
-        `${module.config.postalCodes.length} covered postcodes`
-      );
+      return module.config.areas.length
+        ? `${module.config.areas.length} service ${module.config.areas.length === 1 ? "area" : "areas"}`
+        : `${module.config.postalCodes.length} covered postcodes`;
     }
     case "WORK_HOURS":
-      return "See this weekâ€™s availability";
+      return "See this week’s availability";
     case "TRUST":
       return `${module.config.entries.length} business-provided ${module.config.entries.length === 1 ? "credential" : "credentials"}`;
     case "FAQ":
       return `${module.config.suggestedFaqs.length} common ${module.config.suggestedFaqs.length === 1 ? "question" : "questions"}`;
     case "REVIEW":
       return business.googleReviewScore !== null
-        ? `${business.googleReviewScore.toFixed(1)} Â· ${business.googleReviewCount ?? "Google"} reviews`
+        ? `${business.googleReviewScore.toFixed(1)} · ${business.googleReviewCount ?? "Google"} reviews`
         : "Read or leave a Google review";
     case "SAVE_CONTACT":
       return "Add phone & email to your contacts";
@@ -277,7 +271,6 @@ function PricingPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Pricing</p>
           <h2 id="pricing-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -361,7 +354,6 @@ function ServicesPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Services</p>
           <h2 id="services-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -396,7 +388,6 @@ function WorkHoursPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Availability</p>
           <h2 id="hours-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -436,7 +427,6 @@ function PromotionsPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Special offers</p>
           <h2 id="promotions-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -497,7 +487,6 @@ function ServiceAreaPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Service area</p>
           <h2 id="area-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -513,7 +502,7 @@ function ServiceAreaPresentation({
         <ul className="chip-list">
           {module.config.areas.map((area) => (
             <li key={area.id}>
-              <MapPin size={14} aria-hidden="true" /> {area.name}
+              <MapPin size={14} aria-hidden="true" /> {cityName(area.name)}
             </li>
           ))}
         </ul>
@@ -547,7 +536,6 @@ function TrustPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <p className="action-kicker">Credentials & reassurance</p>
           <h2 id="trust-heading">{module.config.label}</h2>
         </div>
       </div>
@@ -631,7 +619,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           id="quote"
           aria-labelledby="quote-heading"
         >
-          <p className="action-kicker">{module.config.label}</p>
           <h2 id="quote-heading">Tell us what you need</h2>
           <p>
             {module.config.intro ||
@@ -675,7 +662,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           className="action-module public-faq-module"
           aria-labelledby="faq-heading"
         >
-          <p className="action-kicker">Frequently asked questions</p>
           <h2 id="faq-heading">Questions customers often ask</h2>
           <div className="public-faq-list">
             {module.config.suggestedFaqs.map((faq, index) => (
@@ -699,7 +685,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           aria-labelledby="review-heading"
         >
           <div>
-            <p className="action-kicker">Customer feedback</p>
             <h2 id="review-heading">Find us on Google</h2>
             <p>
               Had a good experience? Your review helps other local customers.
@@ -730,7 +715,6 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           aria-labelledby="save-heading"
         >
           <div>
-            <p className="action-kicker">Keep the details</p>
             <h2 id="save-heading">Save this business</h2>
             <p>Add the phone number and email to your contacts.</p>
           </div>

@@ -130,7 +130,6 @@ export function ServiceAreaEditor({
             <label>
               Search for a town or area
               <span className="search-input">
-                <Search size={19} aria-hidden="true" />
                 <input
                   value={query}
                   onChange={(event) => {
@@ -145,6 +144,7 @@ export function ServiceAreaEditor({
                   autoComplete="off"
                   aria-describedby="place-search-status"
                 />
+                <Search size={19} aria-hidden="true" />
               </span>
             </label>
             <div

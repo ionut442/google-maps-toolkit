@@ -133,6 +133,15 @@ describe("product pass public rendering", () => {
       renderToStaticMarkup(<GoogleReviewSummary business={base} />),
     ).toContain("4.8");
     expect(
+      renderToStaticMarkup(<GoogleReviewSummary business={base} />).indexOf(
+        "4.8",
+      ),
+    ).toBeLessThan(
+      renderToStaticMarkup(<GoogleReviewSummary business={base} />).indexOf(
+        "★★★★★",
+      ),
+    );
+    expect(
       renderToStaticMarkup(
         <GoogleReviewSummary
           business={{ ...base, displayGoogleReviewScore: false }}

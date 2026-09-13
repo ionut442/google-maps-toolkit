@@ -33,6 +33,12 @@ export function ToolList({
           <article className="tool-summary-card" key={tool.id}>
             <div className="tool-card-top">
               <ToolIcon type={type} />
+              <ToolStatusSwitch
+                businessId={businessId}
+                moduleId={tool.id}
+                type={type}
+                enabled={tool.enabled}
+              />
             </div>
             <div>
               <h2>{labels[type]}</h2>
@@ -41,22 +47,16 @@ export function ToolList({
                 {toolSummary(type, config, { googleConnected })}
               </span>
             </div>
-            <div className="tool-card-actions">
-              <ToolStatusSwitch
-                businessId={businessId}
-                moduleId={tool.id}
-                type={type}
-                enabled={tool.enabled}
-              />
-              {!onboarding && (
+            {!onboarding && (
+              <div className="tool-card-actions">
                 <Link
                   className="button secondary tool-edit-button"
                   href={toolEditorHref(tool.id)}
                 >
                   Edit <ArrowRight size={16} />
                 </Link>
-              )}
-            </div>
+              </div>
+            )}
           </article>
         );
       })}
