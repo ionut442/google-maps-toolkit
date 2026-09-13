@@ -76,6 +76,26 @@ describe("public contact form", () => {
     });
   });
 
+  it("accepts the canonical origin behind a loopback reverse proxy", async () => {
+    const send = vi.fn().mockResolvedValue({ messageId: "sent-2" });
+    const proxiedRequest = new Request("http://127.0.0.1:3040/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Origin: "https://local-action.com",
+      },
+      body: JSON.stringify(valid),
+    });
+    const response = await handleContactRequest(proxiedRequest, {
+      identifyClient: () => crypto.randomUUID(),
+      expectedOrigin: "https://local-action.com",
+      rateLimit: () => ({ allowed: true, retryAfterSeconds: 0 }),
+      transport: { send },
+    });
+    expect(response.status).toBe(200);
+    expect(send).toHaveBeenCalledOnce();
+  });
+
   it("builds injection-safe headers", () => {
     const email = buildContactEmail({
       ...valid,

@@ -97,6 +97,7 @@ export function buildContactEmail(
 
 export type ContactDependencies = {
   identifyClient: (request: Request) => string;
+  expectedOrigin?: string;
   rateLimit?: (identifier: string) => {
     allowed: boolean;
     retryAfterSeconds: number;
@@ -119,7 +120,9 @@ export async function handleContactRequest(
   dependencies: ContactDependencies,
 ) {
   const origin = request.headers.get("origin");
-  if (!origin || origin !== new URL(request.url).origin)
+  const expectedOrigin =
+    dependencies.expectedOrigin ?? new URL(request.url).origin;
+  if (!origin || origin !== expectedOrigin)
     return Response.json(
       { ok: false, message: "Invalid request." },
       { status: 403 },
