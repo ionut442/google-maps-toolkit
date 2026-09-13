@@ -7,6 +7,7 @@ import {
   ChevronRight,
   FileText,
   House,
+  LifeBuoy,
   LogOut,
   Menu,
   PanelTop,
@@ -78,6 +79,9 @@ export function AppShell({
         </Link>
         <NavigationLinks />
         <div className="sidebar-account">
+          <Link href="/help" className="sidebar-help">
+            <LifeBuoy aria-hidden="true" size={18} /> Help
+          </Link>
           <span className="account-avatar" aria-hidden="true">
             <UserRound size={18} />
           </span>
@@ -113,6 +117,10 @@ export function AppShell({
               <small>{email}</small>
             </div>
             <NavigationLinks mobile />
+            <Link href="/help" className="mobile-help-link">
+              <LifeBuoy aria-hidden="true" size={18} /> Help
+              <ChevronRight aria-hidden="true" size={18} />
+            </Link>
             <form action={logoutAction}>
               <button className="secondary mobile-logout" aria-label="Log out">
                 <LogOut size={18} aria-hidden="true" /> Log out

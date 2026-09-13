@@ -10,6 +10,7 @@ export type TransactionalEmail = {
   destination: string;
   subject: string;
   text: string;
+  replyTo?: string;
 };
 export interface EmailTransport {
   send(message: TransactionalEmail): Promise<{ messageId: string }>;
@@ -37,6 +38,7 @@ export class ResendEmailTransport implements EmailTransport {
       to: message.destination,
       subject: message.subject,
       text: message.text,
+      replyTo: message.replyTo,
     });
     if (error)
       throw new Error(

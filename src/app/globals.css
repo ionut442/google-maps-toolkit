@@ -431,6 +431,43 @@ body:has(.public-action-page) > .site-header {
   border-top: 1px solid var(--soft-border);
   padding: 1rem 0.25rem 0;
 }
+.sidebar-help {
+  grid-column: 1 / -1;
+  display: flex;
+  min-height: 42px;
+  align-items: center;
+  gap: 0.65rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: rgb(244 239 226 / 80%);
+  padding: 0.55rem 0.7rem;
+  font-weight: 700;
+}
+.sidebar-help:hover {
+  border-color: var(--ink);
+  background: var(--primary);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.mobile-help-link {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.72rem;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  color: rgb(244 239 226 / 80%);
+  padding: 0.65rem 0.75rem;
+  font-weight: 700;
+}
+.mobile-help-link svg:last-child {
+  margin-left: auto;
+}
+.mobile-help-link:hover {
+  border-color: var(--ink);
+  background: var(--primary);
+  color: var(--ink);
+}
 .sidebar-account > span:nth-child(2) {
   display: grid;
   min-width: 0;
