@@ -1,5 +1,7 @@
 import { isIP } from "node:net";
 
+import { paddleConfigurationIssues } from "@/lib/paddle-config";
+
 type Environment = Record<string, string | undefined>;
 
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1", "0.0.0.0"]);
@@ -141,5 +143,6 @@ export function productionEnvironmentIssues(env: Environment = process.env) {
     issues.push(
       "SERPAPI_API_KEY must be a non-placeholder 32+ character secret",
     );
+  issues.push(...paddleConfigurationIssues(env));
   return issues;
 }

@@ -9,11 +9,18 @@ import {
 import { setPublishedAction } from "@/app/actions";
 import { CopyLink } from "@/components/copy-link";
 import { CustomerPreview } from "@/components/customer-preview";
+import { PaddleCheckoutButton } from "@/components/paddle-checkout-button";
 import { StepShell } from "@/components/step-shell";
 import { SubmitButton } from "@/components/submit-button";
 import { requireUser } from "@/lib/auth";
+import { hasBillingAccess } from "@/lib/billing-entitlement";
 import { requireOwnedBusiness } from "@/lib/business";
+import { db } from "@/lib/db";
 import { canPublishBusiness } from "@/lib/domain";
+import {
+  createCheckoutSignature,
+  paddlePublicConfig,
+} from "@/lib/paddle-config";
 import { publicBusinessUrl } from "@/lib/public-url";
 import {
   allEnabledToolsReady,
@@ -24,9 +31,22 @@ import { labels, moduleTypes, type ModuleType } from "@/lib/domain";
 import { toolEditorHref } from "@/lib/tool-presentation";
 import { listOwnedTrustEvidence } from "@/lib/trust-evidence";
 
-export default async function PublishPage() {
+export default async function PublishPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ checkout?: string }>;
+}) {
   const user = await requireUser();
   const business = await requireOwnedBusiness(user.id);
+  const billing = await db.businessBilling.findUnique({
+    where: { businessId: business.id },
+  });
+  const billingEntitled = hasBillingAccess(billing?.status);
+  const checkoutConfig = paddlePublicConfig();
+  const checkoutSignature = checkoutConfig
+    ? createCheckoutSignature(business.id)
+    : null;
+  const checkoutCompleted = (await searchParams).checkout === "success";
   const trustEvidence = await listOwnedTrustEvidence(user.id, business.id);
   const url = publicBusinessUrl(business.slug);
   const detailsReady = Boolean(business.phone && business.description);
@@ -118,6 +138,25 @@ export default async function PublishPage() {
                   highlighted item before publishing.
                 </p>
               )}
+              {!billingEntitled && (
+                <section
+                  className="billing-offer"
+                  aria-labelledby="billing-offer-title"
+                >
+                  <span className="billing-offer-kicker">One month free</span>
+                  <h2 id="billing-offer-title">€0 today</h2>
+                  <p>
+                    Then <strong>€9.99/month + applicable taxes</strong>.
+                    Payment details are collected now, but Paddle charges
+                    nothing until the free month ends.
+                  </p>
+                  <ul>
+                    <li>Cancel anytime</li>
+                    <li>One subscription per business</li>
+                    <li>No annual commitment</li>
+                  </ul>
+                </section>
+              )}
               <div className="publish-actions">
                 <form action={setPublishedAction}>
                   <input type="hidden" name="businessId" value={business.id} />
@@ -134,7 +173,7 @@ export default async function PublishPage() {
         <CustomerPreview
           business={{ ...business, trustEvidence }}
           publishAction={
-            business.published ? undefined : (
+            business.published ? undefined : billingEntitled ? (
               <form action={setPublishedAction}>
                 <input type="hidden" name="businessId" value={business.id} />
                 <input type="hidden" name="published" value="true" />
@@ -142,6 +181,21 @@ export default async function PublishPage() {
                   Publish page
                 </SubmitButton>
               </form>
+            ) : checkoutConfig && checkoutSignature ? (
+              <PaddleCheckoutButton
+                businessId={business.id}
+                checkoutSignature={checkoutSignature}
+                clientToken={checkoutConfig.clientToken}
+                email={user.email}
+                environment={checkoutConfig.environment}
+                priceId={checkoutConfig.priceId}
+                disabled={!publishable}
+                activationPending={checkoutCompleted}
+              />
+            ) : (
+              <button className="button" type="button" disabled>
+                Billing setup unavailable
+              </button>
             )
           }
         />

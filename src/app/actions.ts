@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { canPublishWithBilling } from "@/lib/publication-entitlement";
 import { createSession, destroySession, requireUser } from "@/lib/auth";
 import { hashPassword, verifyPassword } from "@/lib/password";
 import {
@@ -28,7 +29,6 @@ import {
   signupSchema,
 } from "@/lib/validation";
 import {
-  canPublishBusiness,
   moduleSwapIndex,
   moduleTypes,
   parseModuleConfig,
@@ -54,7 +54,6 @@ import {
   stageBusinessLogo,
 } from "@/lib/business-logo";
 import { privateStorage } from "@/lib/storage";
-import { allEnabledToolsReady } from "@/lib/onboarding-readiness";
 import {
   directGoogleReviewUrlSchema,
   extractGoogleReviewLink,
@@ -771,13 +770,18 @@ export async function setPublishedAction(formData: FormData) {
     String(formData.get("businessId")) || undefined,
   );
   const publish = String(formData.get("published")) === "true";
+  const billing = publish
+    ? await db.businessBilling.findUnique({
+        where: { businessId: business.id },
+        select: { status: true },
+      })
+    : null;
   if (
     publish &&
-    (!canPublishBusiness(business, business.modules) ||
-      !allEnabledToolsReady(business.modules, business))
+    !canPublishWithBilling(billing?.status, business, business.modules)
   ) {
     throw new Error(
-      "Complete the business details and save every enabled tool before publishing",
+      "An entitled subscription, complete business details, and saved enabled tools are required before publishing",
     );
   }
   await db.business.update({

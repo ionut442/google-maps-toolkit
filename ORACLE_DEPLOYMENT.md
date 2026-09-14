@@ -6,6 +6,15 @@ The application runs as the dedicated, non-login `googlemaps` user from `/opt/go
 
 Production uses `APP_URL=https://local-action.com`, enables trusted proxy headers, and treats Caddy's `X-Forwarded-For` value as the authoritative client IP. Caddy must remain the only public ingress because its default reverse-proxy behavior discards spoofed client forwarding values before setting the upstream header.
 
+Paddle configuration also lives only in the protected runtime file:
+`PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`,
+`NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `NEXT_PUBLIC_PADDLE_PRICE_ID`, and
+`NEXT_PUBLIC_PADDLE_ENVIRONMENT`. While testing, all five values must be from
+Paddle Sandbox and the environment value is `sandbox`. A Live launch replaces
+all four credentials/IDs together and changes the environment to `live`; billing
+code does not change. Because `NEXT_PUBLIC_` values are compiled into browser
+assets, load the protected environment before `npm run build`.
+
 The VM has approximately 956 MiB RAM and a persistent 4 GiB `/swapfile` with mode `0600`. Keep `vm.swappiness=10`; verify swap before dependency installation or production builds. The persisted firewall policy permits public TCP 80 and 443 for Caddy and SSH TCP 22 for administration.
 
 ## Prepare an update locally

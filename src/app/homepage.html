@@ -2158,6 +2158,75 @@
         flex: none;
       }
 
+      /* ============ PRICING ============ */
+      .pricing {
+        padding: 100px 0 110px;
+        background: var(--paper2);
+      }
+      .pricing-wrap {
+        display: grid;
+        grid-template-columns: 0.8fr 1.2fr;
+        gap: clamp(2rem, 6vw, 5rem);
+        align-items: center;
+      }
+      .pricing-copy p {
+        max-width: 48ch;
+        margin-top: 1.2rem;
+        color: var(--ink2);
+        font-size: 1.05rem;
+      }
+      .price-card {
+        position: relative;
+        border: 3px solid var(--ink);
+        border-radius: 18px;
+        background: var(--paper);
+        box-shadow: 10px 10px 0 var(--ink);
+        padding: clamp(1.5rem, 4vw, 2.6rem);
+      }
+      .price-badge {
+        display: inline-block;
+        border: 2px solid var(--ink);
+        border-radius: 999px;
+        background: var(--amber);
+        padding: 0.45rem 0.8rem;
+        font: 700 0.76rem var(--mono);
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .price-today {
+        margin-top: 1.3rem;
+        font: 400 clamp(3rem, 7vw, 5.5rem) / 0.95 var(--display);
+        letter-spacing: 0.01em;
+        text-transform: uppercase;
+      }
+      .price-after {
+        margin: 0.6rem 0 1.2rem;
+        font-size: 1.15rem;
+      }
+      .price-after strong {
+        font-size: 1.4rem;
+      }
+      .price-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem 1rem;
+        margin: 1.3rem 0 1.6rem;
+        padding: 1.2rem 0 0;
+        border-top: 1px solid var(--line);
+        list-style: none;
+      }
+      .price-list li::before {
+        content: "✓";
+        margin-right: 0.5rem;
+        color: var(--pine);
+        font-weight: 800;
+      }
+      .price-note {
+        margin: 1rem 0 0;
+        color: var(--ink2);
+        font-size: 0.88rem;
+      }
+
       /* ============ FAQ ============ */
       .faq {
         padding: 100px 0 110px;
@@ -2502,6 +2571,15 @@
           transform: rotate(-7deg);
         }
       }
+      @media (max-width: 760px) {
+        .pricing-wrap,
+        .price-list {
+          grid-template-columns: 1fr;
+        }
+        .price-card {
+          box-shadow: 6px 6px 0 var(--ink);
+        }
+      }
     </style>
   </head>
   <body>
@@ -2522,6 +2600,7 @@
           <li><a href="#how">How it works</a></li>
           <li><a href="#features">What you get</a></li>
           <li><a href="#who">Who it's for</a></li>
+          <li><a href="#pricing">Pricing</a></li>
           <li><a href="#faq">FAQ</a></li>
         </ul>
         <div class="nav-cta">
@@ -2541,6 +2620,7 @@
         <a href="#how">How it works</a>
         <a href="#features">What you get</a>
         <a href="#who">Who it's for</a>
+        <a href="#pricing">Pricing</a>
         <a href="#faq">FAQ</a>
         <a href="/login">Log in</a>
       </div>
@@ -3929,6 +4009,48 @@
               <circle cx="12" cy="10" r="2.5" /></svg
             >Built for local services
           </div>
+        </div>
+      </section>
+
+      <!-- ================= PRICING ================= -->
+      <section class="pricing" id="pricing">
+        <div class="wrap pricing-wrap">
+          <div class="pricing-copy">
+            <span class="eyebrow" data-reveal data-scramble
+              >Simple pricing</span
+            >
+            <h2 class="h-lg" style="margin-top: 1.3rem" data-reveal>
+              <span class="ln"><span>One business.</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s">One clear plan.</span></span
+              >
+            </h2>
+            <p data-reveal>
+              Paddle is our Merchant of Record and handles secure payment,
+              applicable taxes, invoices, and cancellation.
+            </p>
+          </div>
+          <article class="price-card" data-reveal aria-labelledby="price-title">
+            <span class="price-badge">One month free</span>
+            <h3 class="price-today" id="price-title">€0 today</h3>
+            <p class="price-after">
+              Then <strong>€9.99 / month</strong> + applicable taxes
+            </p>
+            <ul class="price-list">
+              <li>First month free</li>
+              <li>Cancel anytime</li>
+              <li>One subscription per business</li>
+              <li>No annual commitment</li>
+            </ul>
+            <a class="btn" href="/signup">
+              Start your free month
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+            </a>
+            <p class="price-note">
+              Payment details are required when your free trial starts. Cancel
+              before the free month ends and you won’t be charged.
+            </p>
+          </article>
         </div>
       </section>
 

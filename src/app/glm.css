@@ -400,6 +400,19 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   color: var(--glm-ink-2);
 }
 
+.billing-offer,
+.billing-activating,
+.billing-settings-card {
+  border-color: var(--glm-ink);
+  background: var(--glm-amber-soft);
+  color: var(--glm-ink-2);
+}
+
+.billing-status,
+.billing-offer-kicker {
+  font-family: var(--font-mono-stack);
+}
+
 .tool-icon {
   width: 46px;
   height: 46px;

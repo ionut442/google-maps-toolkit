@@ -2290,6 +2290,100 @@ dd {
   flex-wrap: wrap;
   gap: 0.6rem;
 }
+.billing-offer {
+  margin: 1rem 0;
+  border: 2px solid var(--ink);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--accent) 16%, var(--canvas));
+  box-shadow: 4px 4px 0 var(--ink);
+  padding: 1.15rem;
+}
+.billing-offer-kicker,
+.billing-status {
+  display: inline-flex;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem;
+  font: 700 0.72rem var(--font-mono-stack);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.billing-offer h2 {
+  margin: 0.75rem 0 0.4rem;
+}
+.billing-offer p {
+  margin: 0;
+}
+.billing-offer ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem 1.2rem;
+  margin: 0.9rem 0 0;
+  padding-left: 1.2rem;
+  font-size: 0.9rem;
+}
+.paddle-checkout-action {
+  display: grid;
+  gap: 0.65rem;
+}
+.billing-activating {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--canvas);
+  padding: 0.8rem;
+}
+.billing-activating span:last-child {
+  display: grid;
+  gap: 0.15rem;
+}
+.billing-activating small,
+.billing-checkout-message,
+.billing-settings-actions small {
+  color: var(--muted);
+}
+.billing-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid var(--soft-border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: billing-spin 0.8s linear infinite;
+}
+@keyframes billing-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.billing-settings-card {
+  margin-top: 1.3rem;
+}
+.billing-status-trialing,
+.billing-status-active {
+  color: var(--success);
+}
+.billing-status-past_due,
+.billing-status-paused {
+  color: var(--warning, #8a5a00);
+}
+.billing-status-canceled,
+.billing-status-none {
+  color: var(--muted);
+}
+.billing-date,
+.billing-warning {
+  border-left: 4px solid var(--accent);
+  padding-left: 0.8rem;
+}
+.billing-settings-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem 1rem;
+  align-items: center;
+  margin-top: 1rem;
+}
 
 /* Public customer page */
 .public-action-page {

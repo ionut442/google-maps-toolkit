@@ -27,8 +27,13 @@ Run `npm run ops -- health` after migration and start. Seed is development-only;
 - `TRUST_PROXY_HEADERS=true`: only behind ingress that removes client-supplied forwarding headers and writes the authoritative value.
 - `TRUSTED_CLIENT_IP_HEADER`: `x-forwarded-for`, `x-real-ip`, or `cf-connecting-ip`.
 - `EMAIL_TRANSPORT=resend`, `RESEND_API_KEY`, and verified `EMAIL_FROM`.
+- `PADDLE_API_KEY`, `PADDLE_WEBHOOK_SECRET`,
+  `NEXT_PUBLIC_PADDLE_CLIENT_TOKEN`, `NEXT_PUBLIC_PADDLE_PRICE_ID`, and
+  `NEXT_PUBLIC_PADDLE_ENVIRONMENT`. Sandbox uses `sandbox`, a `_sdbx_` API key,
+  and a `test_` client token; Live uses `live`, a `_live_` key, and a `live_`
+  token. All IDs and credentials must come from the same Paddle environment.
 
-`npm run config:check` fails for localhost/insecure `APP_URL`, non-PostgreSQL or missing pooled/direct database URLs, local production storage, invalid Object Storage configuration, placeholders, invalid session lifetime, untrusted proxy settings, or missing Resend configuration.
+`npm run config:check` fails for localhost/insecure `APP_URL`, non-PostgreSQL or missing pooled/direct database URLs, local production storage, invalid Object Storage configuration, placeholders, invalid session lifetime, untrusted proxy settings, missing Resend configuration, or missing/mixed Paddle configuration.
 
 ## Ingress and abuse protection
 

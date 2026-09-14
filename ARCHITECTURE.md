@@ -26,3 +26,25 @@
 - Private-beta operations remain scripts, not an admin product. Cleanup retains analytics for 90 days, Quotes/uploads for 365 days, expired sessions until cleanup, and rate-limit rows for at most 24 hours.
 - Business/account deletion unpublishes first, removes known private objects, then relies on database cascades. Object-removal failure stops database deletion for safe retry.
 - CRM, SMS, calendars, maps, geocoding/GIS, arbitrary pricing formulas, arbitrary form builders, public credential documents, external surveillance analytics, graphic editors, and general-purpose uploads remain outside Goal 5.
+
+# Billing and publication entitlement
+
+Paddle Billing is LocalAction's Merchant of Record. A `BusinessBilling` record
+belongs one-to-one to `Business`, because the €9.99/month plus applicable tax
+subscription is sold per business rather than per user. The configured recurring
+price includes a one-month free trial and collects payment details at trial start.
+
+Paddle webhooks are the subscription source of truth. Only verified
+`subscription.created` and `subscription.updated` events update the local billing
+record. Event IDs make repeat delivery safe and `occurred_at` prevents stale
+events from overwriting newer state. Checkout custom data carries the LocalAction
+business ID plus a server signature so a browser cannot assign a subscription to
+an arbitrary business.
+
+`trialing`, `active`, and `past_due` are entitled. Paddle recommends retaining
+access while it retries past-due payments; the dashboard directs the owner to the
+portal. `paused` and `canceled` are not entitled and their webhook unpublishes the
+page without deleting configuration. An entitled initial-onboarding webhook may
+auto-publish only while `onboardingStep < 7` and all existing readiness checks
+pass, so it cannot republish a page an owner later unpublished. Paddle's hosted
+customer portal handles payment methods, invoices, and cancellation.

@@ -63,6 +63,14 @@ Migration `20260827090000_goal_5_analytics` adds `AnalyticsEvent` and indexed bu
 
 Production must supply the pooled/direct Neon URLs, Object Storage credentials, rate-limit salt, trusted-ingress settings, and Resend values. `EMAIL_FROM` must be a sender accepted by Resend; use a verified domain sender for deployment. Development can use local private storage and the capture email transport.
 
+Paddle provides the per-business €9.99/month plus tax subscription as Merchant
+of Record, with one month free and payment details collected at trial start.
+Checkout is environment-driven, verified subscription webhooks control
+publication entitlement, and Paddle's hosted customer portal handles billing and
+cancellation. Add the five documented Paddle variables to the ignored `.env.local`
+for local development and to the protected production environment file before
+running configuration validation and building.
+
 ## Database and validation
 
 Migrations live in `prisma/migrations`. `npm run db:migrate` deploys them through the direct Neon URL; `npm run db:seed` is idempotent and development-only. Tests require `TEST_DATABASE_URL` plus `TEST_DATABASE_URL_UNPOOLED`, or a linked non-production Neon branch. `npm run db:reset` refuses the configured application database and requires an explicit test database URL.
