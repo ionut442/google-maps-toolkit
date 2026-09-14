@@ -23,9 +23,9 @@ export default async function BusinessDetailsPage() {
   return (
     <main className="dashboard-page narrow-dashboard-page">
       <PageHeader
-        eyebrow="Business Details"
-        title="Your business information"
-        intro="Keep the details reused across your customer tools accurate and up to date."
+        eyebrow="Business & billing"
+        title="Business settings"
+        intro="Keep your customer-facing details accurate and manage your LocalAction subscription."
       />
       <ProfileForm business={business} />
       <SectionCard className="billing-settings-card">
@@ -41,10 +41,11 @@ export default async function BusinessDetailsPage() {
           </span>
         </div>
         <p>
-          <strong>€9.99/month + applicable tax</strong> after the one-month free
-          trial. Billing, payment details, invoices, and cancellation are
-          managed securely by Paddle, our Merchant of Record.
+          <strong>LocalAction monthly</strong>
+          <br />
+          €9.99/month + applicable taxes after the one-month free trial.
         </p>
+        <p>Manage payment method, invoices, and cancellation in Paddle.</p>
         {billingDate && (
           <p className="billing-date">
             {billing?.status === "trialing"
@@ -81,7 +82,7 @@ export default async function BusinessDetailsPage() {
               Start free trial
             </Link>
           )}
-          <small>Cancel anytime in Paddle’s hosted customer portal.</small>
+          <small>Paddle securely hosts your billing portal.</small>
         </div>
       </SectionCard>
     </main>

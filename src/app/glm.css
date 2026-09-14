@@ -320,6 +320,21 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 
 .sidebar-account {
   border-top: 1.5px solid var(--glm-border);
+  color: var(--glm-ink);
+}
+
+.sidebar-help,
+.sidebar-account strong {
+  color: var(--glm-ink);
+}
+
+.sidebar-account small {
+  color: var(--glm-muted);
+}
+
+.mobile-help-link {
+  background: var(--glm-canvas);
+  color: var(--glm-ink);
 }
 
 .dashboard-page,
@@ -400,7 +415,6 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   color: var(--glm-ink-2);
 }
 
-.billing-offer,
 .billing-activating,
 .billing-settings-card {
   border-color: var(--glm-ink);
@@ -408,8 +422,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   color: var(--glm-ink-2);
 }
 
-.billing-status,
-.billing-offer-kicker {
+.billing-status {
   font-family: var(--font-mono-stack);
 }
 

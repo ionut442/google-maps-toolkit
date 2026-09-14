@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  BriefcaseBusiness,
   ChevronRight,
+  CreditCard,
   FileText,
   House,
   LifeBuoy,
@@ -26,8 +26,8 @@ const navigation = [
   { href: "/dashboard/review-kit", label: "Review Kit", icon: Star },
   {
     href: "/dashboard/business",
-    label: "Business Details",
-    icon: BriefcaseBusiness,
+    label: "Business & billing",
+    icon: CreditCard,
   },
 ];
 
@@ -85,7 +85,7 @@ export function AppShell({
           <span className="account-avatar" aria-hidden="true">
             <UserRound size={18} />
           </span>
-          <span>
+          <span className="sidebar-account-identity">
             <strong>{businessName}</strong>
             <small>{email}</small>
           </span>

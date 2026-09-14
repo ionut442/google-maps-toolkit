@@ -78,9 +78,6 @@ export default async function PublishPage({
         <div className="card publish-card">
           {business.published ? (
             <>
-              <div className="publish-success-mark">
-                <CheckCircle2 size={30} aria-hidden="true" />
-              </div>
               <h2>Your customer page is live</h2>
               <div className="publish-url">
                 <small>Your page link</small>
@@ -137,25 +134,6 @@ export default async function PublishPage({
                   <CircleAlert size={18} aria-hidden="true" /> Finish the
                   highlighted item before publishing.
                 </p>
-              )}
-              {!billingEntitled && (
-                <section
-                  className="billing-offer"
-                  aria-labelledby="billing-offer-title"
-                >
-                  <span className="billing-offer-kicker">One month free</span>
-                  <h2 id="billing-offer-title">€0 today</h2>
-                  <p>
-                    Then <strong>€9.99/month + applicable taxes</strong>.
-                    Payment details are collected now, but Paddle charges
-                    nothing until the free month ends.
-                  </p>
-                  <ul>
-                    <li>Cancel anytime</li>
-                    <li>One subscription per business</li>
-                    <li>No annual commitment</li>
-                  </ul>
-                </section>
               )}
               <div className="publish-actions">
                 <form action={setPublishedAction}>

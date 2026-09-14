@@ -26,7 +26,7 @@ export function hasBillingAccess(status: string | null | undefined) {
 export function billingStatusLabel(status: string | null | undefined) {
   switch (status) {
     case "trialing":
-      return "Free trial";
+      return "Trialing";
     case "active":
       return "Active";
     case "past_due":

@@ -72,6 +72,7 @@ export function PaddleCheckoutButton({
         settings: {
           displayMode: "overlay",
           theme: "light",
+          showAddTaxId: true,
           successUrl: `${window.location.origin}/onboarding/publish?checkout=success`,
         },
       });
@@ -88,6 +89,12 @@ export function PaddleCheckoutButton({
 
   return (
     <div className="paddle-checkout-action" aria-live="polite">
+      {!activating && !checkoutSubmitted && (
+        <p className="billing-inline-summary">
+          <strong>1 month free · €0 today</strong>
+          <span>Then €9.99/month + tax · Cancel anytime</span>
+        </p>
+      )}
       {activating ? (
         <div className="billing-activating" role="status">
           <span className="billing-spinner" aria-hidden="true" />

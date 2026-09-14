@@ -50,6 +50,7 @@ describe("per-business billing entitlement", () => {
   });
 
   it("keeps owner-facing status labels centralized", () => {
+    expect(billingStatusLabel("trialing")).toBe("Trialing");
     expect(billingStatusLabel("past_due")).toBe("Past due");
     expect(billingStatusLabel(null)).toBe("Not started");
   });
