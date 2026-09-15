@@ -43,6 +43,11 @@ describe("public Legal, Help, and Contact pages", () => {
     expect(homepage).toContain('data-count="14"');
     expect(homepage).toContain('data-count="9"');
     expect(homepage).toContain("We’ll email you when a customer submits");
+    expect(homepage).toContain("LocalAction complements your website");
+    expect(homepage).toContain(
+      "without replacing your broader business presence",
+    );
+    expect(homepage).not.toContain("LocalAction can work on its own");
     expect(homepage).toContain("Then <strong>€9.99 / month</strong>");
     expect(homepage).not.toContain("+ applicable taxes");
     expect(homepage).not.toContain("Merchant of Record");
