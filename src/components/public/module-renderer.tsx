@@ -62,14 +62,7 @@ const moduleKickers: Record<ModuleType, string> = {
 function modulePreview(module: PublicModule, business: PublicBusiness) {
   switch (module.type) {
     case "CALL_WHATSAPP":
-      return (
-        <>
-          <strong>{business.phone}</strong>
-          {module.config.emergencyEnabled && module.config.emergencyLabel
-            ? ` · ${module.config.emergencyLabel}`
-            : " · Call or message in one tap"}
-        </>
-      );
+      return "Call or message in one tap";
     case "QUOTE_REQUEST":
       return module.config.intro || "A few quick questions · quick to send";
     case "PROMOTIONS": {

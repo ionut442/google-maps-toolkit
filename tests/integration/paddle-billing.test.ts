@@ -74,6 +74,7 @@ function eventFor(
     paddleCustomerId: `ctm_${randomUUID()}`,
     paddleSubscriptionId: `sub_${randomUUID()}`,
     paddlePriceId: "pri_localaction-monthly",
+    billingName: "Alex Buyer",
     quantity: 1,
     status: "trialing",
     trialEndsAt: "2026-10-14T12:00:00.000Z",
@@ -104,6 +105,7 @@ describe("Paddle subscription persistence", () => {
     ).resolves.toMatchObject({
       paddleSubscriptionId: input.paddleSubscriptionId,
       paddleCustomerId: input.paddleCustomerId,
+      billingName: "Alex Buyer",
       status: "trialing",
     });
     await expect(
@@ -246,6 +248,7 @@ describe("Paddle subscription persistence", () => {
           customData: {
             businessId,
             checkoutSignature: createCheckoutSignature(businessId),
+            billingName: "Taylor Purchaser",
           },
           items: [
             {
@@ -259,7 +262,12 @@ describe("Paddle subscription persistence", () => {
           currentBillingPeriod: { endsAt: "2026-10-14T12:00:00.000Z" },
         },
       }),
-    ).toMatchObject({ businessId, quantity: 1, status: "trialing" });
+    ).toMatchObject({
+      businessId,
+      billingName: "Taylor Purchaser",
+      quantity: 1,
+      status: "trialing",
+    });
   });
 
   it("fails safely when Paddle custom data has no business mapping", () => {

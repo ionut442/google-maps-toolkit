@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BriefcaseBusiness,
   ChevronRight,
   CreditCard,
   FileText,
@@ -26,7 +27,12 @@ const navigation = [
   { href: "/dashboard/review-kit", label: "Review Kit", icon: Star },
   {
     href: "/dashboard/business",
-    label: "Business & billing",
+    label: "Business details",
+    icon: BriefcaseBusiness,
+  },
+  {
+    href: "/dashboard/billing",
+    label: "Billing",
     icon: CreditCard,
   },
 ];

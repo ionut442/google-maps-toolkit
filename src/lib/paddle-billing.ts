@@ -22,6 +22,7 @@ export type PaddleSubscriptionEventInput = {
   paddleCustomerId: string;
   paddleSubscriptionId: string;
   paddlePriceId: string;
+  billingName?: string | null;
   quantity: number;
   status: PaddleSubscriptionStatus;
   trialEndsAt: string | null;
@@ -79,6 +80,10 @@ export function normalizePaddleSubscriptionEvent(
       : {};
   const businessId = customData.businessId;
   const checkoutSignature = customData.checkoutSignature;
+  const billingName =
+    typeof customData.billingName === "string"
+      ? customData.billingName.trim().slice(0, 1024)
+      : undefined;
   const status = data.status;
   const items = Array.isArray(data.items)
     ? (data.items as Array<Record<string, unknown>>)
@@ -121,6 +126,7 @@ export function normalizePaddleSubscriptionEvent(
     paddleCustomerId: data.customerId,
     paddleSubscriptionId: data.id,
     paddlePriceId: price.id,
+    billingName,
     quantity: recurringItem.quantity,
     status,
     trialEndsAt:
@@ -214,6 +220,7 @@ export async function applyPaddleSubscriptionEvent(
         paddleCustomerId: input.paddleCustomerId,
         paddleSubscriptionId: input.paddleSubscriptionId,
         paddlePriceId: input.paddlePriceId,
+        billingName: input.billingName ?? null,
         status: input.status,
         trialEndsAt,
         nextBilledAt,
@@ -225,6 +232,9 @@ export async function applyPaddleSubscriptionEvent(
         paddleCustomerId: input.paddleCustomerId,
         paddleSubscriptionId: input.paddleSubscriptionId,
         paddlePriceId: input.paddlePriceId,
+        ...(input.billingName !== undefined
+          ? { billingName: input.billingName }
+          : {}),
         status: input.status,
         trialEndsAt,
         nextBilledAt,

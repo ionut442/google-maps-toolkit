@@ -2297,17 +2297,24 @@ dd {
   display: grid;
   gap: 0.65rem;
 }
-.billing-inline-summary {
+.checkout-billing-name {
   display: grid;
-  gap: 0.12rem;
+  gap: 0.3rem;
   margin: 0;
   color: var(--ink);
-  font-size: 0.78rem;
-  line-height: 1.35;
-  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 800;
 }
-.billing-inline-summary span {
+.checkout-billing-name input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.55rem 0.7rem;
+}
+.checkout-billing-name small {
   color: var(--muted);
+  font-size: 0.7rem;
+  font-weight: 500;
+  line-height: 1.35;
 }
 .billing-activating {
   display: flex;
@@ -2366,6 +2373,188 @@ dd {
   gap: 0.8rem 1rem;
   align-items: center;
   margin-top: 1rem;
+}
+.billing-page {
+  display: grid;
+  gap: 1.25rem;
+}
+.billing-page .page-header {
+  margin-bottom: 0.25rem;
+}
+.billing-overview-grid,
+.billing-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+.billing-detail-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.billing-plan-card,
+.billing-next-card,
+.billing-payments-card,
+.billing-account-card {
+  height: 100%;
+}
+.billing-plan-card {
+  background: var(--primary-soft);
+}
+.billing-plan-price {
+  margin: 1.15rem 0;
+  font-family: var(--font-display-stack);
+  font-size: clamp(2rem, 5vw, 3.25rem);
+  line-height: 1;
+}
+.billing-plan-price small {
+  color: var(--muted);
+  font-family: var(--font-body-stack);
+  font-size: 0.85rem;
+}
+.billing-facts,
+.billing-account-details,
+.billing-totals {
+  display: grid;
+  gap: 0;
+  margin: 1rem 0;
+}
+.billing-facts > div,
+.billing-account-details > div,
+.billing-totals > div,
+.billing-line-items > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--soft-border);
+  padding: 0.7rem 0;
+}
+.billing-facts dt,
+.billing-account-details dt,
+.billing-totals dt {
+  color: var(--muted);
+}
+.billing-facts dd,
+.billing-account-details dd,
+.billing-totals dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 800;
+}
+.billing-line-items {
+  display: grid;
+  margin-top: 1rem;
+}
+.billing-line-items small {
+  color: var(--muted);
+}
+.billing-total-row {
+  border-top: 2px solid var(--ink) !important;
+  font-size: 1.05rem;
+}
+.billing-tax-note,
+.billing-account-note {
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+.billing-notice {
+  margin: 0;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--success-soft, #e2f7eb);
+  padding: 0.85rem 1rem;
+  font-weight: 800;
+}
+.billing-payment-list {
+  display: grid;
+  gap: 0;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.billing-payment-list li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  border-top: 1px solid var(--soft-border);
+  padding: 0.8rem 0;
+}
+.billing-payment-list li > span:first-child {
+  display: grid;
+}
+.billing-payment-list small {
+  color: var(--muted);
+}
+.payment-status {
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.2rem 0.45rem;
+  color: var(--muted);
+  font: 700 0.68rem var(--font-mono-stack);
+  text-transform: uppercase;
+}
+.payment-status-completed {
+  color: var(--success);
+}
+.payment-status-past_due {
+  color: var(--warning, #8a5a00);
+}
+.billing-account-form {
+  display: grid;
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+.billing-account-form label {
+  display: grid;
+  gap: 0.35rem;
+  font-weight: 800;
+}
+.billing-account-form small {
+  margin-top: -0.5rem;
+  color: var(--muted);
+}
+.billing-account-form .button {
+  justify-self: start;
+}
+.billing-cancel-panel {
+  border: 1.5px solid var(--soft-border);
+  border-radius: var(--radius);
+  background: var(--canvas);
+}
+.billing-cancel-panel summary {
+  cursor: pointer;
+  padding: 1rem 1.15rem;
+  color: var(--danger, #a22b2b);
+  font-weight: 800;
+}
+.billing-cancel-panel > div {
+  border-top: 1px solid var(--soft-border);
+  padding: 0 1.15rem 1.15rem;
+}
+.billing-cancel-panel form {
+  display: grid;
+  gap: 0.8rem;
+  justify-items: start;
+}
+.billing-cancel-confirmation {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+}
+.billing-empty-card {
+  max-width: 620px;
+}
+@media (max-width: 800px) {
+  .billing-overview-grid,
+  .billing-detail-grid {
+    grid-template-columns: 1fr;
+  }
+  .billing-payment-list li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .billing-payment-list form {
+    grid-column: 1 / -1;
+  }
 }
 
 /* Public customer page */

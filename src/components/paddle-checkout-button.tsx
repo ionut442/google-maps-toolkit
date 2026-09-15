@@ -31,6 +31,7 @@ export function PaddleCheckoutButton({
   const [activating, setActivating] = useState(activationPending);
   const [checkoutSubmitted, setCheckoutSubmitted] = useState(activationPending);
   const [message, setMessage] = useState<string | null>(null);
+  const [billingName, setBillingName] = useState("");
 
   useEffect(() => {
     if (!activating) return;
@@ -49,6 +50,11 @@ export function PaddleCheckoutButton({
   }, [activating, router]);
 
   async function openCheckout() {
+    const name = billingName.trim();
+    if (!name) {
+      setMessage("Add the name of the person buying the subscription.");
+      return;
+    }
     setOpening(true);
     setMessage(null);
     try {
@@ -68,7 +74,7 @@ export function PaddleCheckoutButton({
       paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
         customer: { email },
-        customData: { businessId, checkoutSignature },
+        customData: { businessId, checkoutSignature, billingName: name },
         settings: {
           displayMode: "overlay",
           theme: "light",
@@ -90,10 +96,19 @@ export function PaddleCheckoutButton({
   return (
     <div className="paddle-checkout-action" aria-live="polite">
       {!activating && !checkoutSubmitted && (
-        <p className="billing-inline-summary">
-          <strong>1 month free · €0 today</strong>
-          <span>Then €9.99/month + tax · Cancel anytime</span>
-        </p>
+        <label className="checkout-billing-name">
+          Billing name
+          <input
+            autoComplete="name"
+            maxLength={1024}
+            placeholder="Full name"
+            value={billingName}
+            onChange={(event) => setBillingName(event.currentTarget.value)}
+          />
+          <small>
+            Company and VAT details can be added securely in checkout.
+          </small>
+        </label>
       )}
       {activating ? (
         <div className="billing-activating" role="status">

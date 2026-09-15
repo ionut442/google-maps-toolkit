@@ -71,6 +71,7 @@ model BusinessBilling {
   paddleCustomerId            String
   paddleSubscriptionId        String   @unique
   paddlePriceId               String?
+  billingName                 String?
   status                      String
   trialEndsAt                 DateTime?
   nextBilledAt                DateTime?
