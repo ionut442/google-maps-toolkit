@@ -158,115 +158,120 @@ export async function applyPaddleSubscriptionEvent(
   const nextBilledAt = optionalDate(input.nextBilledAt);
   const currentPeriodEndsAt = optionalDate(input.currentPeriodEndsAt);
 
-  return client.$transaction(async (tx) => {
-    // Serialize updates for one business so concurrent out-of-order deliveries
-    // cannot overwrite a newer occurred_at snapshot after both read old state.
-    await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${input.businessId} FOR UPDATE`;
-    const duplicate = await tx.businessBilling.findUnique({
-      where: { lastPaddleEventId: input.eventId },
-      select: { businessId: true },
-    });
-    if (duplicate) return { outcome: "duplicate" as const, published: false };
-
-    const business = await tx.business.findUnique({
-      where: { id: input.businessId },
-      include: { billing: true, modules: true },
-    });
-    if (!business)
-      throw new PaddleWebhookError(
-        "Paddle event references no LocalAction business",
-      );
-
-    const assignedSubscription = await tx.businessBilling.findUnique({
-      where: { paddleSubscriptionId: input.paddleSubscriptionId },
-      select: { businessId: true },
-    });
-    if (
-      assignedSubscription &&
-      assignedSubscription.businessId !== business.id
-    ) {
-      throw new PaddleWebhookError(
-        "Paddle subscription is already assigned to another business",
-        409,
-      );
-    }
-
-    if (
-      business.billing &&
-      business.billing.lastPaddleEventOccurredAt >= occurredAt
-    ) {
-      return { outcome: "stale" as const, published: false };
-    }
-
-    if (
-      business.billing &&
-      business.billing.paddleSubscriptionId !== input.paddleSubscriptionId &&
-      !(
-        input.eventType === "subscription.created" &&
-        input.status === "trialing" &&
-        !hasBillingAccess(business.billing.status)
-      )
-    ) {
-      throw new PaddleWebhookError(
-        "Business already has a different current Paddle subscription",
-        409,
-      );
-    }
-
-    await tx.businessBilling.upsert({
-      where: { businessId: business.id },
-      create: {
-        businessId: business.id,
-        paddleCustomerId: input.paddleCustomerId,
-        paddleSubscriptionId: input.paddleSubscriptionId,
-        paddlePriceId: input.paddlePriceId,
-        billingName: input.billingName ?? null,
-        status: input.status,
-        trialEndsAt,
-        nextBilledAt,
-        currentPeriodEndsAt,
-        lastPaddleEventId: input.eventId,
-        lastPaddleEventOccurredAt: occurredAt,
-      },
-      update: {
-        paddleCustomerId: input.paddleCustomerId,
-        paddleSubscriptionId: input.paddleSubscriptionId,
-        paddlePriceId: input.paddlePriceId,
-        ...(input.billingName !== undefined
-          ? { billingName: input.billingName }
-          : {}),
-        status: input.status,
-        trialEndsAt,
-        nextBilledAt,
-        currentPeriodEndsAt,
-        lastPaddleEventId: input.eventId,
-        lastPaddleEventOccurredAt: occurredAt,
-      },
-    });
-
-    const entitled = hasBillingAccess(input.status);
-    const ready = canPublishWithBilling(
-      input.status,
-      business,
-      business.modules,
-    );
-    const shouldAutoPublish =
-      entitled && ready && !business.published && business.onboardingStep < 7;
-    const shouldUnpublish = !entitled && business.published;
-
-    if (shouldAutoPublish || shouldUnpublish) {
-      await tx.business.update({
-        where: { id: business.id },
-        data: shouldAutoPublish
-          ? { published: true, onboardingStep: 7 }
-          : { published: false },
+  return client.$transaction(
+    async (tx) => {
+      // Serialize updates for one business so concurrent out-of-order deliveries
+      // cannot overwrite a newer occurred_at snapshot after both read old state.
+      await tx.$queryRaw`SELECT "id" FROM "Business" WHERE "id" = ${input.businessId} FOR UPDATE`;
+      const duplicate = await tx.businessBilling.findUnique({
+        where: { lastPaddleEventId: input.eventId },
+        select: { businessId: true },
       });
-    }
+      if (duplicate) return { outcome: "duplicate" as const, published: false };
 
-    return {
-      outcome: "applied" as const,
-      published: shouldAutoPublish,
-      unpublished: shouldUnpublish,
-    };
-  });
+      const business = await tx.business.findUnique({
+        where: { id: input.businessId },
+        include: { billing: true, modules: true },
+      });
+      if (!business)
+        throw new PaddleWebhookError(
+          "Paddle event references no LocalAction business",
+        );
+
+      const assignedSubscription = await tx.businessBilling.findUnique({
+        where: { paddleSubscriptionId: input.paddleSubscriptionId },
+        select: { businessId: true },
+      });
+      if (
+        assignedSubscription &&
+        assignedSubscription.businessId !== business.id
+      ) {
+        throw new PaddleWebhookError(
+          "Paddle subscription is already assigned to another business",
+          409,
+        );
+      }
+
+      if (
+        business.billing &&
+        business.billing.lastPaddleEventOccurredAt >= occurredAt
+      ) {
+        return { outcome: "stale" as const, published: false };
+      }
+
+      if (
+        business.billing &&
+        business.billing.paddleSubscriptionId !== input.paddleSubscriptionId &&
+        !(
+          input.eventType === "subscription.created" &&
+          input.status === "trialing" &&
+          !hasBillingAccess(business.billing.status)
+        )
+      ) {
+        throw new PaddleWebhookError(
+          "Business already has a different current Paddle subscription",
+          409,
+        );
+      }
+
+      await tx.businessBilling.upsert({
+        where: { businessId: business.id },
+        create: {
+          businessId: business.id,
+          paddleCustomerId: input.paddleCustomerId,
+          paddleSubscriptionId: input.paddleSubscriptionId,
+          paddlePriceId: input.paddlePriceId,
+          billingName: input.billingName ?? null,
+          status: input.status,
+          trialEndsAt,
+          nextBilledAt,
+          currentPeriodEndsAt,
+          lastPaddleEventId: input.eventId,
+          lastPaddleEventOccurredAt: occurredAt,
+        },
+        update: {
+          paddleCustomerId: input.paddleCustomerId,
+          paddleSubscriptionId: input.paddleSubscriptionId,
+          paddlePriceId: input.paddlePriceId,
+          ...(input.billingName !== undefined
+            ? { billingName: input.billingName }
+            : {}),
+          status: input.status,
+          trialEndsAt,
+          nextBilledAt,
+          currentPeriodEndsAt,
+          lastPaddleEventId: input.eventId,
+          lastPaddleEventOccurredAt: occurredAt,
+        },
+      });
+
+      const entitled = hasBillingAccess(input.status);
+      const ready = canPublishWithBilling(
+        input.status,
+        business,
+        business.modules,
+      );
+      const shouldAutoPublish =
+        entitled && ready && !business.published && business.onboardingStep < 7;
+      const shouldUnpublish = !entitled && business.published;
+
+      if (shouldAutoPublish || shouldUnpublish) {
+        await tx.business.update({
+          where: { id: business.id },
+          data: shouldAutoPublish
+            ? { published: true, onboardingStep: 7 }
+            : { published: false },
+        });
+      }
+
+      return {
+        outcome: "applied" as const,
+        published: shouldAutoPublish,
+        unpublished: shouldUnpublish,
+      };
+    },
+    // Concurrent Paddle deliveries may briefly wait for both a pooled
+    // connection and the per-business row lock above.
+    { maxWait: 10_000, timeout: 30_000 },
+  );
 }
