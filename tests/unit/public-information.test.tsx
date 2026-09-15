@@ -26,13 +26,35 @@ describe("public Legal, Help, and Contact pages", () => {
     expect(html).toContain('href="/cookies"');
   });
 
-  it("keeps the approved homepage source intact apart from discoverability links", () => {
+  it("keeps the homepage product claims and sample content explicit", () => {
     const homepage = readFileSync("src/app/homepage.html", "utf8");
     expect(homepage).toContain("Calls, quotes,");
     expect(homepage).toContain("WhatsApp");
     expect(homepage).toContain("reviews");
     expect(homepage).toContain('<li><a href="/help">Help</a></li>');
     expect(homepage).toContain('<li><a href="/cookies">Cookies</a></li>');
+    expect(homepage).toContain(
+      "Most businesses can get their LocalAction page",
+    );
+    expect(homepage).toContain("Placeholder — not a customer endorsement");
+    expect(homepage.match(/class="testimonial-type"/g)).toHaveLength(3);
+    expect(homepage).toContain('data-count="128"');
+    expect(homepage).toContain('data-count="6"');
+    expect(homepage).toContain('data-count="14"');
+    expect(homepage).toContain('data-count="9"');
+    expect(homepage).toContain("We’ll email you when a customer submits");
+    expect(homepage).toContain("Then <strong>€9.99 / month</strong>");
+    expect(homepage).not.toContain("+ applicable taxes");
+    expect(homepage).not.toContain("Merchant of Record");
+  });
+
+  it("describes cancellation and retained settings in the Terms", () => {
+    const html = renderToStaticMarkup(<TermsPage />);
+    expect(html).toContain("Cancellation stops the next renewal");
+    expect(html).toContain("does not end access");
+    expect(html).toContain("becomes unpublished");
+    expect(html).toContain("saved business and page configuration remains");
+    expect(html).toContain("publish the page again");
   });
 
   it("provides stable Help anchors for current tools", () => {

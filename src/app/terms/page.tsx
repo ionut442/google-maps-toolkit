@@ -122,8 +122,29 @@ const sections: LegalSection[] = [
     ),
   },
   {
+    id: "subscriptions",
+    title: "7. Subscriptions and cancellation",
+    content: (
+      <>
+        <p>
+          LocalAction subscriptions renew on the applicable monthly billing
+          cycle unless you cancel. You can request cancellation at any time.
+          Cancellation stops the next renewal; it does not end access that is
+          already covered by your current paid or trial entitlement period.
+        </p>
+        <p>
+          When that entitlement period expires, your customer-facing LocalAction
+          page becomes unpublished and is no longer publicly available. Your
+          saved business and page configuration remains in your account in line
+          with our normal account and data-retention practices. If you later
+          start an eligible subscription again, you can publish the page again.
+        </p>
+      </>
+    ),
+  },
+  {
     id: "offers",
-    title: "7. Promotions and special offers",
+    title: "8. Promotions and special offers",
     content: (
       <p>
         Businesses are responsible for an offer&apos;s accuracy, eligibility
@@ -136,7 +157,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "credentials",
-    title: "8. Credentials and evidence",
+    title: "9. Credentials and evidence",
     content: (
       <p>
         Credentials, descriptions, reference numbers, expiry dates, images, and
@@ -150,7 +171,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "google",
-    title: "9. Google features",
+    title: "10. Google features",
     content: (
       <>
         <p>
@@ -171,7 +192,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "review-kit",
-    title: "10. Review Kit",
+    title: "11. Review Kit",
     content: (
       <p>
         Review Kit assets are generated from the business name, saved brand
@@ -184,7 +205,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "content",
-    title: "11. Your content and the licence you give us",
+    title: "12. Your content and the licence you give us",
     content: (
       <>
         <p>
@@ -204,7 +225,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "acceptable-use",
-    title: "12. Acceptable use",
+    title: "13. Acceptable use",
     content: (
       <>
         <p>You must not use LocalAction to:</p>
@@ -232,7 +253,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "third-parties",
-    title: "13. Third-party services",
+    title: "14. Third-party services",
     content: (
       <p>
         LocalAction relies on service providers for hosting, databases, file
@@ -247,7 +268,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "availability",
-    title: "14. Availability and changes",
+    title: "15. Availability and changes",
     content: (
       <p>
         We work to keep LocalAction useful and available, but do not promise
@@ -260,7 +281,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "suspension",
-    title: "15. Suspension, termination, and deletion",
+    title: "16. Suspension, termination, and deletion",
     content: (
       <>
         <p>
@@ -282,7 +303,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "disclaimers",
-    title: "16. Disclaimers",
+    title: "17. Disclaimers",
     content: (
       <p>
         LocalAction is provided on an “as available” basis. We do not guarantee
@@ -296,7 +317,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "liability",
-    title: "17. Liability",
+    title: "18. Liability",
     content: (
       <>
         <p>
@@ -315,7 +336,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "changes",
-    title: "18. Changes to these terms",
+    title: "19. Changes to these terms",
     content: (
       <p>
         We may update these terms when the service, our practices, or legal
@@ -328,7 +349,7 @@ const sections: LegalSection[] = [
   },
   {
     id: "contact",
-    title: "19. Contact",
+    title: "20. Contact",
     content: (
       <p>
         Questions about these terms can be sent to{" "}

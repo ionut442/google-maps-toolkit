@@ -1953,6 +1953,57 @@
         font-size: 0.95rem;
         max-width: 26em;
       }
+
+      /* ============ SAMPLE TESTIMONIALS ============ */
+      .testimonials {
+        padding: 100px 0 110px;
+        background: var(--paper);
+      }
+      .testimonial-head {
+        max-width: 780px;
+      }
+      .testimonial-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.4rem;
+        margin-top: 2.8rem;
+      }
+      .testimonial-card {
+        display: flex;
+        flex-direction: column;
+        min-height: 280px;
+        border: 2.5px solid var(--ink);
+        border-radius: 16px;
+        background: var(--card);
+        box-shadow: 7px 7px 0 var(--ink);
+        padding: 1.6rem;
+      }
+      .testimonial-card:nth-child(2) {
+        background: var(--paper2);
+      }
+      .testimonial-card:nth-child(3) {
+        background: var(--amber2);
+      }
+      .testimonial-type {
+        font: 700 0.72rem/1.35 var(--mono);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--pine);
+      }
+      .testimonial-card blockquote {
+        margin: 1.35rem 0 1.6rem;
+        font: 700 clamp(1.05rem, 1.7vw, 1.3rem) / 1.45 var(--body);
+        color: var(--ink);
+      }
+      .testimonial-card footer {
+        margin-top: auto;
+        padding: 0;
+        background: none;
+        color: var(--ink2);
+        font: 600 0.7rem/1.4 var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
       .collage {
         position: relative;
         height: 560px;
@@ -2428,8 +2479,12 @@
         .pos-top,
         .act-grid,
         .rk-grid,
-        .faq-grid {
+        .faq-grid,
+        .testimonial-grid {
           grid-template-columns: 1fr;
+        }
+        .testimonial-card {
+          min-height: 0;
         }
         .hero {
           padding-top: 44px;
@@ -2496,6 +2551,28 @@
       @media (max-width: 620px) {
         body {
           font-size: 16px;
+        }
+        .nav {
+          gap: 0.55rem;
+        }
+        .brand {
+          gap: 0.4rem;
+          font-size: 1.12rem;
+        }
+        .brand .mark {
+          width: 26px;
+          height: 26px;
+        }
+        .nav-cta {
+          gap: 0.5rem;
+        }
+        .nav-cta .btn-sm {
+          padding: 0.65rem 0.8rem;
+          font-size: 0.8rem;
+        }
+        .burger {
+          width: 40px;
+          height: 40px;
         }
         .device {
           width: 290px;
@@ -3013,7 +3090,7 @@
                 <p>
                   Collect the details you actually need before calling back.
                   Customers can answer your questions and send useful job
-                  information.
+                  information, and we email the request to your business.
                 </p>
                 <div class="fsample">
                   <span class="plabel">Sample form</span>
@@ -3449,7 +3526,8 @@
             </h2>
             <p class="lead" style="margin-top: 1.2rem" data-reveal>
               No blank canvas and no website-building project. Start with the
-              useful stuff and get your page ready.
+              useful stuff. Most businesses can get their LocalAction page ready
+              in under 10 minutes.
             </p>
           </div>
 
@@ -3809,19 +3887,19 @@
             </div>
             <div class="metrics">
               <div class="metric">
-                <div class="mv" data-count="238">0</div>
+                <div class="mv" data-count="128">0</div>
                 <div class="ml">Page views</div>
               </div>
               <div class="metric">
-                <div class="mv amber" data-count="21">0</div>
+                <div class="mv amber" data-count="6">0</div>
                 <div class="ml">Quote requests</div>
               </div>
               <div class="metric">
-                <div class="mv" data-count="34">0</div>
+                <div class="mv" data-count="14">0</div>
                 <div class="ml">Calls</div>
               </div>
               <div class="metric">
-                <div class="mv" data-count="12">0</div>
+                <div class="mv" data-count="9">0</div>
                 <div class="ml">Review clicks</div>
               </div>
             </div>
@@ -3974,6 +4052,72 @@
         </div>
       </section>
 
+      <!-- ================= SAMPLE TESTIMONIALS ================= -->
+      <!-- TODO: Replace sample testimonials with approved real customer testimonials before public market launch. -->
+      <section
+        class="testimonials"
+        id="testimonials"
+        aria-labelledby="testimonials-title"
+      >
+        <div class="wrap">
+          <div class="testimonial-head">
+            <span class="eyebrow" data-reveal data-scramble
+              >In their words</span
+            >
+            <h2
+              class="h-lg"
+              id="testimonials-title"
+              style="margin-top: 1.3rem"
+              data-reveal
+            >
+              <span class="ln"><span>A simpler next step for</span></span>
+              <span class="ln"
+                ><span style="--ld: 0.12s"
+                  >local <span class="amb">customers.</span></span
+                ></span
+              >
+            </h2>
+            <p class="lead" style="margin-top: 1.2rem" data-reveal>
+              Sample feedback showing how LocalAction can fit different local
+              service businesses.
+            </p>
+          </div>
+          <div class="testimonial-grid">
+            <article class="testimonial-card" data-reveal>
+              <span class="testimonial-type">Plumber · sample testimonial</span>
+              <blockquote>
+                “Customers used to call just to ask whether we covered their
+                area or what a job might cost. Now I can send one link with the
+                useful details in one place.”
+              </blockquote>
+              <footer>Placeholder — not a customer endorsement</footer>
+            </article>
+            <article class="testimonial-card" data-reveal style="--d: 0.1s">
+              <span class="testimonial-type"
+                >Electrician · sample testimonial</span
+              >
+              <blockquote>
+                “It gives people a quicker way to go from finding the business
+                to getting in touch. They do not have to dig through different
+                pages first.”
+              </blockquote>
+              <footer>Placeholder — not a customer endorsement</footer>
+            </article>
+            <article class="testimonial-card" data-reveal style="--d: 0.2s">
+              <span class="testimonial-type"
+                >Cleaning business · sample testimonial</span
+              >
+              <blockquote>
+                “The quote request helps customers tell us what they need from
+                the start, so there is less back and forth before we can follow
+                up.”
+              </blockquote>
+              <footer>Placeholder — not a customer endorsement</footer>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <!-- ================= REASSURANCE ================= -->
       <section class="strip" aria-label="Reassurance points">
         <div class="wrap strip-grid">
@@ -4026,29 +4170,28 @@
               >
             </h2>
             <p data-reveal>
-              Paddle is our Merchant of Record and handles secure payment,
-              applicable taxes, invoices, and cancellation.
+              For around the price of a couple of coffees a month, LocalAction
+              gives your customers one simple place to call, request a quote,
+              check prices, see where you work and leave a review.
             </p>
           </div>
           <article class="price-card" data-reveal aria-labelledby="price-title">
-            <span class="price-badge">One month free</span>
+            <span class="price-badge">Start for free</span>
             <h3 class="price-today" id="price-title">€0 today</h3>
-            <p class="price-after">
-              Then <strong>€9.99 / month</strong> + applicable taxes
-            </p>
+            <p class="price-after">Then <strong>€9.99 / month</strong></p>
             <ul class="price-list">
-              <li>First month free</li>
+              <li>Start for free</li>
               <li>Cancel anytime</li>
               <li>One subscription per business</li>
               <li>No annual commitment</li>
             </ul>
             <a class="btn" href="/signup">
-              Start your free month
+              Start for free
               <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
             </a>
             <p class="price-note">
-              Payment details are required when your free trial starts. Cancel
-              before the free month ends and you won’t be charged.
+              Payment details are required to get started. You won’t be charged
+              today, and you can cancel before your first payment.
             </p>
           </article>
         </div>
@@ -4077,14 +4220,17 @@
           <div>
             <div class="qa open" data-reveal>
               <button class="qa-q" aria-expanded="true">
-                Do I need a website?<span class="pm">+</span>
+                Do I still need a website?<span class="pm">+</span>
               </button>
               <div class="qa-a">
                 <div>
                   <p>
-                    No. Your LocalAction page can work on its own. If you
-                    already have a website, you can use LocalAction alongside
-                    it.
+                    Yes. LocalAction is not designed to replace your website.
+                    Your website can tell the full story of your business;
+                    LocalAction is the fast, focused page for customers who are
+                    ready to act. It puts calling, messaging, quote requests,
+                    pricing, service areas, trust information and reviews in one
+                    place, making the next step obvious, quick and easy.
                   </p>
                 </div>
               </div>
@@ -4132,6 +4278,22 @@
             </div>
             <div class="qa" data-reveal style="--d: 0.2s">
               <button class="qa-q" aria-expanded="false">
+                How do I know when someone requests a quote?<span class="pm"
+                  >+</span
+                >
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    We’ll email you when a customer submits a quote request,
+                    including the details they provided, so you can follow up
+                    directly. The request is also saved in your dashboard.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.2s">
+              <button class="qa-q" aria-expanded="false">
                 Does LocalAction replace my Google Business Profile?<span
                   class="pm"
                   >+</span
@@ -4172,6 +4334,27 @@
                     You connect the review destination you want customers to
                     use. LocalAction can then use it for your review action and
                     generated QR materials.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="qa" data-reveal style="--d: 0.4s">
+              <button class="qa-q" aria-expanded="false">
+                What happens after I start for free or if I cancel?<span
+                  class="pm"
+                  >+</span
+                >
+              </button>
+              <div class="qa-a">
+                <div>
+                  <p>
+                    You won’t be charged when you start. After the free period,
+                    your subscription continues at €9.99/month unless you cancel
+                    before your first payment. You can cancel at any time; your
+                    subscription and live page keep working until the current
+                    paid or trial period ends. After that, the page is
+                    unpublished, but your saved settings stay in your account so
+                    you can renew and publish again.
                   </p>
                 </div>
               </div>

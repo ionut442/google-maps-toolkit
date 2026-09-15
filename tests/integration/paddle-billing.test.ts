@@ -198,6 +198,32 @@ describe("Paddle subscription persistence", () => {
     },
   );
 
+  it("keeps a scheduled cancellation published until Paddle ends the entitlement", async () => {
+    const business = await createReadyBusiness({
+      published: true,
+      onboardingStep: 7,
+    });
+    const created = eventFor(business.id, { status: "trialing" });
+    await applyPaddleSubscriptionEvent(created);
+
+    await expect(
+      applyPaddleSubscriptionEvent({
+        ...created,
+        eventId: `evt_${randomUUID()}`,
+        eventType: "subscription.updated",
+        occurredAt: "2026-09-14T14:00:00.000Z",
+        status: "trialing",
+        nextBilledAt: null,
+      }),
+    ).resolves.toMatchObject({
+      outcome: "applied",
+      unpublished: false,
+    });
+    await expect(
+      db.business.findUnique({ where: { id: business.id } }),
+    ).resolves.toMatchObject({ published: true });
+  });
+
   it("does not republish after an owner manually unpublishes", async () => {
     const business = await createReadyBusiness({ onboardingStep: 6 });
     const created = eventFor(business.id, { status: "trialing" });
