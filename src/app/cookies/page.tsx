@@ -9,7 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "Cookie Policy | LocalAction",
   description:
-    "The strictly necessary cookie LocalAction uses for secure business account sessions.",
+    "The strictly necessary cookies used for secure LocalAction business account sessions.",
   alternates: { canonical: "https://local-action.com/cookies" },
 };
 
@@ -51,18 +51,20 @@ const sections: LegalSection[] = [
             <tbody>
               <tr>
                 <td>
-                  <code>gmt_session</code>
+                  <code>__session</code>, <code>__client</code>, and related
+                  Clerk authentication cookies
                 </td>
                 <td>
-                  Keeps a business user signed in and lets LocalAction retrieve
-                  the matching protected account session. The cookie contains a
-                  random session token; the stored server record contains a hash
-                  of that token.
+                  Clerk uses these cookies to authenticate business users,
+                  refresh short-lived session tokens, protect sign-in state, and
+                  let LocalAction retrieve the matching protected account.
                 </td>
                 <td>Strictly necessary</td>
                 <td>
-                  Until the configured session expiry, 30 days by default, or
-                  earlier if the user logs out or the session is revoked.
+                  Session-token cookies are short-lived and refreshed while the
+                  Clerk session remains valid. Other authentication cookies can
+                  remain until their Clerk or browser expiry, logout,
+                  revocation, or deletion in browser settings.
                 </td>
               </tr>
             </tbody>
@@ -73,14 +75,16 @@ const sections: LegalSection[] = [
   },
   {
     id: "security",
-    title: "3. How the session cookie is protected",
+    title: "3. How authentication cookies are protected",
     content: (
       <p>
-        The session cookie is restricted to LocalAction, is not available to
-        browser JavaScript, uses secure HTTPS delivery in production, and uses a
-        SameSite setting that helps reduce unwanted cross-site requests. It is
-        used across LocalAction so an authenticated business user can move
-        between protected account pages.
+        Clerk signs and rotates authentication tokens, uses short-lived session
+        tokens, and applies cookie controls including secure production delivery
+        and SameSite protection. Clerk&apos;s long-lived production client
+        cookie is HttpOnly on the Clerk authentication domain. Its short-lived
+        session cookie must be available to Clerk&apos;s browser SDK on
+        LocalAction&apos;s domain and is refreshed while the session remains
+        valid.
       </p>
     ),
   },
@@ -104,10 +108,10 @@ const sections: LegalSection[] = [
       <>
         <p>
           You can delete or block cookies using your browser settings. Because
-          <code>gmt_session</code> is required to recognise a signed-in account,
-          blocking or deleting it will prevent protected business pages from
-          working or will sign you out. Public marketing and Action Pages remain
-          available without this login cookie.
+          Clerk authentication cookies are required to recognise a signed-in
+          account. Blocking or deleting them will prevent protected business
+          pages from working or will sign you out. Public marketing and Action
+          Pages remain available without these login cookies.
         </p>
         <p>
           There is no optional LocalAction cookie category to accept or reject,
@@ -122,13 +126,14 @@ const sections: LegalSection[] = [
     title: "6. Third-party destinations",
     content: (
       <p>
-        LocalAction pages can contain links to Google, WhatsApp, a
-        business&apos;s website, email software, or telephone services. If you
-        follow one of those links, the third party may use cookies or similar
-        technologies under its own policy. LocalAction does not control cookies
-        set after you leave our service. The marketing homepage also requests
-        font files from Google&apos;s font service; LocalAction does not use
-        that request to set its own cookie.
+        Clerk provides LocalAction&apos;s authentication and sets the strictly
+        necessary cookies described above. LocalAction pages can also contain
+        links to Google, WhatsApp, a business&apos;s website, email software, or
+        telephone services. If you follow one of those links, the third party
+        may use cookies or similar technologies under its own policy.
+        LocalAction does not control cookies set after you leave our service.
+        The marketing homepage also requests font files from Google&apos;s font
+        service; LocalAction does not use that request to set its own cookie.
       </p>
     ),
   },
@@ -163,7 +168,7 @@ export default function CookiePolicyPage() {
     <LegalDocument
       eyebrow="Legal"
       title="Cookie Policy"
-      intro="A clear account of the one strictly necessary cookie LocalAction currently uses."
+      intro="A clear account of the strictly necessary authentication cookies LocalAction currently uses."
       sections={sections}
     />
   );

@@ -49,7 +49,10 @@ Migration `20260827090000_goal_5_analytics` adds `AnalyticsEvent` and indexed bu
 - `DATABASE_URL`: pooled Neon PostgreSQL URL used by the application.
 - `DATABASE_URL_UNPOOLED`: direct Neon PostgreSQL URL used for migrations.
 - `APP_URL`: origin-only application URL for public links, metadata, email links, and QR destinations. Production requires a public HTTPS origin; development defaults to `http://localhost:3000`.
-- `SESSION_TTL_DAYS`: opaque login-session lifetime; defaults to 30.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: public Clerk instance key used by the browser SDK.
+- `CLERK_SECRET_KEY`: server-only Clerk key used for session verification and first-time local-user linking.
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login` and `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup`: LocalAction auth routes.
+- `NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL=/auth/continue` and `NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL=/auth/continue`: shared post-auth routing bridge.
 - `PRIVATE_STORAGE_PROVIDER`: `local` for development or `neon` for production.
 - `PRIVATE_STORAGE_DIR`: private local development object root. It must not be web-served or placed under `public/`.
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION`: Neon Object Storage S3-compatible credentials and endpoint. Production uses the private `uploads` bucket.

@@ -28,14 +28,8 @@ const optionalGoogleMapsUrl = z
 const optionalDirectReviewUrl = z
   .union([z.literal(""), directGoogleReviewUrlSchema])
   .transform((value) => value || null);
-export const signupSchema = z.object({
-  email: z.string().trim().toLowerCase().pipe(z.email()),
-  password: z.string().min(10, "Use at least 10 characters").max(128),
+export const businessNameSchema = z.object({
   businessName: z.string().trim().min(2).max(100),
-});
-export const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().pipe(z.email()),
-  password: z.string().min(1).max(128),
 });
 export const industrySchema = z
   .object({

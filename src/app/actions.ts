@@ -4,8 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { canPublishWithBilling } from "@/lib/publication-entitlement";
-import { createSession, destroySession, requireUser } from "@/lib/auth";
-import { hashPassword, verifyPassword } from "@/lib/password";
+import { requireUser } from "@/lib/auth";
 import {
   addFaqItem,
   deleteFaqItem,
@@ -16,17 +15,17 @@ import {
 import {
   applyTemplate,
   createBusinessForUser,
+  findOwnedBusiness,
   requireOwnedBusiness,
   requireOwnedBusinessId,
   requireOwnedBusinessRecord,
 } from "@/lib/business";
 import {
+  businessNameSchema,
   industrySchema,
-  loginSchema,
   normalizePhone,
   primaryActionSchema,
   profileSchema,
-  signupSchema,
 } from "@/lib/validation";
 import {
   moduleSwapIndex,
@@ -108,74 +107,20 @@ const invalid = (error: {
   fields: error.flatten().fieldErrors,
 });
 
-export async function signupAction(
+export async function createBusinessAction(
   _: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const parsed = signupSchema.safeParse(values(formData));
+  const user = await requireUser();
+  const parsed = businessNameSchema.safeParse(values(formData));
   if (!parsed.success) return invalid(parsed.error);
-  const existing = await db.user.findUnique({
-    where: { email: parsed.data.email },
-    select: { id: true },
-  });
-  if (existing)
-    return { error: "An account could not be created with these details." };
-  const user = await db.$transaction(async (tx) => {
-    const created = await tx.user.create({
-      data: {
-        email: parsed.data.email,
-        passwordHash: await hashPassword(parsed.data.password),
-      },
-    });
-    await createBusinessForUser(
-      created.id,
-      parsed.data.businessName,
-      parsed.data.email,
-      tx,
+  const existing = await findOwnedBusiness(user.id);
+  if (!existing) {
+    await db.$transaction((tx) =>
+      createBusinessForUser(user.id, parsed.data.businessName, user.email, tx),
     );
-    return created;
-  });
-  await createSession(user.id);
+  }
   redirect("/onboarding/industry");
-}
-
-export async function loginAction(
-  _: FormState,
-  formData: FormData,
-): Promise<FormState> {
-  const parsed = loginSchema.safeParse(values(formData));
-  if (!parsed.success) return invalid(parsed.error);
-  const user = await db.user.findUnique({
-    where: { email: parsed.data.email },
-  });
-  if (!user || !(await verifyPassword(parsed.data.password, user.passwordHash)))
-    return { error: "Email or password is incorrect." };
-  await createSession(user.id);
-  const business = await requireOwnedBusinessRecord(user.id);
-  redirect(
-    business.onboardingStep < 7
-      ? stepPath(business.onboardingStep)
-      : "/dashboard",
-  );
-}
-
-export async function logoutAction() {
-  await destroySession();
-  redirect("/login");
-}
-
-function stepPath(step: number) {
-  return (
-    (
-      {
-        2: "/onboarding/industry",
-        3: "/onboarding/details",
-        4: "/onboarding/tools",
-        5: "/onboarding/publish",
-        6: "/onboarding/publish",
-      } as Record<number, string>
-    )[step] ?? "/dashboard"
-  );
 }
 
 export async function selectIndustryAction(formData: FormData) {

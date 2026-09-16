@@ -3,7 +3,6 @@ import {
   applicationBaseUrl,
   clientNetworkIdentifier,
   productionEnvironmentIssues,
-  sessionTtlDays,
 } from "@/lib/environment";
 
 describe("Goal 6 production environment", () => {
@@ -20,12 +19,6 @@ describe("Goal 6 production environment", () => {
     expect(() =>
       applicationBaseUrl({ APP_URL: "https://toolkit.example/path" }),
     ).toThrow("only an HTTP(S) origin");
-  });
-
-  it("bounds session lifetime", () => {
-    expect(sessionTtlDays({ SESSION_TTL_DAYS: "30" })).toBe(30);
-    expect(() => sessionTtlDays({ SESSION_TTL_DAYS: "0" })).toThrow();
-    expect(() => sessionTtlDays({ SESSION_TTL_DAYS: "forever" })).toThrow();
   });
 
   it("accepts client addresses only from explicitly trusted ingress", () => {
@@ -55,7 +48,6 @@ describe("Goal 6 production environment", () => {
   it("reports complete production prerequisites without exposing values", () => {
     const issues = productionEnvironmentIssues({
       APP_URL: "http://localhost:3000",
-      SESSION_TTL_DAYS: "900",
       PRIVATE_STORAGE_PROVIDER: "local",
       QUOTE_RATE_LIMIT_SALT: "replace-me",
       EMAIL_TRANSPORT: "development",
@@ -63,7 +55,8 @@ describe("Goal 6 production environment", () => {
     expect(issues).toEqual(
       expect.arrayContaining([
         expect.stringContaining("APP_URL"),
-        expect.stringContaining("SESSION_TTL_DAYS"),
+        expect.stringContaining("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY"),
+        expect.stringContaining("CLERK_SECRET_KEY"),
         expect.stringContaining("DATABASE_URL"),
         expect.stringContaining("DATABASE_URL_UNPOOLED"),
         expect.stringContaining("PRIVATE_STORAGE_PROVIDER"),
@@ -88,7 +81,8 @@ describe("Goal 6 production environment", () => {
     expect(
       productionEnvironmentIssues({
         APP_URL: "https://toolkit.example",
-        SESSION_TTL_DAYS: "30",
+        NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_live_test-only",
+        CLERK_SECRET_KEY: "sk_live_test-only",
         DATABASE_URL: "postgresql://runtime.example/toolkit",
         DATABASE_URL_UNPOOLED: "postgresql://migrations.example/toolkit",
         PRIVATE_STORAGE_PROVIDER: "neon",

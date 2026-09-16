@@ -134,11 +134,27 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 }
 
 .auth-form,
+.clerk-auth-frame,
 .legal-page > section {
   border: 1.5px solid var(--glm-ink);
   border-radius: var(--glm-card-radius);
   background: var(--glm-canvas);
   box-shadow: 6px 6px 0 var(--glm-ink);
+}
+
+.clerk-auth-frame {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+.mobile-account-control {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-weight: 750;
 }
 
 /* Mobile-first onboarding */

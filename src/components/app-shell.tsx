@@ -1,5 +1,6 @@
 "use client";
 
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -9,7 +10,6 @@ import {
   FileText,
   House,
   LifeBuoy,
-  LogOut,
   Menu,
   PanelTop,
   Star,
@@ -17,7 +17,6 @@ import {
   Wrench,
   X,
 } from "lucide-react";
-import { logoutAction } from "@/app/actions";
 
 const navigation = [
   { href: "/dashboard", label: "Home", icon: House, exact: true },
@@ -95,15 +94,7 @@ export function AppShell({
             <strong>{businessName}</strong>
             <small>{email}</small>
           </span>
-          <form action={logoutAction}>
-            <button
-              className="icon-button"
-              aria-label="Log out"
-              title="Log out"
-            >
-              <LogOut size={18} aria-hidden="true" />
-            </button>
-          </form>
+          <UserButton />
         </div>
       </aside>
 
@@ -127,11 +118,10 @@ export function AppShell({
               <LifeBuoy aria-hidden="true" size={18} /> Help
               <ChevronRight aria-hidden="true" size={18} />
             </Link>
-            <form action={logoutAction}>
-              <button className="secondary mobile-logout" aria-label="Log out">
-                <LogOut size={18} aria-hidden="true" /> Log out
-              </button>
-            </form>
+            <div className="mobile-account-control">
+              <span>Account and sign out</span>
+              <UserButton />
+            </div>
           </div>
         </details>
       </header>

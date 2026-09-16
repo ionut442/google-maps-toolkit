@@ -27,6 +27,10 @@ import {
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({ get: () => undefined })),
 }));
+vi.mock("@clerk/nextjs/server", () => ({
+  auth: vi.fn(async () => ({ userId: null })),
+  clerkClient: vi.fn(),
+}));
 import {
   saveOwnedModuleConfig,
   saveOwnedTrustConfig,

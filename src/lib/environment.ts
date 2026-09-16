@@ -40,13 +40,6 @@ export function applicationBaseUrl(env: Environment = process.env) {
   return url.origin;
 }
 
-export function sessionTtlDays(env: Environment = process.env) {
-  const value = Number(env.SESSION_TTL_DAYS ?? 30);
-  if (!Number.isInteger(value) || value < 1 || value > 365)
-    throw new Error("SESSION_TTL_DAYS must be an integer from 1 to 365");
-  return value;
-}
-
 function trustedIpHeader(env: Environment): TrustedIpHeader {
   const value = (
     env.TRUSTED_CLIENT_IP_HEADER ?? "x-forwarded-for"
@@ -84,13 +77,10 @@ export function productionEnvironmentIssues(env: Environment = process.env) {
   } catch (error) {
     issues.push(error instanceof Error ? error.message : "APP_URL is invalid");
   }
-  try {
-    sessionTtlDays(env);
-  } catch (error) {
-    issues.push(
-      error instanceof Error ? error.message : "SESSION_TTL_DAYS is invalid",
-    );
-  }
+  if (!env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY?.trim())
+    issues.push("NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY is required");
+  if (!env.CLERK_SECRET_KEY?.trim())
+    issues.push("CLERK_SECRET_KEY is required");
   const databaseUrl = env.DATABASE_URL?.trim();
   if (!databaseUrl) issues.push("DATABASE_URL is required");
   else if (!/^postgres(?:ql)?:\/\//i.test(databaseUrl))

@@ -1,5 +1,5 @@
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { logoutAction } from "@/app/actions";
 
 export function AppHeader({ email }: { email: string }) {
   return (
@@ -8,9 +8,7 @@ export function AppHeader({ email }: { email: string }) {
         LocalAction
       </Link>
       <span>{email}</span>
-      <form action={logoutAction}>
-        <button className="secondary">Log out</button>
-      </form>
+      <UserButton />
     </div>
   );
 }

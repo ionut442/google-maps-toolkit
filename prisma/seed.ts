@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { hashPassword } from "../src/lib/password";
 import { getTemplate } from "../src/lib/templates";
 
 const db = new PrismaClient();
@@ -54,13 +53,12 @@ const examples = [
 ] as const;
 
 async function main() {
-  const passwordHash = await hashPassword("LocalDevOnly!123");
   const users = new Map<string, string>();
   for (const email of ["owner@example.test", "other-owner@example.test"]) {
     const user = await db.user.upsert({
       where: { email },
       update: {},
-      create: { email, passwordHash },
+      create: { email },
     });
     users.set(email, user.id);
   }

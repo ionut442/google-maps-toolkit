@@ -20,7 +20,9 @@ Run `npm run ops -- health` after migration and start. Seed is development-only;
 - `DATABASE_URL`: pooled Neon PostgreSQL connection for application runtime.
 - `DATABASE_URL_UNPOOLED`: direct Neon PostgreSQL connection for Prisma migrations.
 - `APP_URL`: exact public HTTPS origin, with no path, query, or fragment. It controls canonical metadata, email links, and QR destinations.
-- `SESSION_TTL_DAYS`: integer 1–365; default 30.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`: production Clerk publishable key; required during the Next.js build.
+- `CLERK_SECRET_KEY`: production Clerk secret key; server-only and never a public build argument.
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL=/login`, `NEXT_PUBLIC_CLERK_SIGN_UP_URL=/signup`, and both Clerk force-redirect values set to `/auth/continue`.
 - `PRIVATE_STORAGE_PROVIDER=neon`.
 - `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, and `AWS_REGION=us-east-2`: credentials and endpoint for the private Neon Object Storage `uploads` bucket.
 - `QUOTE_RATE_LIMIT_SALT`: random secret of at least 32 characters.

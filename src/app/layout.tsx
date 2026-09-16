@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Anton, IBM_Plex_Mono, Public_Sans } from "next/font/google";
@@ -35,12 +36,14 @@ export default function RootLayout({
       className={`${anton.variable} ${publicSans.variable} ${plexMono.variable}`}
     >
       <body>
-        <header className="site-header">
-          <Link href="/" className="brand">
-            LocalAction
-          </Link>
-        </header>
-        {children}
+        <ClerkProvider>
+          <header className="site-header">
+            <Link href="/" className="brand">
+              LocalAction
+            </Link>
+          </header>
+          {children}
+        </ClerkProvider>
       </body>
     </html>
   );
