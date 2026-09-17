@@ -44,7 +44,7 @@ export default async function ToolPage({
   const evidence =
     type === "TRUST" ? await listOwnedTrustEvidence(user.id, business.id) : [];
   const complex = !["REVIEW", "SAVE_CONTACT"].includes(type);
-  const ownsPreview = [
+  const editorOwnsPreview = [
     "CALL_WHATSAPP",
     "QUOTE_REQUEST",
     "PRICING",
@@ -52,15 +52,13 @@ export default async function ToolPage({
     "TRUST",
     "FAQ",
     "SERVICES",
-    "WORK_HOURS",
-    "PROMOTIONS",
   ].includes(type);
   return (
     <ToolEditorShell
       type={type}
       title={toolEditorTitles[type]}
       intro={toolDescriptions[type]}
-      fullWidth={ownsPreview}
+      fullWidth={editorOwnsPreview}
       backHref={returnTo === "publish" ? "/onboarding/publish" : undefined}
       backLabel={returnTo === "publish" ? "Final check" : undefined}
       statusControl={
@@ -72,7 +70,7 @@ export default async function ToolPage({
         />
       }
       aside={
-        complex && !ownsPreview ? (
+        complex && !editorOwnsPreview ? (
           <CustomerPreview business={business} />
         ) : undefined
       }

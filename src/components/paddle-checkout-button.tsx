@@ -14,6 +14,9 @@ type Props = {
   priceId: string;
   disabled?: boolean;
   activationPending?: boolean;
+  successPath?: string;
+  completionPath?: string;
+  buttonLabel?: string;
 };
 
 export function PaddleCheckoutButton({
@@ -25,13 +28,15 @@ export function PaddleCheckoutButton({
   priceId,
   disabled = false,
   activationPending = false,
+  successPath = "/onboarding/publish?checkout=success",
+  completionPath,
+  buttonLabel = "Start free trial & publish",
 }: Props) {
   const router = useRouter();
   const [opening, setOpening] = useState(false);
   const [activating, setActivating] = useState(activationPending);
   const [checkoutSubmitted, setCheckoutSubmitted] = useState(activationPending);
   const [message, setMessage] = useState<string | null>(null);
-  const [billingName, setBillingName] = useState("");
 
   useEffect(() => {
     if (!activating) return;
@@ -50,11 +55,6 @@ export function PaddleCheckoutButton({
   }, [activating, router]);
 
   async function openCheckout() {
-    const name = billingName.trim();
-    if (!name) {
-      setMessage("Add the name of the person buying the subscription.");
-      return;
-    }
     setOpening(true);
     setMessage(null);
     try {
@@ -66,7 +66,11 @@ export function PaddleCheckoutButton({
             setOpening(false);
             setCheckoutSubmitted(true);
             setActivating(true);
-            router.refresh();
+            if (completionPath) {
+              router.push(completionPath);
+            } else {
+              router.refresh();
+            }
           }
         },
       });
@@ -74,12 +78,12 @@ export function PaddleCheckoutButton({
       paddle.Checkout.open({
         items: [{ priceId, quantity: 1 }],
         customer: { email },
-        customData: { businessId, checkoutSignature, billingName: name },
+        customData: { businessId, checkoutSignature },
         settings: {
           displayMode: "overlay",
           theme: "light",
           showAddTaxId: true,
-          successUrl: `${window.location.origin}/onboarding/publish?checkout=success`,
+          successUrl: `${window.location.origin}${successPath}`,
         },
       });
       setOpening(false);
@@ -95,27 +99,16 @@ export function PaddleCheckoutButton({
 
   return (
     <div className="paddle-checkout-action" aria-live="polite">
-      {!activating && !checkoutSubmitted && (
-        <label className="checkout-billing-name">
-          Billing name
-          <input
-            autoComplete="name"
-            maxLength={1024}
-            placeholder="Full name"
-            value={billingName}
-            onChange={(event) => setBillingName(event.currentTarget.value)}
-          />
-          <small>
-            Company and VAT details can be added securely in checkout.
-          </small>
-        </label>
-      )}
       {activating ? (
         <div className="billing-activating" role="status">
           <span className="billing-spinner" aria-hidden="true" />
           <span>
             <strong>Activating your subscription…</strong>
-            <small>We’ll publish as soon as Paddle confirms the trial.</small>
+            <small>
+              {completionPath
+                ? "We’ll return you to My Page as soon as Paddle confirms the trial."
+                : "We’ll make publishing available as soon as Paddle confirms the trial."}
+            </small>
           </span>
         </div>
       ) : checkoutSubmitted ? (
@@ -136,7 +129,7 @@ export function PaddleCheckoutButton({
           disabled={disabled || opening}
           onClick={openCheckout}
         >
-          {opening ? "Opening secure checkout…" : "Start free trial & publish"}
+          {opening ? "Opening secure checkout…" : buttonLabel}
         </button>
       )}
       {message && <p className="billing-checkout-message">{message}</p>}

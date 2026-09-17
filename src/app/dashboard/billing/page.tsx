@@ -1,4 +1,3 @@
-import Link from "next/link";
 import {
   cancelSubscriptionAction,
   downloadInvoiceAction,
@@ -6,6 +5,7 @@ import {
   updatePaymentMethodAction,
 } from "@/app/billing-actions";
 import { PageHeader, SectionCard } from "@/components/dashboard-ui";
+import { PaddleCheckoutButton } from "@/components/paddle-checkout-button";
 import { SubmitButton } from "@/components/submit-button";
 import { requireUser } from "@/lib/auth";
 import {
@@ -14,6 +14,10 @@ import {
 } from "@/lib/billing-entitlement";
 import { requireOwnedBusiness } from "@/lib/business";
 import { db } from "@/lib/db";
+import {
+  createCheckoutSignature,
+  paddlePublicConfig,
+} from "@/lib/paddle-config";
 import {
   formatPaddleMoney,
   formatTaxRate,
@@ -45,6 +49,10 @@ export default async function BillingPage({
   const billing = await db.businessBilling.findUnique({
     where: { businessId: business.id },
   });
+  const checkoutConfig = paddlePublicConfig();
+  const checkoutSignature = checkoutConfig
+    ? createCheckoutSignature(business.id)
+    : null;
   const overview = billing ? await loadPaddleBillingOverview(billing) : null;
   const cancellationScheduled =
     (await searchParams).cancellation === "scheduled" ||
@@ -68,9 +76,23 @@ export default async function BillingPage({
           <span className="section-kicker">LocalAction monthly</span>
           <h2>No subscription yet</h2>
           <p>Start your free trial when you are ready to publish.</p>
-          <Link className="button" href="/onboarding/publish">
-            Go to publish
-          </Link>
+          {checkoutConfig && checkoutSignature ? (
+            <PaddleCheckoutButton
+              businessId={business.id}
+              checkoutSignature={checkoutSignature}
+              clientToken={checkoutConfig.clientToken}
+              email={user.email}
+              environment={checkoutConfig.environment}
+              priceId={checkoutConfig.priceId}
+              successPath="/dashboard/page?checkout=success"
+              completionPath="/dashboard/page?checkout=success"
+              buttonLabel="Start free trial"
+            />
+          ) : (
+            <button className="button" type="button" disabled>
+              Billing setup unavailable
+            </button>
+          )}
         </SectionCard>
       ) : (
         <>

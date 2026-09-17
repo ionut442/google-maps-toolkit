@@ -1,6 +1,5 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,10 +12,10 @@ import {
   Menu,
   PanelTop,
   Star,
-  UserRound,
   Wrench,
   X,
 } from "lucide-react";
+import { AccountProfileControl } from "@/components/account-profile-control";
 
 const navigation = [
   { href: "/dashboard", label: "Home", icon: House, exact: true },
@@ -84,17 +83,15 @@ export function AppShell({
         </Link>
         <NavigationLinks />
         <div className="sidebar-account">
-          <Link href="/help" className="sidebar-help">
+          <Link
+            href="/help"
+            className="sidebar-help"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
             <LifeBuoy aria-hidden="true" size={18} /> Help
           </Link>
-          <span className="account-avatar" aria-hidden="true">
-            <UserRound size={18} />
-          </span>
-          <span className="sidebar-account-identity">
-            <strong>{businessName}</strong>
-            <small>{email}</small>
-          </span>
-          <UserButton />
+          <AccountProfileControl email={email} businessName={businessName} />
         </div>
       </aside>
 
@@ -109,19 +106,21 @@ export function AppShell({
             <X className="menu-close-icon" aria-hidden="true" />
           </summary>
           <div className="mobile-menu-sheet">
-            <div>
-              <strong>{businessName}</strong>
-              <small>{email}</small>
-            </div>
+            <AccountProfileControl
+              email={email}
+              businessName={businessName}
+              compact
+            />
             <NavigationLinks mobile />
-            <Link href="/help" className="mobile-help-link">
+            <Link
+              href="/help"
+              className="mobile-help-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <LifeBuoy aria-hidden="true" size={18} /> Help
               <ChevronRight aria-hidden="true" size={18} />
             </Link>
-            <div className="mobile-account-control">
-              <span>Account and sign out</span>
-              <UserButton />
-            </div>
           </div>
         </details>
       </header>

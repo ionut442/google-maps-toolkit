@@ -195,5 +195,9 @@ describe("public tool cards", () => {
       'href="mailto:offers@example.test?subject=Offer%20enquiry%3A%20Email%20offer',
     );
     expect(html.match(/Request this offer/g)).toHaveLength(3);
+    expect(html).toContain('class="sr-only" id="promotions-heading"');
+    expect(html).toContain('class="sr-only" id="faq-heading"');
+    expect(html).not.toContain('<h2 id="promotions-heading"');
+    expect(html).not.toContain('<h2 id="faq-heading"');
   });
 });

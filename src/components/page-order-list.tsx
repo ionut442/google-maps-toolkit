@@ -41,24 +41,34 @@ export function PageOrderList({
         const ready = onboardingToolReady(tool, business);
         return (
           <div className="page-order-row" key={tool.id}>
-            <GripVertical className="drag-hint" size={18} aria-hidden="true" />
-            <ToolIcon type={type} />
-            <strong>{labels[type]}</strong>
-            <span
-              className={
-                ready ? "tool-readiness is-ready" : "tool-readiness is-pending"
-              }
-            >
-              {ready ? "Configured" : "Needs setup"}
-            </span>
-            {!ready && (
-              <Link
-                className="finish-tool-setup"
-                href={toolEditorHref(tool.id)}
-              >
-                Finish setup
-              </Link>
-            )}
+            <div className="page-order-main">
+              <GripVertical
+                className="drag-hint"
+                size={18}
+                aria-hidden="true"
+              />
+              <ToolIcon type={type} />
+              <span className="page-order-details">
+                <strong>{labels[type]}</strong>
+                <span
+                  className={
+                    ready
+                      ? "tool-readiness is-ready"
+                      : "tool-readiness is-pending"
+                  }
+                >
+                  {ready ? "Configured" : "Needs setup"}
+                </span>
+                {!ready && (
+                  <Link
+                    className="finish-tool-setup"
+                    href={toolEditorHref(tool.id)}
+                  >
+                    Finish setup
+                  </Link>
+                )}
+              </span>
+            </div>
             <form
               action={setModuleOpenByDefaultAction}
               className="open-by-default-form"
@@ -81,7 +91,7 @@ export function PageOrderList({
                 Save
               </SubmitButton>
             </form>
-            <form action={moveModuleAction}>
+            <form action={moveModuleAction} className="page-order-actions">
               <input type="hidden" name="businessId" value={businessId} />
               <input type="hidden" name="moduleId" value={tool.id} />
               <SubmitButton

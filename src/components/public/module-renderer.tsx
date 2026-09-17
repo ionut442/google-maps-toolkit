@@ -264,7 +264,9 @@ function PricingPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="pricing-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="pricing-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       {module.config.mode === "HOURLY" ? (
@@ -347,7 +349,9 @@ function ServicesPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="services-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="services-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       <div className="public-service-categories">
@@ -381,7 +385,9 @@ function WorkHoursPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="hours-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="hours-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       <dl>
@@ -420,7 +426,9 @@ function PromotionsPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="promotions-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="promotions-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       <div className="public-promotion-list">
@@ -480,7 +488,9 @@ function ServiceAreaPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="area-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="area-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       {points.length > 0 && (
@@ -529,7 +539,9 @@ function TrustPresentation({
     >
       <div className="public-module-heading">
         <div>
-          <h2 id="trust-heading">{module.config.label}</h2>
+          <h2 className="sr-only" id="trust-heading">
+            {module.config.label}
+          </h2>
         </div>
       </div>
       <ul className="trust-list">
@@ -612,7 +624,9 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           id="quote"
           aria-labelledby="quote-heading"
         >
-          <h2 id="quote-heading">Tell us what you need</h2>
+          <h2 className="sr-only" id="quote-heading">
+            Tell us what you need
+          </h2>
           <p>
             {module.config.intro ||
               "Share a few details and we’ll get back to you."}
@@ -655,7 +669,9 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           className="action-module public-faq-module"
           aria-labelledby="faq-heading"
         >
-          <h2 id="faq-heading">Questions customers often ask</h2>
+          <h2 className="sr-only" id="faq-heading">
+            Questions customers often ask
+          </h2>
           <div className="public-faq-list">
             {module.config.suggestedFaqs.map((faq, index) => (
               <details key={index + "-" + faq.question}>
@@ -678,7 +694,9 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           aria-labelledby="review-heading"
         >
           <div>
-            <h2 id="review-heading">Find us on Google</h2>
+            <h2 className="sr-only" id="review-heading">
+              Find us on Google
+            </h2>
             <p>
               Had a good experience? Your review helps other local customers.
             </p>
@@ -708,7 +726,9 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
           aria-labelledby="save-heading"
         >
           <div>
-            <h2 id="save-heading">Save this business</h2>
+            <h2 className="sr-only" id="save-heading">
+              Save this business
+            </h2>
             <p>Add the phone number and email to your contacts.</p>
           </div>
           <a

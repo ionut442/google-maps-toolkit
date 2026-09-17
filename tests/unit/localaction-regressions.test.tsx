@@ -83,6 +83,8 @@ describe("LocalAction real-user regressions", () => {
     expect(html).toContain('name="openByDefault"');
     expect(html).toContain('checked=""');
     expect(html).toContain("Open by default");
+    expect(html).toContain('class="page-order-main"');
+    expect(html).toContain('class="page-order-actions"');
   });
 
   it("uses LocalAction styling and preserves a logo's intrinsic shape", () => {
