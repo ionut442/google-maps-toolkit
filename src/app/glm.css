@@ -1553,7 +1553,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 .tool-switch {
   min-width: 88px;
   min-height: 40px;
-  justify-content: flex-start;
+  justify-content: flex-start !important;
   gap: 0.55rem;
   border: 1.5px solid var(--glm-border);
   border-radius: 999px;
@@ -1812,19 +1812,19 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   color: var(--glm-muted);
   font-size: 0.72rem;
   line-height: 1.35;
-  text-align: left;
+  text-align: left !important;
 }
 
-.search-result,
-.search-result:hover:not(:disabled),
-.search-result:active:not(:disabled) {
+button.search-result,
+button.search-result:hover:not(:disabled),
+button.search-result:active:not(:disabled) {
   justify-content: flex-start;
-  border: 1.5px solid var(--glm-ink);
-  background: var(--glm-white);
-  color: var(--glm-ink);
-  box-shadow: none;
+  border: 1.5px solid var(--glm-ink) !important;
+  background: var(--glm-white) !important;
+  color: var(--glm-ink) !important;
+  box-shadow: none !important;
   text-align: left;
-  transform: none;
+  transform: none !important;
 }
 
 .search-result > span,

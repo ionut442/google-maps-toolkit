@@ -261,6 +261,9 @@ describe("LocalAction real-user regressions", () => {
     expect(css).toMatch(
       /\.google-review-display-options input\[type="checkbox"\]\s*\{[^}]*box-shadow:\s*none/s,
     );
+    expect(css).toMatch(
+      /button\.search-result[\s\S]*?background:\s*var\(--glm-white\)\s*!important/s,
+    );
     expect(shell).toContain('removeAttribute("open")');
     expect(publish).toContain(
       "Finish setting up your enabled tools before publishing.",
