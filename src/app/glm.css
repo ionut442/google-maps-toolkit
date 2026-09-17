@@ -1349,14 +1349,14 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   gap: 0.45rem;
 }
 
-.app-shell .account-profile-trigger,
-.app-shell .account-sign-out {
-  min-height: 0;
-  border: 0;
-  background: transparent;
+.app-shell button.account-profile-trigger,
+.app-shell button.account-sign-out {
+  min-height: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
   color: var(--glm-ink);
-  padding: 0;
-  box-shadow: none;
+  padding: 0 !important;
+  box-shadow: none !important;
 }
 
 .account-profile-trigger {
@@ -1369,14 +1369,14 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   text-align: left;
 }
 
-.app-shell .account-profile-trigger:hover,
-.app-shell .account-profile-trigger:active,
-.app-shell .account-sign-out:hover,
-.app-shell .account-sign-out:active {
-  border: 0;
-  background: transparent;
-  box-shadow: none;
-  transform: none;
+.app-shell button.account-profile-trigger:hover,
+.app-shell button.account-profile-trigger:active,
+.app-shell button.account-sign-out:hover,
+.app-shell button.account-sign-out:active {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 .account-profile-trigger:hover :is(strong, small),
@@ -1446,6 +1446,10 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   width: 100%;
   border-top: 1px solid var(--glm-soft-border);
   padding-top: 10px;
+}
+
+.open-by-default-form .open-by-default-control {
+  display: inline-flex;
 }
 
 .page-order-actions button {
