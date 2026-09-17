@@ -1349,8 +1349,8 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   gap: 0.45rem;
 }
 
-.account-profile-trigger,
-.account-sign-out {
+.app-shell .account-profile-trigger,
+.app-shell .account-sign-out {
   min-height: 0;
   border: 0;
   background: transparent;
@@ -1369,10 +1369,10 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   text-align: left;
 }
 
-.account-profile-trigger:hover,
-.account-profile-trigger:active,
-.account-sign-out:hover,
-.account-sign-out:active {
+.app-shell .account-profile-trigger:hover,
+.app-shell .account-profile-trigger:active,
+.app-shell .account-sign-out:hover,
+.app-shell .account-sign-out:active {
   border: 0;
   background: transparent;
   box-shadow: none;
@@ -1402,8 +1402,9 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 /* Stable Page Order rows across desktop, tablet, and mobile widths. */
 .page-order-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
-  align-items: center;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: start;
   gap: 12px;
   padding: 14px;
 }
@@ -1432,8 +1433,19 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 
 .page-order-actions {
   display: grid !important;
+  grid-column: 2;
+  grid-row: 1;
   grid-template-columns: repeat(2, 42px);
   gap: 7px !important;
+}
+
+.page-order-row > .open-by-default-form {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-content: space-between;
+  width: 100%;
+  border-top: 1px solid var(--glm-soft-border);
+  padding-top: 10px;
 }
 
 .page-order-actions button {
