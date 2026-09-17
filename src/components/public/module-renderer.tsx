@@ -341,7 +341,6 @@ function ServicesPresentation({
   const categories = module.config.categories.filter(
     (category) => category.items.length > 0,
   );
-  if (!categories.length) return null;
   return (
     <section
       className="action-module public-services"
@@ -355,6 +354,11 @@ function ServicesPresentation({
         </div>
       </div>
       <div className="public-service-categories">
+        {!categories.length && (
+          <p className="public-module-empty">
+            Contact us to discuss the service you need.
+          </p>
+        )}
         {categories.map((category) => (
           <section key={category.id}>
             <h3>{category.name}</h3>
@@ -418,7 +422,6 @@ function PromotionsPresentation({
   const offers = module.config.offers.filter(
     (offer) => !promotionIsExpired(offer.validUntil),
   );
-  if (!offers.length) return null;
   return (
     <section
       className="action-module public-promotions"
@@ -432,6 +435,11 @@ function PromotionsPresentation({
         </div>
       </div>
       <div className="public-promotion-list">
+        {!offers.length && (
+          <p className="public-module-empty">
+            Contact us to ask about our latest special offers.
+          </p>
+        )}
         {offers.map((offer) => {
           const action = promotionRequestAction(business, offer);
           return (
@@ -744,8 +752,7 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
   SERVICES: {
     analyticsEvent: "services_viewed",
     render: ({ module }) =>
-      module.type === "SERVICES" &&
-      module.config.categories.some((category) => category.items.length > 0) ? (
+      module.type === "SERVICES" ? (
         <ServicesPresentation module={module} />
       ) : null,
   },
@@ -760,10 +767,7 @@ export const publicModuleRegistry: Record<ModuleType, RegistryEntry> = {
   PROMOTIONS: {
     analyticsEvent: "promotions_viewed",
     render: ({ business, module }) =>
-      module.type === "PROMOTIONS" &&
-      module.config.offers.some(
-        (offer) => !promotionIsExpired(offer.validUntil),
-      ) ? (
+      module.type === "PROMOTIONS" ? (
         <PromotionsPresentation business={business} module={module} />
       ) : null,
   },

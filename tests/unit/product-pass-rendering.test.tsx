@@ -103,7 +103,7 @@ describe("product pass public rendering", () => {
     expect(html).not.toContain("Expired offer");
   });
 
-  it("does not render empty structured tool cards", () => {
+  it("renders useful fallbacks for enabled empty Services and Offers", () => {
     const business: PublicBusiness = {
       ...base,
       modules: [
@@ -122,7 +122,12 @@ describe("product pass public rendering", () => {
     const html = renderToStaticMarkup(
       <PublicModuleRenderer business={business} primary={null} />,
     );
-    expect(html).not.toContain("<details");
+    expect(html).toContain('data-module="services"');
+    expect(html).toContain("Contact us to discuss the service you need.");
+    expect(html).toContain('data-module="promotions"');
+    expect(html).toContain(
+      "Contact us to ask about our latest special offers.",
+    );
   });
 
   it("renders review score and count independently without empty punctuation", () => {

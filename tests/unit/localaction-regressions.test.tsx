@@ -207,4 +207,63 @@ describe("LocalAction real-user regressions", () => {
       "Add this contact method in Business Details before publishing the offer.",
     );
   });
+
+  it("keeps enabled Services and Special Offers visible before items are added", () => {
+    const business: PublicBusiness = {
+      name: "Preview Co",
+      slug: "preview-co",
+      logoUrl: null,
+      description: "A useful business description.",
+      phone: "+40700111222",
+      whatsapp: "+40700111222",
+      email: "owner@example.test",
+      website: null,
+      brandColor: "#13332c",
+      industry: "PLUMBING",
+      customIndustryLabel: null,
+      googleReviewUrl: null,
+      googleReviewScore: null,
+      googleReviewCount: null,
+      displayGoogleReviewScore: false,
+      displayGoogleReviewCount: false,
+      primaryAction: null,
+      modules: [
+        {
+          type: "SERVICES",
+          sortOrder: 0,
+          config: { label: "Services", categories: [] },
+        },
+        {
+          type: "PROMOTIONS",
+          sortOrder: 1,
+          config: { label: "Special Offers", offers: [] },
+        },
+      ],
+    };
+    const html = renderToStaticMarkup(
+      <BusinessPage business={business} preview />,
+    );
+    expect(html).toContain('data-module="services"');
+    expect(html).toContain("Contact us to discuss the service you need.");
+    expect(html).toContain('data-module="promotions"');
+    expect(html).toContain(
+      "Contact us to ask about our latest special offers.",
+    );
+  });
+
+  it("preserves the responsive interaction fixes in shared styles and shells", () => {
+    const css = readFileSync("src/app/glm.css", "utf8");
+    const shell = readFileSync("src/components/app-shell.tsx", "utf8");
+    const publish = readFileSync("src/app/onboarding/publish/page.tsx", "utf8");
+    expect(css).toMatch(/\.action-description\s*\{[^}]*max-width:\s*none/s);
+    expect(css).toMatch(/\.page-order-list\s*\{[^}]*gap:\s*12px/s);
+    expect(css).toMatch(/\.page-order-actions button\s*\{[^}]*width:\s*32px/s);
+    expect(css).toMatch(
+      /\.google-review-display-options input\[type="checkbox"\]\s*\{[^}]*box-shadow:\s*none/s,
+    );
+    expect(shell).toContain('removeAttribute("open")');
+    expect(publish).toContain(
+      "Finish setting up your enabled tools before publishing.",
+    );
+  });
 });

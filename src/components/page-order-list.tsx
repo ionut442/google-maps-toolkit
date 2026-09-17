@@ -102,7 +102,7 @@ export function PageOrderList({
                 aria-label={`Move ${labels[type]} up`}
                 pendingLabel="…"
               >
-                <ChevronUp size={17} />
+                <ChevronUp size={14} />
               </SubmitButton>
               <SubmitButton
                 className="icon secondary"
@@ -112,7 +112,7 @@ export function PageOrderList({
                 aria-label={`Move ${labels[type]} down`}
                 pendingLabel="…"
               >
-                <ChevronDown size={17} />
+                <ChevronDown size={14} />
               </SubmitButton>
             </form>
           </div>

@@ -148,23 +148,23 @@ export function ContactActionEditor({
         <section className="tool-customer-preview">
           <h2>What customers see</h2>
           <p>Two simple ways to get in touch.</p>
-          <div className="contact-preview-actions">
-            <div className="contact-preview-action">
-              <span>
+          <div className="public-quick-actions contact-preview-actions">
+            <div className="public-quick-action-item">
+              <div className="public-quick-action public-quick-action-call">
                 <Phone size={20} aria-hidden="true" />
-                {draft.callLabel}
-              </span>
+                <span>{draft.callLabel}</span>
+              </div>
               {draft.emergencyEnabled && draft.emergencyLabel && (
-                <small className="contact-preview-emergency">
+                <small className="public-quick-action-note">
                   {draft.emergencyLabel}
                 </small>
               )}
             </div>
-            <div className="contact-preview-action">
-              <span>
+            <div className="public-quick-action-item">
+              <div className="public-quick-action public-quick-action-whatsapp">
                 <MessageCircle size={20} aria-hidden="true" />
-                {draft.whatsappLabel}
-              </span>
+                <span>{draft.whatsappLabel}</span>
+              </div>
             </div>
           </div>
           {draft.whatsappMessage && (

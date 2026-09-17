@@ -51,7 +51,6 @@ export default async function ToolPage({
     "SERVICE_AREA",
     "TRUST",
     "FAQ",
-    "SERVICES",
   ].includes(type);
   return (
     <ToolEditorShell

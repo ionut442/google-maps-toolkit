@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
   BriefcaseBusiness,
@@ -35,7 +36,13 @@ const navigation = [
   },
 ];
 
-function NavigationLinks({ mobile = false }: { mobile?: boolean }) {
+function NavigationLinks({
+  mobile = false,
+  onNavigate,
+}: {
+  mobile?: boolean;
+  onNavigate?: () => void;
+}) {
   const pathname = usePathname();
   return (
     <nav
@@ -51,6 +58,7 @@ function NavigationLinks({ mobile = false }: { mobile?: boolean }) {
           <Link
             href={item.href}
             key={item.href}
+            onClick={onNavigate}
             className={active ? "active" : undefined}
             aria-label={item.label}
             aria-current={active ? "page" : undefined}
@@ -74,6 +82,9 @@ export function AppShell({
   businessName: string;
   children: React.ReactNode;
 }) {
+  const mobileMenuRef = useRef<HTMLDetailsElement>(null);
+  const closeMobileMenu = () => mobileMenuRef.current?.removeAttribute("open");
+
   return (
     <div className="app-shell">
       <aside className="app-sidebar">
@@ -100,7 +111,7 @@ export function AppShell({
           <span aria-hidden="true">L</span>
           LocalAction
         </Link>
-        <details className="mobile-menu">
+        <details className="mobile-menu" ref={mobileMenuRef}>
           <summary aria-label="Open navigation">
             <Menu className="menu-open-icon" aria-hidden="true" />
             <X className="menu-close-icon" aria-hidden="true" />
@@ -111,12 +122,13 @@ export function AppShell({
               businessName={businessName}
               compact
             />
-            <NavigationLinks mobile />
+            <NavigationLinks mobile onNavigate={closeMobileMenu} />
             <Link
               href="/help"
               className="mobile-help-link"
               target="_blank"
               rel="noopener noreferrer"
+              onClick={closeMobileMenu}
             >
               <LifeBuoy aria-hidden="true" size={18} /> Help
               <ChevronRight aria-hidden="true" size={18} />

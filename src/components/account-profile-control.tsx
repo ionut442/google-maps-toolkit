@@ -28,9 +28,16 @@ const profileAppearance = {
       borderRadius: "10px",
       backgroundColor: "#fffdf6",
       padding: "16px",
+      marginBottom: "14px",
     },
     profileSectionContent: {
       boxShadow: "none",
+    },
+    profileSection__connectedAccounts: {
+      display: "none",
+    },
+    profileSectionPrimaryButton__emailAddresses: {
+      display: "none",
     },
   },
 };

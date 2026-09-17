@@ -151,29 +151,42 @@ export default async function PublishPage({
         <CustomerPreview
           business={{ ...business, trustEvidence }}
           publishAction={
-            business.published ? undefined : billingEntitled ? (
-              <form action={setPublishedAction}>
-                <input type="hidden" name="businessId" value={business.id} />
-                <input type="hidden" name="published" value="true" />
-                <SubmitButton disabled={!publishable}>
-                  Publish page
-                </SubmitButton>
-              </form>
-            ) : checkoutConfig && checkoutSignature ? (
-              <PaddleCheckoutButton
-                businessId={business.id}
-                checkoutSignature={checkoutSignature}
-                clientToken={checkoutConfig.clientToken}
-                email={user.email}
-                environment={checkoutConfig.environment}
-                priceId={checkoutConfig.priceId}
-                disabled={!publishable}
-                activationPending={checkoutCompleted}
-              />
-            ) : (
-              <button className="button" type="button" disabled>
-                Billing setup unavailable
-              </button>
+            business.published ? undefined : (
+              <div className="publish-preview-action">
+                {billingEntitled ? (
+                  <form action={setPublishedAction}>
+                    <input
+                      type="hidden"
+                      name="businessId"
+                      value={business.id}
+                    />
+                    <input type="hidden" name="published" value="true" />
+                    <SubmitButton disabled={!publishable}>
+                      Publish page
+                    </SubmitButton>
+                  </form>
+                ) : checkoutConfig && checkoutSignature ? (
+                  <PaddleCheckoutButton
+                    businessId={business.id}
+                    checkoutSignature={checkoutSignature}
+                    clientToken={checkoutConfig.clientToken}
+                    email={user.email}
+                    environment={checkoutConfig.environment}
+                    priceId={checkoutConfig.priceId}
+                    disabled={!publishable}
+                    activationPending={checkoutCompleted}
+                  />
+                ) : (
+                  <button className="button" type="button" disabled>
+                    Billing setup unavailable
+                  </button>
+                )}
+                {!publishable && (
+                  <small className="publish-disabled-note">
+                    Finish setting up your enabled tools before publishing.
+                  </small>
+                )}
+              </div>
             )
           }
         />
