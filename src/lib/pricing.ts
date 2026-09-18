@@ -1,6 +1,15 @@
 import { z } from "zod";
 
-export const currencies = ["USD", "EUR", "GBP", "RON"] as const;
+export const currencies = ["USD", "EUR", "GBP", "SGD", "CAD", "AUD"] as const;
+export const currencyLabels: Record<(typeof currencies)[number], string> = {
+  USD: "US dollar",
+  EUR: "Euro",
+  GBP: "British pound",
+  SGD: "Singapore dollar",
+  CAD: "Canadian dollar",
+  AUD: "Australian dollar",
+};
+const acceptedCurrencies = [...currencies, "RON"] as const;
 export const moneyIdSchema = z.string().regex(/^[a-z][a-z0-9_]{1,39}$/);
 const amountSchema = z.number().int().min(0).max(100_000_000);
 const labelSchema = z.string().trim().min(1).max(80);
@@ -48,7 +57,7 @@ const currentPricingSchema = z.discriminatedUnion("mode", [
     .object({
       mode: z.literal("HOURLY"),
       label: z.string().trim().min(1).max(60),
-      currency: z.enum(currencies),
+      currency: z.enum(acceptedCurrencies),
       amountMinor: amountSchema,
       note: z.string().trim().max(160).optional(),
     })
@@ -57,7 +66,7 @@ const currentPricingSchema = z.discriminatedUnion("mode", [
     .object({
       mode: z.literal("PRICE_LIST"),
       label: z.string().trim().min(1).max(60),
-      currency: z.enum(currencies),
+      currency: z.enum(acceptedCurrencies),
       categories: z.array(priceCategorySchema).max(12),
     })
     .strict(),
@@ -65,7 +74,7 @@ const currentPricingSchema = z.discriminatedUnion("mode", [
     .object({
       mode: z.literal("SIMPLE_ESTIMATE"),
       label: z.string().trim().min(1).max(60),
-      currency: z.enum(currencies),
+      currency: z.enum(acceptedCurrencies),
       base: z
         .object({ label: labelSchema, amountMinor: amountSchema })
         .strict(),
@@ -79,7 +88,7 @@ const legacyPriceListSchema = z
   .object({
     mode: z.literal("PRICE_LIST"),
     label: z.string().trim().min(1).max(60),
-    currency: z.enum(currencies),
+    currency: z.enum(acceptedCurrencies),
     items: z.array(priceItemSchema).max(20),
   })
   .strict()
@@ -153,7 +162,7 @@ export function calculateEstimate(
 
 export function formatMoney(
   amountMinor: number,
-  currency: (typeof currencies)[number],
+  currency: (typeof acceptedCurrencies)[number],
 ) {
   return new Intl.NumberFormat(undefined, {
     style: "currency",

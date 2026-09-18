@@ -17,6 +17,7 @@ import { PricingEstimator } from "@/components/public/pricing-estimator";
 import { SubmitButton } from "@/components/submit-button";
 import {
   currencies,
+  currencyLabels,
   formatMoney,
   pricingConfigSchema,
   type PricingConfig,
@@ -160,7 +161,9 @@ export function PricingEditor({
                 }
               >
                 {currencies.map((currency) => (
-                  <option key={currency}>{currency}</option>
+                  <option key={currency} value={currency}>
+                    {currencyLabels[currency]} ({currency})
+                  </option>
                 ))}
               </select>
             </label>

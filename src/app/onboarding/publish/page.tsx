@@ -181,13 +181,15 @@ export default async function PublishPage({
                     Billing setup unavailable
                   </button>
                 )}
-                {!publishable && (
-                  <small className="publish-disabled-note">
-                    Finish setting up your enabled tools before publishing.
-                  </small>
-                )}
               </div>
             )
+          }
+          publishNote={
+            !business.published && !publishable ? (
+              <small className="publish-disabled-note" role="status">
+                Finish setting up your enabled tools before publishing.
+              </small>
+            ) : undefined
           }
         />
       </div>

@@ -42,9 +42,11 @@ type PreviewBusiness = {
 export function CustomerPreview({
   business,
   publishAction,
+  publishNote,
 }: {
   business: PreviewBusiness;
   publishAction?: ReactNode;
+  publishNote?: ReactNode;
 }) {
   const safeBusiness = toPublicBusiness(business);
   const logoUrl = safeHttpUrl(safeBusiness.logoUrl);
@@ -107,6 +109,7 @@ export function CustomerPreview({
           Open draft preview
         </Link>
         {publishAction}
+        {publishNote}
       </div>
     </div>
   );

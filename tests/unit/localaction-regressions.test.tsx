@@ -259,6 +259,9 @@ describe("LocalAction real-user regressions", () => {
     expect(css).toMatch(/\.page-order-list\s*\{[^}]*gap:\s*12px/s);
     expect(css).toMatch(/\.page-order-actions button\s*\{[^}]*width:\s*32px/s);
     expect(css).toMatch(
+      /\.page-order-actions button\s*\{[^}]*min-height:\s*0\s*!important/s,
+    );
+    expect(css).toMatch(
       /\.google-review-display-options input\[type="checkbox"\]\s*\{[^}]*box-shadow:\s*none/s,
     );
     expect(css).toMatch(
@@ -268,5 +271,16 @@ describe("LocalAction real-user regressions", () => {
     expect(publish).toContain(
       "Finish setting up your enabled tools before publishing.",
     );
+    expect(publish).toContain("publishNote=");
+    expect(css).toMatch(
+      /\.publish-disabled-note\s*\{[^}]*grid-column:\s*1\s*\/\s*-1[^}]*background:\s*#fff0ed/s,
+    );
+    expect(css).toMatch(
+      /\.contact-preview-actions > div\s*\{[^}]*grid-template-columns:\s*1fr/s,
+    );
+    expect(css).toMatch(
+      /input\[type="checkbox"\]:is\(:focus, :focus-visible\)\s*\{[^}]*box-shadow:\s*none\s*!important/s,
+    );
+    expect(css).toMatch(/\.action-identity\s*\{[^}]*justify-items:\s*center/s);
   });
 });

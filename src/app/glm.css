@@ -1484,7 +1484,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
   width: 32px;
   min-width: 32px;
   height: 32px;
-  min-height: 32px;
+  min-height: 0 !important;
   padding: 0;
 }
 
@@ -1783,7 +1783,7 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
     width: 32px;
     min-width: 32px;
     height: 32px;
-    min-height: 32px;
+    min-height: 0 !important;
   }
 }
 
@@ -1808,11 +1808,64 @@ body:has(:is(.auth-page, .legal-page, .setup-shell)) > .site-header .brand {
 }
 
 .publish-disabled-note {
-  max-width: 32ch;
-  color: var(--glm-muted);
-  font-size: 0.72rem;
+  grid-column: 1 / -1;
+  width: 100%;
+  max-width: none;
+  border: 1px solid #d7978d;
+  border-radius: 7px;
+  background: #fff0ed;
+  color: #8d2e22;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.76rem;
+  font-weight: 700;
   line-height: 1.35;
-  text-align: left !important;
+  text-align: center !important;
+}
+
+:is(.setup-shell, .app-shell, .public-action-page)
+  input[type="checkbox"]:is(:focus, :focus-visible) {
+  box-shadow: none !important;
+}
+
+.contact-preview-actions > div {
+  grid-template-columns: 1fr;
+}
+
+.contact-preview-actions .public-quick-action-item,
+.contact-preview-actions .public-quick-action {
+  width: 100%;
+}
+
+.not-found-page {
+  display: grid;
+  min-height: calc(100vh - 76px);
+  place-items: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.not-found-page > div {
+  display: grid;
+  justify-items: center;
+  gap: 0.9rem;
+}
+
+.not-found-page :is(h1, p) {
+  margin: 0;
+}
+
+.billing-update-payment {
+  background: var(--glm-amber) !important;
+}
+
+.billing-payment-helper {
+  display: block;
+  margin-top: 0.9rem;
+  line-height: 1.35;
+}
+
+.action-identity {
+  justify-items: center;
 }
 
 button.search-result,

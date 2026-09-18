@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   calculateEstimate,
+  currencies,
+  currencyLabels,
   parseMajorAmount,
   pricingConfigSchema,
 } from "@/lib/pricing";
@@ -13,6 +15,14 @@ import {
 import { trustConfigSchema, trustEntryState } from "@/lib/trust";
 
 describe("Goal 4 strict business tools", () => {
+  it("offers the supported customer-facing currencies", () => {
+    expect(currencies).toEqual(["USD", "EUR", "GBP", "SGD", "CAD", "AUD"]);
+    expect(currencies).not.toContain("RON");
+    expect(currencyLabels.SGD).toBe("Singapore dollar");
+    expect(currencyLabels.CAD).toBe("Canadian dollar");
+    expect(currencyLabels.AUD).toBe("Australian dollar");
+  });
+
   const estimate = pricingConfigSchema.parse({
     mode: "SIMPLE_ESTIMATE",
     label: "Estimate",

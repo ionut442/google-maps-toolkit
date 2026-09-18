@@ -155,12 +155,12 @@ export default async function BillingPage({
               {overview?.updatePaymentMethodAvailable && (
                 <form action={updatePaymentMethodAction}>
                   <input type="hidden" name="businessId" value={business.id} />
-                  <SubmitButton className="secondary">
+                  <SubmitButton className="billing-update-payment">
                     Update payment method
                   </SubmitButton>
                 </form>
               )}
-              <small>
+              <small className="billing-payment-helper">
                 Card details are handled securely by Paddle; only that step
                 opens Paddle&apos;s protected payment screen.
               </small>

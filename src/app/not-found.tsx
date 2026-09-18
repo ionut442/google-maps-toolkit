@@ -1,7 +1,7 @@
 import Link from "next/link";
 export default function NotFound() {
   return (
-    <main className="centered">
+    <main className="not-found-page">
       <div>
         <h1>Page not available</h1>
         <p>This business page does not exist or is not published.</p>

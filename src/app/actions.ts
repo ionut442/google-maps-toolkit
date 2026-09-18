@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { refresh, revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { canPublishWithBilling } from "@/lib/publication-entitlement";
@@ -297,6 +297,7 @@ export async function setModuleOpenByDefaultAction(formData: FormData) {
   revalidatePath("/dashboard/page");
   revalidatePath(`/preview/${business.slug}`);
   revalidatePath(`/${business.slug}`);
+  refresh();
 }
 
 export async function updateModuleLabelAction(formData: FormData) {
